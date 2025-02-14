@@ -7,6 +7,8 @@ const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
 const materiaRoutes = require('./Routes/materia.routes');
 const dictarRoutes = require('./Routes/dictar.route');
+const comentarioRoutes = require('./Routes/comentario.routes');
+
 
 
 //--------------MIDDLEWARE
@@ -27,6 +29,9 @@ app.use('/materias', materiaRoutes);
 
 // Rutas de Dictar
 app.use('/dictar', dictarRoutes);
+
+// Rutas de Dictar
+app.use('/comentarios', comentarioRoutes);
 
 //TEST API
 app.use('/test', testRoute);
