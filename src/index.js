@@ -5,6 +5,8 @@ const pool = require('./db');
 const testRoute = require('./Routes/testRoute');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
+const materiaRoutes = require('./Routes/materia.routes');
+const dictarRoutes = require('./Routes/dictar.route');
 
 
 //--------------MIDDLEWARE
@@ -19,6 +21,12 @@ app.use('/usuario', usuarioRoutes);
 
 //CURSO ROUTES
 app.use('/cursos', cursosRoutes);
+
+// Rutas de Materias
+app.use('/materias', materiaRoutes);
+
+// Rutas de Dictar
+app.use('/dictar', dictarRoutes);
 
 //TEST API
 app.use('/test', testRoute);
