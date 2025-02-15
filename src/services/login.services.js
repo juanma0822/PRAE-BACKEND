@@ -13,10 +13,9 @@ const verifyEmail = async (value) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.email)) {
         throw new Error("Email no es válido");
     }
-    console.log(value.password,232)
-    console.log(typeof(value.password))
-    const user = await ExistingUser(value.email, "hola");
-    console.log(user,343)
+
+    const user = await ExistingUser(value.email,value.password);
+    
     
     if (!user) {
         throw new Error("El email o la contraseña son incorrectos");
