@@ -13,8 +13,8 @@ const createAdmin = async (req, res) => {
 
 const createProfesor = async (req, res) => {
     try {
-        const { documento_identidad, nombre, apellido, correo, contraseña, institucion, area_ensenanza } = req.body;
-        const newProfesor = await usuarioService.addProfesor(documento_identidad, nombre, apellido, correo, contraseña, institucion, area_ensenanza);
+        const { documento_identidad, nombre, apellido, correo, contraseña, institucion, area_ensenanza, id_materia } = req.body;
+        const newProfesor = await usuarioService.addProfesor(documento_identidad, nombre, apellido, correo, contraseña, institucion, area_ensenanza, id_materia);
         res.status(201).json(newProfesor);
     } catch (error) {
         console.error(error);
@@ -103,4 +103,38 @@ const getEstudiantes = async (req, res) => {
     }
 };
 
-module.exports = { createAdmin, createProfesor, createEstudiante, getUsuarios, updateUsuario, deleteUsuario, activarUsuario, getAdmins, getDocentes, getEstudiantes };
+// Actualizar datos de un profesor
+const updateProfesor = async (req, res) => {
+    try {
+        const { documento_identidad } = req.params;
+        const { nombre, apellido, correo, contraseña, institucion, area_ensenanza } = req.body;
+        
+        const usuarioActualizado = await usuarioService.updateProfesor(
+            documento_identidad, nombre, apellido, correo, contraseña, institucion, area_ensenanza
+        );
+
+        res.status(200).json({ message: 'Profesor actualizado con éxito', usuarioActualizado });
+    } catch (error) {
+        console.error('Error al actualizar el profesor:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
+// Actualizar datos de un estudiante
+const updateEstudiante = async (req, res) => {
+    try {
+        const { documento_identidad } = req.params;
+        const { nombre, apellido, correo, contraseña, institucion, id_curso } = req.body;
+
+        const usuarioActualizado = await usuarioService.updateEstudiante(
+            documento_identidad, nombre, apellido, correo, contraseña, institucion, id_curso
+        );
+
+        res.status(200).json({ message: 'Estudiante actualizado con éxito', usuarioActualizado });
+    } catch (error) {
+        console.error('Error al actualizar el estudiante:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+};
+
+module.exports = { createAdmin, createProfesor, createEstudiante, getUsuarios, updateUsuario, deleteUsuario, activarUsuario, getAdmins, getDocentes, getEstudiantes, updateEstudiante, updateProfesor };

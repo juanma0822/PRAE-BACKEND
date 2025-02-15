@@ -54,10 +54,26 @@ const deleteDictar = async (req, res) => {
   }
 };
 
+//Actualizar materia que dicta un profesor
+const updateMateriaProfesor = async (req, res) => {
+  try {
+      const { documento_identidad } = req.params;
+      const { id_materia } = req.body;
+
+      const resultado = await dictarService.updateMateriaProfesor(documento_identidad, id_materia);
+      res.status(200).json({ message: 'Materia actualizada con éxito', resultado });
+  } catch (error) {
+      console.error('Error al actualizar la materia del profesor:', error);
+      res.status(500).json({ error: 'Error interno del servidor' });
+  }
+};
+
+
 module.exports = {
   createDictar,
   getAllDictar,
   getMateriasPorProfesor,
   getProfesoresPorMateria,
   deleteDictar,
+  updateMateriaProfesor
 };

@@ -56,10 +56,25 @@ const deleteDictar = async (id_materiadictada) => {
   return result.rows[0];
 };
 
+//Actualizar materia que da un profesor
+const updateMateriaProfesor = async (documento_identidad, id_materia) => {
+  const query = `
+      UPDATE Dictar 
+      SET id_materia = $1 
+      WHERE documento_profe = $2
+      RETURNING *;
+  `;
+
+  const result = await pool.query(query, [id_materia, documento_identidad]);
+  return result.rows[0];
+};
+
+
 module.exports = {
   insertDictar,
   getAllDictar,
   getMateriasPorProfesor,
   getProfesoresPorMateria,
   deleteDictar,
+  updateMateriaProfesor
 };

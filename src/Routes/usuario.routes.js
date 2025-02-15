@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createAdmin, createProfesor, createEstudiante, getUsuarios, updateUsuario, deleteUsuario, activarUsuario, getAdmins, getDocentes,getEstudiantes } = require('../controllers/usuario.controller');
+const { createAdmin, createProfesor, createEstudiante, getUsuarios, updateUsuario, deleteUsuario, activarUsuario, getAdmins, getDocentes,getEstudiantes, updateEstudiante, updateProfesor } = require('../controllers/usuario.controller');
 
 // Crear usuarios
 router.post('/admin', createAdmin);
@@ -17,5 +17,14 @@ router.put('/activar/:documento_identidad', activarUsuario);
 router.get('/admins', getAdmins);
 router.get('/docentes', getDocentes);
 router.get('/estudiantes', getEstudiantes);
+
+// Ruta para actualizar un profesor
+router.put('/updateProfesor/:documento_identidad', updateProfesor);
+
+// Ruta para actualizar un estudiante
+router.put('/updateEstudiante/:documento_identidad', updateEstudiante);
+
+
+
 
 module.exports = router;
