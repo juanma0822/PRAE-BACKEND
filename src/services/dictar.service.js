@@ -1,4 +1,5 @@
 const dictarModel = require('../models/dictar.model');
+const { updateEstudiante } = require('./usuario.service');
 
 // Crear una relación Dictar (asignar una materia a un profesor)
 const createDictar = async (documento_profe, id_materia) => {
@@ -53,10 +54,16 @@ const deleteDictar = async (id_materiadictada) => {
   }
 };
 
+//Actualizar materia que da un profesor
+const updateMateriaProfesor = async (documento_identidad, id_materia) => {
+  return await dictarModel.updateMateriaProfesor(documento_identidad, id_materia);
+};
+
 module.exports = {
   createDictar,
   getAllDictar,
   getMateriasPorProfesor,
   getProfesoresPorMateria,
   deleteDictar,
+  updateMateriaProfesor
 };

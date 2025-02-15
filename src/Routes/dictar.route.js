@@ -6,6 +6,7 @@ const {
   getMateriasPorProfesor,
   getProfesoresPorMateria,
   deleteDictar,
+  updateMateriaProfesor
 } = require('../controllers/dictar.controller');
 
 // Crear una relación Dictar
@@ -22,5 +23,9 @@ router.get('/materia/:id_materia/profesores', getProfesoresPorMateria);
 
 // Eliminar una relación Dictar
 router.delete('/:id_materiadictada', deleteDictar);
+
+//Ruta para actualizar materia que da un profesor
+router.put('/updateMateriaProfesor/:documento_identidad', updateMateriaProfesor);
+
 
 module.exports = router;
