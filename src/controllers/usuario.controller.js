@@ -25,6 +25,7 @@ const createProfesor = async (req, res) => {
 const createEstudiante = async (req, res) => {
     try {
         const { documento_identidad, nombre, apellido, correo, contraseña, institucion, id_curso } = req.body;
+        console.log(documento_identidad, nombre, apellido, correo, contraseña, institucion, id_curso)
         const newEstudiante = await usuarioService.addEstudiante(documento_identidad, nombre, apellido, correo, contraseña, institucion, id_curso);
         res.status(201).json(newEstudiante);
     } catch (error) {
