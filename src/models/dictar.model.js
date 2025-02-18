@@ -36,10 +36,16 @@ const getAllDictar = async () => {
 // Obtener las materias que dicta un profesor
 const getMateriasPorProfesor = async (documento_profe) => {
   const query = `
-    SELECT m.* 
+    SELECT 
+      m.id_materia,
+      m.nombre AS nombre_materia,
+      c.id_curso,
+      c.nombre AS nombre_curso
     FROM Dictar d
     JOIN Materia m ON d.id_materia = m.id_materia
-    WHERE d.documento_profe = $1 AND m.activo = TRUE;
+    JOIN Asignar a ON m.id_materia = a.id_materia
+    JOIN Curso c ON a.id_curso = c.id_curso
+    WHERE d.documento_profe = $1 AND m.activo = TRUE AND c.activo = TRUE;
   `;
   const result = await pool.query(query, [documento_profe]);
   return result.rows;

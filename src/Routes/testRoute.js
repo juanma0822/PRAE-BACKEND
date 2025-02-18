@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {getUser} = require('../controllers/register.controller');
-const {recoverPassword,validateResetToken,VerifyLogin}=require("./rutascontroller")
+const {recoverPassword,validateResetToken,VerifyLogin}=require("../controllers/rutas.controller")
 router.get('/', (req, res) => {
     res.send('API is working!');
 });
