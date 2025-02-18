@@ -6,6 +6,7 @@ const {
   getAllComentarios,
   getComentariosPorProfesor,
   getComentariosPorEstudiante,
+  getComentariosPorProfesorYEstudiante,
 } = require('../controllers/comentario.controller');
 
 
@@ -23,5 +24,8 @@ router.get('/profesor/:documento_profe', getComentariosPorProfesor);
 
 // Obtener comentarios por estudiante
 router.get('/estudiante/:documento_estudiante', getComentariosPorEstudiante);
+
+// Obtener comentarios por profesor y estudiante
+router.get('/profesor/:documento_profe/estudiante/:documento_estudiante', getComentariosPorProfesorYEstudiante);
 
 module.exports = router;

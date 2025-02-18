@@ -177,6 +177,16 @@ const updateEstudiante = async (
   );
 };
 
+// Servicio para obtener los estudiantes de una institución
+const getEstudiantesPorInstitucion = async (institucion) => {
+  return await usuarioModel.getEstudiantesPorInstitucion(institucion);
+};
+
+// Servicio para obtener los estudiantes que un porfesor les da clase
+const getEstudiantesPorProfesor = async (documento_profe) => {
+  return await usuarioModel.getEstudiantesPorProfesor(documento_profe);
+};
+
 module.exports = {
   addUsuario,
   addProfesor,
@@ -188,4 +198,6 @@ module.exports = {
   getUsuariosByRol,
   updateProfesor,
   updateEstudiante,
+  getEstudiantesPorInstitucion,
+  getEstudiantesPorProfesor,
 };

@@ -72,7 +72,7 @@ const activarUsuario = async (documento_identidad) => {
 };
 
 
-
+//Obtener usuarios por el rol
 const getUsuariosByRol = async (rol) => {
     let query = "";
     
@@ -109,6 +109,33 @@ const getUsuariosByRol = async (rol) => {
     }
 
     const result = await pool.query(query, [rol]);
+    return result.rows;
+};
+
+// Obtener estudiantes por institución
+const getEstudiantesPorInstitucion = async (institucion) => {
+    const query = `
+        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, e.id_curso, c.nombre AS curso
+        FROM Usuario u
+        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+        INNER JOIN Curso c ON e.id_curso = c.id_curso
+        WHERE u.institucion = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+    `;
+    const result = await pool.query(query, [institucion]);
+    return result.rows;
+};
+
+// Obtener estudiantes por profesor
+const getEstudiantesPorProfesor = async (documento_profe) => {
+    const query = `
+        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, e.id_curso, c.nombre AS curso
+        FROM Usuario u
+        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+        INNER JOIN Curso c ON e.id_curso = c.id_curso
+        INNER JOIN Dictar d ON e.id_curso = d.id_curso
+        WHERE d.documento_profe = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+    `;
+    const result = await pool.query(query, [documento_profe]);
     return result.rows;
 };
 
@@ -165,4 +192,4 @@ const updateEstudiante = async (documento_identidad, nombre, apellido, correo, c
 };
 
 
-module.exports = { insertUsuario, insertProfesor, insertEstudiante, getUsuariosActivos, updateUsuario, desactivarUsuario, activarUsuario, getUsuariosByRol, updateEstudiante, updateProfesor  };
+module.exports = { insertUsuario, insertProfesor, insertEstudiante, getUsuariosActivos, updateUsuario, desactivarUsuario, activarUsuario, getUsuariosByRol, updateEstudiante, updateProfesor, getEstudiantesPorInstitucion, getEstudiantesPorProfesor  };
