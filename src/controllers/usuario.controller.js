@@ -56,6 +56,7 @@ const createProfesor = async (req, res) => {
 };
 
 const createEstudiante = async (req, res) => {
+
   try {
     const {
       documento_identidad,
@@ -80,6 +81,7 @@ const createEstudiante = async (req, res) => {
     console.error(error);
     res.status(500).send("Error al crear el estudiante");
   }
+
 };
 
 const getUsuarios = async (req, res) => {

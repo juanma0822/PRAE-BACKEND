@@ -26,7 +26,7 @@ const addUsuario = async (
       rol,
       institucion
     );
-
+ 
     return newUser;
   } catch (error) {
     console.error("Error al registrar usuario: ", error);
