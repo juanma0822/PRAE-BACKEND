@@ -31,14 +31,31 @@ const selectCalificacionesEstudiante = async (id_materia, id_estudiante) => {
 
 const selectCalificacionesCurso = async (id_materia, id_curso) => {
     const query = `
-        SELECT e.documento_identidad, u.nombre, c.nota, a.nombre AS actividad
+        SELECT e.documento_identidad, u.nombre, u.apellido, c.nota, a.nombre AS actividad
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad
         JOIN Estudiante e ON c.id_estudiante = e.documento_identidad
         JOIN Usuario u ON e.documento_identidad = u.documento_identidad
         WHERE a.id_materia = $1 AND e.id_curso = $2`;
     const { rows } = await pool.query(query, [id_materia, id_curso]);
-    return rows;
+
+    // Agrupar las actividades por estudiante
+    const result = rows.reduce((acc, row) => {
+        const { documento_identidad, nombre, apellido, nota, actividad } = row;
+        if (!acc[documento_identidad]) {
+            acc[documento_identidad] = {
+                documento_identidad,
+                nombre,
+                apellido,
+                actividades: []
+            };
+        }
+        acc[documento_identidad].actividades.push({ nota, actividad });
+        return acc;
+    }, {});
+
+    // Convertir el objeto result a un array
+    return Object.values(result);
 };
 
 const selectPromedioEstudiante = async (id_materia, id_estudiante) => {
