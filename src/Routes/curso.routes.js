@@ -15,4 +15,5 @@ router.get('/getId/:nombre', getIdByName);
 // Ruta para obtener estudiantes por id_curso
 router.get('/:id_curso/estudiantes', getEstudiantesPorCurso);
 
+
 module.exports = router;

@@ -40,7 +40,8 @@ CREATE TABLE Comentarios (
 CREATE TABLE Materia (
     id_materia SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    activo BOOLEAN DEFAULT TRUE
+    activo BOOLEAN DEFAULT TRUE,
+    color VARCHAR(20) NOT NULL DEFAULT 'azul'
 );
 
 CREATE TABLE Dictar(
