@@ -12,14 +12,26 @@ const insertDictar = async (documento_profe, id_materia) => {
   return result.rows[0];
 };
 
-// Obtener todas las relaciones Dictar
+// Obtener todas las relaciones Dictar con detalles adicionales
 const getAllDictar = async () => {
   const query = `
-    SELECT * FROM Dictar;
+    SELECT 
+      d.id_materiadictada,
+      u.nombre AS nombre_profesor,
+      u.apellido AS apellido_profesor,
+      m.nombre AS nombre_materia,
+      c.nombre AS nombre_curso
+    FROM Dictar d
+    JOIN Profesor p ON d.documento_profe = p.documento_identidad
+    JOIN Usuario u ON p.documento_identidad = u.documento_identidad
+    JOIN Materia m ON d.id_materia = m.id_materia
+    JOIN Asignar a ON m.id_materia = a.id_materia
+    JOIN Curso c ON a.id_curso = c.id_curso
+    WHERE m.activo = TRUE AND c.activo = TRUE;
   `;
   const result = await pool.query(query);
   return result.rows;
-};
+}
 
 // Obtener las materias que dicta un profesor
 const getMateriasPorProfesor = async (documento_profe) => {

@@ -1,13 +1,13 @@
 const pool = require('../db');
 
 // Insertar una materia
-const insertMateria = async (nombre) => {
+const insertMateria = async (nombre, color) => {
   const query = `
-    INSERT INTO Materia (nombre, activo)
-    VALUES ($1, TRUE)
+    INSERT INTO Materia (nombre, activo, color)
+    VALUES ($1, TRUE, $2)
     RETURNING *;
   `;
-  const values = [nombre];
+  const values = [nombre, color];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
