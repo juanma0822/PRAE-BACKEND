@@ -43,6 +43,17 @@ const getComentariosPorEstudiante = async (req, res) => {
   }
 };
 
+// Obtener comentarios por profesor y estudiante
+const getComentariosPorProfesorYEstudiante = async (req, res) => {
+  try {
+    const { documento_profe, documento_estudiante } = req.params;
+    const comentarios = await comentarioService.getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante);
+    res.status(200).json(comentarios);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Eliminar un comentario
 const deleteComentario = async (req, res) => {
   try {
@@ -60,4 +71,5 @@ module.exports = {
   getComentariosPorProfesor,
   getComentariosPorEstudiante,
   deleteComentario,
+  getComentariosPorProfesorYEstudiante
 };

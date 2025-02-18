@@ -21,7 +21,7 @@ const updateCalificacion = async (id_calificacion, nota) => {
 
 const selectCalificacionesEstudiante = async (id_materia, id_estudiante) => {
     const query = `
-        SELECT c.id_calificacion, c.nota, a.nombre AS actividad
+        SELECT c.id_calificacion, c.nota, a.nombre AS actividad, c.id_actividad
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad
         WHERE a.id_materia = $1 AND c.id_estudiante = $2`;
@@ -31,7 +31,7 @@ const selectCalificacionesEstudiante = async (id_materia, id_estudiante) => {
 
 const selectCalificacionesCurso = async (id_materia, id_curso) => {
     const query = `
-        SELECT e.documento_identidad, u.nombre, u.apellido, c.nota, a.nombre AS actividad
+        SELECT e.documento_identidad, u.nombre, u.apellido, c.nota, a.nombre AS actividad, c.id_actividad
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad
         JOIN Estudiante e ON c.id_estudiante = e.documento_identidad

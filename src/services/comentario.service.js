@@ -33,6 +33,13 @@ async getComentariosPorProfesor(documento_profe) {
     return result.rows;
   },
 
+  // Obtener comentarios por profesor y estudiante
+  async getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante) {
+    const query = 'SELECT * FROM Comentarios WHERE documento_profe = $1 AND documento_estudiante = $2';
+    const result = await pool.query(query, [documento_profe, documento_estudiante]);
+    return result.rows;
+  },
+
   // Eliminar un comentario
   async deleteComentario(id_comentario) {
     const query = 'DELETE FROM Comentarios WHERE id_comentario = $1 RETURNING *';
