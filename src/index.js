@@ -12,20 +12,42 @@ const asignarCursoMateriaRoutes = require('./Routes/asignar.routes');
 const actividadRoutes = require('./Routes/actividad.routes');
 const calificacionRoutes = require('./Routes/calificacion.routes');
 
-// Middleware
+
+//--------------MIDDLEWARE
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+//-------------ROUTES
+
+//USER ROUTES
+
 app.use('/usuario', usuarioRoutes);
+
+//CURSO ROUTES
 app.use('/cursos', cursosRoutes);
+
+// Rutas de Materias
 app.use('/materias', materiaRoutes);
+
+// Rutas de Dictar (Profesor - Materia)
 app.use('/dictar', dictarRoutes);
+
+// Comments Routes
 app.use('/comentarios', comentarioRoutes);
+
+//Asign (Curso - Materia) Route
+
 app.use('/asignar', asignarCursoMateriaRoutes);
+
+// Activity Route
 app.use('/actividad', actividadRoutes);
+
+// Calification Route
 app.use('/calificacion', calificacionRoutes);
+
+//TEST API
 app.use('/test', testRoute);
 
-// En lugar de app.listen()
-module.exports = app;
+app.listen(5000, () => {
+    console.log('Server running on port 5000');
+});
