@@ -14,7 +14,9 @@ const {
   updateEstudiante,
   updateProfesor,
   getEstudiantesPorInstitucion,
-  getEstudiantesPorProfesor
+  getEstudiantesPorProfesor,
+  getProfesorById,
+  getEstudianteById,
 } = require("../controllers/usuario.controller");
 
 // Crear usuarios
@@ -44,5 +46,11 @@ router.get('/institucion/:institucion', getEstudiantesPorInstitucion);
 
 // Ruta para obtener estudiantes por profesor
 router.get('/profesor/:documento_profe/estudiantes', getEstudiantesPorProfesor);
+
+// Ruta para obtener un profesor por su ID
+router.get('/profesor/:id', getProfesorById);
+
+// Ruta para obtener un estudiante por su ID
+router.get('/estudiante/:id', getEstudianteById);
 
 module.exports = router;

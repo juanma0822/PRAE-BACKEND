@@ -72,7 +72,7 @@ const activarUsuario = async (documento_identidad) => {
 };
 
 
-//Obtener usuarios por el rol
+// Obtener usuarios por el rol
 const getUsuariosByRol = async (rol) => {
     let query = "";
     
@@ -87,11 +87,13 @@ const getUsuariosByRol = async (rol) => {
         query = `
             SELECT 
                 u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
-                p.area_ensenanza, d.id_materia, m.nombre AS materia
+                p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
-            INNER JOIN Dictar d ON p.documento_identidad = d.documento_profe
-            INNER JOIN Materia m ON d.id_materia = m.id_materia
+            LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
+            LEFT JOIN Materia m ON d.id_materia = m.id_materia
+            LEFT JOIN Asignar a ON m.id_materia = a.id_materia
+            LEFT JOIN Curso c ON a.id_curso = c.id_curso
             WHERE u.rol = $1 AND u.activo = TRUE;
         `;
     } else if (rol === "estudiante") {
@@ -109,7 +111,65 @@ const getUsuariosByRol = async (rol) => {
     }
 
     const result = await pool.query(query, [rol]);
+
+    if (rol === "docente") {
+        const profesores = {};
+        result.rows.forEach(row => {
+            if (!profesores[row.documento_identidad]) {
+                profesores[row.documento_identidad] = {
+                    documento_identidad: row.documento_identidad,
+                    nombre: row.nombre,
+                    apellido: row.apellido,
+                    correo: row.correo,
+                    rol: row.rol,
+                    institucion: row.institucion,
+                    activo: row.activo,
+                    area_ensenanza: row.area_ensenanza,
+                    materias: []
+                };
+            }
+            if (row.id_materia) {
+                profesores[row.documento_identidad].materias.push({
+                    id_materia: row.id_materia,
+                    nombre_materia: row.materia,
+                    id_curso: row.id_curso,
+                    nombre_curso: row.curso
+                });
+            }
+        });
+        return Object.values(profesores);
+    }
+
     return result.rows;
+};
+
+// Obtener un profesor por su ID
+const getProfesorById = async (documento_identidad) => {
+    const query = `
+        SELECT 
+            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+            p.area_ensenanza
+        FROM Usuario u
+        INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
+        WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+    `;
+    const result = await pool.query(query, [documento_identidad]);
+    return result.rows[0];
+};
+
+// Obtener un estudiante por su ID
+const getEstudianteById = async (documento_identidad) => {
+    const query = `
+        SELECT 
+            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+            e.id_curso, c.nombre AS curso
+        FROM Usuario u
+        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+        INNER JOIN Curso c ON e.id_curso = c.id_curso
+        WHERE u.documento_identidad = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+    `;
+    const result = await pool.query(query, [documento_identidad]);
+    return result.rows[0];
 };
 
 // Obtener estudiantes por institución
@@ -192,4 +252,4 @@ const updateEstudiante = async (documento_identidad, nombre, apellido, correo, c
 };
 
 
-module.exports = { insertUsuario, insertProfesor, insertEstudiante, getUsuariosActivos, updateUsuario, desactivarUsuario, activarUsuario, getUsuariosByRol, updateEstudiante, updateProfesor, getEstudiantesPorInstitucion, getEstudiantesPorProfesor  };
+module.exports = { insertUsuario, insertProfesor, insertEstudiante, getUsuariosActivos, updateUsuario, desactivarUsuario, activarUsuario, getUsuariosByRol, updateEstudiante, updateProfesor, getEstudiantesPorInstitucion, getEstudiantesPorProfesor, getProfesorById, getEstudianteById  };

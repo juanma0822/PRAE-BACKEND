@@ -196,6 +196,30 @@ const getEstudiantesPorProfesor = async (req, res) => {
   }
 };
 
+// Obtener un profesor por su ID
+const getProfesorById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profesor = await usuarioService.getProfesorById(id);
+    res.status(200).json(profesor);
+  } catch (error) {
+    console.error("Error al obtener el profesor:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+// Obtener un estudiante por su ID
+const getEstudianteById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const estudiante = await usuarioService.getEstudianteById(id);
+    res.status(200).json(estudiante);
+  } catch (error) {
+    console.error("Error al obtener el estudiante:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 // Actualizar datos de un profesor
 const updateProfesor = async (req, res) => {
   try {
@@ -272,4 +296,6 @@ module.exports = {
   updateProfesor,
   getEstudiantesPorInstitucion,
   getEstudiantesPorProfesor,
+  getEstudianteById,
+  getProfesorById,
 };
