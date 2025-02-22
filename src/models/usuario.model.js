@@ -112,6 +112,35 @@ const getUsuariosByRol = async (rol) => {
     return result.rows;
 };
 
+// Obtener un profesor por su ID
+const getProfesorById = async (documento_identidad) => {
+    const query = `
+        SELECT 
+            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+            p.area_ensenanza
+        FROM Usuario u
+        INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
+        WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+    `;
+    const result = await pool.query(query, [documento_identidad]);
+    return result.rows[0];
+};
+
+// Obtener un estudiante por su ID
+const getEstudianteById = async (documento_identidad) => {
+    const query = `
+        SELECT 
+            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+            e.id_curso, c.nombre AS curso
+        FROM Usuario u
+        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+        INNER JOIN Curso c ON e.id_curso = c.id_curso
+        WHERE u.documento_identidad = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+    `;
+    const result = await pool.query(query, [documento_identidad]);
+    return result.rows[0];
+};
+
 // Obtener estudiantes por institución
 const getEstudiantesPorInstitucion = async (institucion) => {
     const query = `
@@ -192,4 +221,4 @@ const updateEstudiante = async (documento_identidad, nombre, apellido, correo, c
 };
 
 
-module.exports = { insertUsuario, insertProfesor, insertEstudiante, getUsuariosActivos, updateUsuario, desactivarUsuario, activarUsuario, getUsuariosByRol, updateEstudiante, updateProfesor, getEstudiantesPorInstitucion, getEstudiantesPorProfesor  };
+module.exports = { insertUsuario, insertProfesor, insertEstudiante, getUsuariosActivos, updateUsuario, desactivarUsuario, activarUsuario, getUsuariosByRol, updateEstudiante, updateProfesor, getEstudiantesPorInstitucion, getEstudiantesPorProfesor, getProfesorById, getEstudianteById  };

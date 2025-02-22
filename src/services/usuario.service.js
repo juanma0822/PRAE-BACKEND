@@ -187,6 +187,16 @@ const getEstudiantesPorProfesor = async (documento_profe) => {
   return await usuarioModel.getEstudiantesPorProfesor(documento_profe);
 };
 
+// Servicio para obtener un profesor por su ID
+const getProfesorById = async (documento_identidad) => {
+  return await usuarioModel.getProfesorById(documento_identidad);
+};
+
+// Servicio para obtener un estudiante por su ID
+const getEstudianteById = async (documento_identidad) => {
+  return await usuarioModel.getEstudianteById(documento_identidad);
+};
+
 module.exports = {
   addUsuario,
   addProfesor,
@@ -200,4 +210,6 @@ module.exports = {
   updateEstudiante,
   getEstudiantesPorInstitucion,
   getEstudiantesPorProfesor,
+  getProfesorById,
+  getEstudianteById,
 };
