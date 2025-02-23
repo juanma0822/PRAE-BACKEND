@@ -7,12 +7,17 @@ const testRoute = require('./Routes/testRoute');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
 const { initializeSocket } = require("./sockets/sockets");
-
+const setupSwagger = require("./swagger/swagger");
 //--------------MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+setupSwagger(app);
 const server = http.createServer(app);
 const io = initializeSocket(server);
+
+
+
+
 //-------------ROUTES
 
 //USER ROUTES

@@ -11,10 +11,10 @@ const ExistingUser = async(email,password=null) => {
         throw new Error("El email no está registrado");
     }
  
-/*     const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
         throw new Error("Contraseña incorrecta");
-    } */
+    } 
     
     console.log("Ingreso exitoso");
     return user;
@@ -39,5 +39,40 @@ const getMessages = async (sender_id, receiver_id) => {
     return result.rows; 
   };
 
+  const SearchDataAllStudents = async (id, curse, subject) => {
+    try {
+      
+      let query = `
+        SELECT *
+        FROM estudiante
+        INNER JOIN curso ON estudiante.id_curso = curso.id_curso
+        INNER JOIN asignar ON curso.id_curso = asignar.id_curso
+        INNER JOIN materia ON asignar.id_materia = materia.id_materia
+        INNER JOIN calificacion ON estudiante.documento_identidad = calificacion.id_estudiante
+        WHERE curso.nombre = $1 AND materia.nombre = $2`;
+      
+      let values = [curse, subject];
+  
+      if (id !="all") {
+        query += " AND estudiante.documento_identidad = $3";
+        values.push(id);
+     
+       
+      }
+  
+      const result = await Pool.query(query, values);
+      return result.rows;
+    } catch (e) {
+      return e;
+    }
+  };
+  
+const FindOneStudentModels=async()=>{
+try{
 
-module.exports = {ExistingUser,saveMessage,getMessages}
+}catch(e){
+  return e
+}
+}
+
+module.exports = {ExistingUser,saveMessage,getMessages,SearchDataAllStudents,FindOneStudentModels}
