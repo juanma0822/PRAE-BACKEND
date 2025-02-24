@@ -11,8 +11,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:5000",
-      description: "Servidor de desarrollo",
+      url: "https://prae-backend.vercel.app",
+      description: "Servidor en Vercel",
     },
   ],
 };
