@@ -16,7 +16,7 @@ const swaggerOptions = {
         description: "Servidor en Vercel",
       },
       {
-        url: "http://localhost:3000",
+        url: "http://localhost:5000",
         description: "Servidor local",
       },
     ],
@@ -46,6 +46,8 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 const options = {
   customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "PRAE API Documentation",
+  customfavIcon: "/path/to/favicon.ico",
 };
 
 module.exports = {

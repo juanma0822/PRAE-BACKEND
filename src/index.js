@@ -58,7 +58,7 @@ app.use('/calificacion', calificacionRoutes);
 //TEST API
 app.use('/test', testRoute);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 // Agrega esto antes de iniciar el servidor
 app.get('/', (req, res) => {
