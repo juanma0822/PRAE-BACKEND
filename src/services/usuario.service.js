@@ -1,5 +1,5 @@
 const usuarioModel = require("../models/usuario.model");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const saltRounds = 10;
 
@@ -29,7 +29,8 @@ const addUsuario = async (
  
     return newUser;
   } catch (error) {
-    throw new Error("Error al registrar usuario");
+    console.error("Error al registrar usuario: ", error);
+    throw new Error("Error al registrar usuario: " + error.detail);
   }
 };
 
@@ -40,7 +41,8 @@ const addProfesor = async (
   correo,
   contraseña,
   institucion,
-  area_ensenanza
+  area_ensenanza,
+  id_materia
 ) => {
   const usuario = await addUsuario(
     documento_identidad,
@@ -51,7 +53,11 @@ const addProfesor = async (
     "docente",
     institucion
   );
-  await usuarioModel.insertProfesor(documento_identidad, area_ensenanza);
+  await usuarioModel.insertProfesor(
+    documento_identidad,
+    area_ensenanza,
+    id_materia
+  );
   return usuario;
 };
 
@@ -116,15 +122,79 @@ const activarUsuario = async (documento_identidad) => {
 };
 
 const getUsuariosByRol = async (rol) => {
-    try {
-        const usuarios = await usuarioModel.getUsuariosByRol(rol);
-        if (usuarios.length === 0) {
-            throw new Error(`No se encontraron usuarios con el rol: ${rol}`);
-        }
-        return usuarios;
-    } catch (error) {
-        throw new Error(error.message);
+  try {
+    const usuarios = await usuarioModel.getUsuariosByRol(rol);
+    if (usuarios.length === 0) {
+      throw new Error(`No se encontraron usuarios con el rol: ${rol}`);
     }
+    return usuarios;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+// Servicio para actualizar un profesor
+const updateProfesor = async (
+  documento_identidad,
+  nombre,
+  apellido,
+  correo,
+  contraseña,
+  institucion,
+  area_ensenanza
+) => {
+  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, 10) : null;
+  return await usuarioModel.updateProfesor(
+    documento_identidad,
+    nombre,
+    apellido,
+    correo,
+    hashedPassword,
+    institucion,
+    area_ensenanza
+  );
+};
+
+// Servicio para actualizar un estudiante
+const updateEstudiante = async (
+  documento_identidad,
+  nombre,
+  apellido,
+  correo,
+  contraseña,
+  institucion,
+  id_curso
+) => {
+  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, 10) : null;
+  return await usuarioModel.updateEstudiante(
+    documento_identidad,
+    nombre,
+    apellido,
+    correo,
+    hashedPassword,
+    institucion,
+    id_curso
+  );
+};
+
+// Servicio para obtener los estudiantes de una institución
+const getEstudiantesPorInstitucion = async (institucion) => {
+  return await usuarioModel.getEstudiantesPorInstitucion(institucion);
+};
+
+// Servicio para obtener los estudiantes que un porfesor les da clase
+const getEstudiantesPorProfesor = async (documento_profe) => {
+  return await usuarioModel.getEstudiantesPorProfesor(documento_profe);
+};
+
+// Servicio para obtener un profesor por su ID
+const getProfesorById = async (documento_identidad) => {
+  return await usuarioModel.getProfesorById(documento_identidad);
+};
+
+// Servicio para obtener un estudiante por su ID
+const getEstudianteById = async (documento_identidad) => {
+  return await usuarioModel.getEstudianteById(documento_identidad);
 };
 
 module.exports = {
@@ -136,4 +206,10 @@ module.exports = {
   deleteUsuario,
   activarUsuario,
   getUsuariosByRol,
+  updateProfesor,
+  updateEstudiante,
+  getEstudiantesPorInstitucion,
+  getEstudiantesPorProfesor,
+  getProfesorById,
+  getEstudianteById,
 };

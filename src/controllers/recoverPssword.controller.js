@@ -1,6 +1,5 @@
 const { sendRecoveryEmail, verifyToken } = require('../services/recoverPassword.services');
 
-
 const recoverPassword = async (req, res) => {
     try {
         const { email } = req.body;
@@ -25,6 +24,5 @@ const validateResetToken = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
-
 
 module.exports = { recoverPassword, validateResetToken };

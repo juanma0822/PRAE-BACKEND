@@ -16,7 +16,8 @@ try{
         { expiresIn: "2h" }
     );
     console.log(token)
-    res.status(200).json({ message: "Login exitoso", token });
+    res.status(200).json({ message: "Login exitoso", user });
+
 } catch (e) {
     console.error(e);
     res.status(400).json({ error: e.message || "Error en la autenticación" });

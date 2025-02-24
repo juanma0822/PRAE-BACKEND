@@ -1,5 +1,4 @@
 const express = require('express');
-const pool = require('../db'); 
 const router = express.Router();
 const { getUser } = require('../controllers/register.controller');
 const { recoverPassword, validateResetToken, VerifyLogin, sendMessage, getChatHistory, generatePdf,NotesBySubject } = require("./rutascontroller");
@@ -251,8 +250,7 @@ router.get('/validate/:token', validateResetToken);
  *       500:
  *         description: Error en el servidor.
  */
-
-
 router.get('/materia/:id',NotesBySubject)
+
 
 module.exports = router;
