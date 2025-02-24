@@ -1,10 +1,13 @@
 const express = require('express');
 const app = express();
+const http = require("http");
 const cors = require('cors');
 const pool = require('./db');
 const testRoute = require('./Routes/testRoute');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
+const { initializeSocket } = require("./sockets/sockets");
+const setupSwagger = require("./swagger/swagger");
 const materiaRoutes = require('./Routes/materia.routes');
 const dictarRoutes = require('./Routes/dictar.route');
 const comentarioRoutes = require('./Routes/comentario.routes');
@@ -16,6 +19,12 @@ const calificacionRoutes = require('./Routes/calificacion.routes');
 //--------------MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+setupSwagger(app);
+const server = http.createServer(app);
+const io = initializeSocket(server);
+
+
+
 
 //-------------ROUTES
 

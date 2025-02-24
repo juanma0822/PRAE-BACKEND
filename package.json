@@ -19,6 +19,11 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.10.0",
-    "pg": "^8.13.2"
+    "pdfkit": "^0.16.0",
+    "pg": "^8.13.2",
+    "socket.io": "^4.8.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "twilio": "^5.4.4"
   }
 }
