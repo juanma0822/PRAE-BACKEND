@@ -58,6 +58,12 @@ app.use('/calificacion', calificacionRoutes);
 app.use('/test', testRoute);
 
 const PORT = process.env.PORT;
+
+// Agrega esto antes de iniciar el servidor
+app.get('/', (req, res) => {
+    res.send('<h1>Bienvenido al API REST de PRAE</h1><p>Este es el index</p>');
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT || 'default'}`);
 });
