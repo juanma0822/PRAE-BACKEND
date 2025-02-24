@@ -7,8 +7,7 @@ const testRoute = require('./Routes/testRoute');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
 const { initializeSocket } = require("./sockets/sockets");
-const swaggerUi = require('swagger-ui-express');
-const swagger = require('./swagger/swagger');
+const swaggerSetup = require('./swagger/swagger');
 const materiaRoutes = require('./Routes/materia.routes');
 const dictarRoutes = require('./Routes/dictar.route');
 const comentarioRoutes = require('./Routes/comentario.routes');
@@ -20,7 +19,8 @@ const calificacionRoutes = require('./Routes/calificacion.routes');
 //--------------MIDDLEWARE
 app.use(cors());
 app.use(express.json());
-app.use('/api-docs', swagger.serve, swagger.setup);
+swaggerSetup(app);
+console.log("Swagger UI montado en /api-docs");
 const server = http.createServer(app);
 const io = initializeSocket(server);
 
