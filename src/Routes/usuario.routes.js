@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const verifyToken = require("../middleware/auth.middleware")
 const { 
     createAdmin, 
     createProfesor, 
@@ -61,7 +62,7 @@ router.post('/estudiante', createEstudiante);
  *       200:
  *         description: Lista de usuarios obtenida correctamente
  */
-router.get('/', getUsuarios);
+router.get('/', verifyToken, getUsuarios);
 
 /**
  * @swagger
@@ -79,7 +80,7 @@ router.get('/', getUsuarios);
  *       200:
  *         description: Usuario actualizado correctamente
  */
-router.put('/:id', updateUsuario);
+router.put('/:id', verifyToken, updateUsuario);
 
 /**
  * @swagger
@@ -97,7 +98,7 @@ router.put('/:id', updateUsuario);
  *       200:
  *         description: Usuario eliminado correctamente
  */
-router.delete('/:id', deleteUsuario);
+router.delete('/:id', verifyToken, deleteUsuario);
 
 /**
  * @swagger
@@ -115,7 +116,7 @@ router.delete('/:id', deleteUsuario);
  *       200:
  *         description: Usuario activado correctamente
  */
-router.put('/activar/:documento_identidad', activarUsuario);
+router.put('/activar/:documento_identidad', verifyToken, activarUsuario);
 
 /**
  * @swagger
@@ -126,7 +127,7 @@ router.put('/activar/:documento_identidad', activarUsuario);
  *       200:
  *         description: Lista de administradores obtenida correctamente
  */
-router.get('/admins', getAdmins);
+router.get('/admins', verifyToken, getAdmins);
 
 /**
  * @swagger
@@ -137,7 +138,7 @@ router.get('/admins', getAdmins);
  *       200:
  *         description: Lista de docentes obtenida correctamente
  */
-router.get('/docentes', getDocentes);
+router.get('/docentes', verifyToken, getDocentes);
 
 /**
  * @swagger
@@ -148,7 +149,7 @@ router.get('/docentes', getDocentes);
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
  */
-router.get('/estudiantes', getEstudiantes);
+router.get('/estudiantes', verifyToken, getEstudiantes);
 
 /**
  * @swagger
@@ -166,7 +167,7 @@ router.get('/estudiantes', getEstudiantes);
  *       200:
  *         description: Profesor actualizado correctamente
  */
-router.put("/updateProfesor/:documento_identidad", updateProfesor);
+router.put("/updateProfesor/:documento_identidad", verifyToken, updateProfesor);
 
 /**
  * @swagger
@@ -184,7 +185,7 @@ router.put("/updateProfesor/:documento_identidad", updateProfesor);
  *       200:
  *         description: Estudiante actualizado correctamente
  */
-router.put("/updateEstudiante/:documento_identidad", updateEstudiante);
+router.put("/updateEstudiante/:documento_identidad", verifyToken, updateEstudiante);
 
 /**
  * @swagger
@@ -202,7 +203,7 @@ router.put("/updateEstudiante/:documento_identidad", updateEstudiante);
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
  */
-router.get('/institucion/:institucion', getEstudiantesPorInstitucion);
+router.get('/institucion/:institucion', verifyToken, getEstudiantesPorInstitucion);
 
 /**
  * @swagger
@@ -220,7 +221,7 @@ router.get('/institucion/:institucion', getEstudiantesPorInstitucion);
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
  */
-router.get('/profesor/:documento_profe/estudiantes', getEstudiantesPorProfesor);
+router.get('/profesor/:documento_profe/estudiantes', verifyToken, getEstudiantesPorProfesor);
 
 /**
  * @swagger
@@ -238,7 +239,7 @@ router.get('/profesor/:documento_profe/estudiantes', getEstudiantesPorProfesor);
  *       200:
  *         description: Profesor obtenido correctamente
  */
-router.get('/profesor/:id', getProfesorById);
+router.get('/profesor/:id', verifyToken, getProfesorById);
 
 /**
  * @swagger
@@ -256,6 +257,6 @@ router.get('/profesor/:id', getProfesorById);
  *       200:
  *         description: Estudiante obtenido correctamente
  */
-router.get('/estudiante/:id', getEstudianteById);
+router.get('/estudiante/:id', verifyToken, getEstudianteById);
 
 module.exports = router;

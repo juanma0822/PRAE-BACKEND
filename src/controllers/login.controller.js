@@ -1,3 +1,5 @@
+const { config } = require('dotenv');
+config();
 const {verifyEmail}= require("../services/login.services")
 const jwt = require("jsonwebtoken");
 const VerifyLogin = async(req, res)=>{
@@ -12,8 +14,8 @@ try{
     
     const token = jwt.sign(
         { email: user.correo, id: user.documento_identidad,rol:user.rol }, 
-        "juanmateton", 
-        { expiresIn: "2h" }
+        process.env.JWT_SECRET, 
+        { expiresIn: "1h" }
     );
     console.log(token)
     res.status(200).json({ message: "Login exitoso", token });
