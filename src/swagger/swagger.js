@@ -1,6 +1,7 @@
-const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
+// Configuración de Swagger
 const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
@@ -22,26 +23,33 @@ const swaggerOptions = {
     components: {
       securitySchemes: {
         JWT: {
-          name: "User Authorization",
-          description: "Value: Bearer {token}",
-          type: "apiKey",
-          scheme: "bearer",
-          in: "header",
-          bearerFormat: "JWT",
+          name: 'User Authorization',
+          description: 'Value: Bearer {token}',
+          type: 'apiKey',
+          scheme: 'bearer',
+          in: 'header',
+          bearerFormat: 'JWT',
         },
       },
     },
   },
-  apis: ["./src/Routes/*.js", "./src/controllers/*.js"],
+  apis: [
+    "./src/Routes/*.js", 
+    "./src/controllers/*.js",
+    "./src/controllers/login.controller.js",
+    "./src/index.js",
+    "./src/Routes/testrouter/*.js"
+  ],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 
 const options = {
-  customCss: ".swagger-ui .topbar { display: none }",
+  customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: "PRAE API Documentation",
 };
 
-module.exports = (app) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs, options));
+module.exports = {
+  serve: swaggerUi.serve,
+  setup: swaggerUi.setup(swaggerDocs, options),
 };

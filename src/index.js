@@ -7,7 +7,7 @@ const testRoute = require('./Routes/testRoute');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
 const { initializeSocket } = require("./sockets/sockets");
-const swaggerSetup = require('./swagger/swagger');
+const swagger = require('./swagger/swagger');
 const materiaRoutes = require('./Routes/materia.routes');
 const dictarRoutes = require('./Routes/dictar.route');
 const comentarioRoutes = require('./Routes/comentario.routes');
@@ -15,22 +15,16 @@ const asignarCursoMateriaRoutes = require('./Routes/asignar.routes');
 const actividadRoutes = require('./Routes/actividad.routes');
 const calificacionRoutes = require('./Routes/calificacion.routes');
 
-
 //--------------MIDDLEWARE
 app.use(cors());
 app.use(express.json());
-swaggerSetup(app);
-console.log("Swagger UI montado en /api-docs");
+app.use('/api-docs', swagger.serve, swagger.setup);
 const server = http.createServer(app);
 const io = initializeSocket(server);
-
-
-
 
 //-------------ROUTES
 
 //USER ROUTES
-
 app.use('/usuario', usuarioRoutes);
 
 //CURSO ROUTES
@@ -46,7 +40,6 @@ app.use('/dictar', dictarRoutes);
 app.use('/comentarios', comentarioRoutes);
 
 //Asign (Curso - Materia) Route
-
 app.use('/asignar', asignarCursoMateriaRoutes);
 
 // Activity Route
@@ -66,5 +59,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT || 'default'}`);
+    console.log(`Server running on port ${PORT}`);
 });
