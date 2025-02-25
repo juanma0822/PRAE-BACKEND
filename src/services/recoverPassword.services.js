@@ -5,7 +5,9 @@ const models =require('../models/user.model')
 
 const generateToken = (data) => {
  
-    return jwt.sign({ email: data.correo, id: data.documento_identidad,rol:data.rol }, "juanmateton", { expiresIn: '1h' });
+    return jwt.sign({ email: data.correo, id: data.documento_identidad,rol:data.rol }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '1h' });
 }
 
 const sendRecoveryEmail = async (email) => {
@@ -45,7 +47,7 @@ const sendRecoveryEmail = async (email) => {
 
 const verifyToken = (token) => {
     try {
-        return jwt.verify(token, "juanmateton");
+        return jwt.verify(token, process.env.JWT_SECRET);
     } catch (error) {
         throw new Error('Token inválido o expirado');
     }
