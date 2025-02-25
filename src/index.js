@@ -14,6 +14,7 @@ const comentarioRoutes = require('./Routes/comentario.routes');
 const asignarCursoMateriaRoutes = require('./Routes/asignar.routes');
 const actividadRoutes = require('./Routes/actividad.routes');
 const calificacionRoutes = require('./Routes/calificacion.routes');
+const authRoutes = require('./Routes/auth.routes');
 
 //--------------MIDDLEWARE
 app.use(cors());
@@ -48,9 +49,13 @@ app.use('/actividad', actividadRoutes);
 // Calification Route
 app.use('/calificacion', calificacionRoutes);
 
+// Auth Route
+app.use('/auth', authRoutes);
+
 //TEST API
 app.use('/test', testRoute);
 
+// Usar el puerto asignado por Vercel o el puerto 5000 en desarrollo
 const PORT = process.env.PORT || 5000;
 
 // Agrega esto antes de iniciar el servidor
