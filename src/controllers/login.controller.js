@@ -18,7 +18,8 @@ const VerifyLogin = async(req, res)=>{
             id: user.documento_identidad,
             rol: user.rol,
             nombre: user.nombre,
-            apellido: user.apellido
+            apellido: user.apellido,
+            institucion: user.institucion
         };
 
         if (user.rol === 'estudiante') {
