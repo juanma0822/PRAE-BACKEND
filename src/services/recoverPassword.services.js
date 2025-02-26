@@ -4,11 +4,21 @@ const jwt = require('jsonwebtoken');
 const models =require('../models/user.model')
 
 const generateToken = (data) => {
- 
-    return jwt.sign({ email: data.correo, id: data.documento_identidad,rol:data.rol }, 
-        process.env.JWT_SECRET, 
-        { expiresIn: '1h' });
-}
+    const payload = {
+        email: data.correo,
+        id: data.documento_identidad,
+        rol: data.rol,
+        nombre: data.nombre,
+        apellido: data.apellido
+    };
+
+    if (data.rol === 'estudiante') {
+        payload.id_curso = data.id_curso;
+        payload.curso = data.curso;
+    }
+
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+};
 
 const sendRecoveryEmail = async (email) => {
     try {

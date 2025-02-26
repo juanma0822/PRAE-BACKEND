@@ -1,24 +1,6 @@
 const Pool = require('../db');
 const bcrypt = require("bcryptjs");
 
-const ExistingUser = async(email, password = null) => {
-    console.log(typeof(password));
-    const verifyEmail = await Pool.query('SELECT * FROM usuario WHERE correo = $1', [email]);
-  
-    const user = verifyEmail.rows[0];
-    if (!user) {
-        throw new Error("El email no está registrado");
-    }
-
-    if (password) {
-        const passwordMatch = await bcrypt.compare(password, user.contraseña);
-        if (!passwordMatch) {
-            throw new Error("Contraseña incorrecta");
-        }
-    }   
-    console.log("Ingreso exitoso");
-    return user;
-}
 const saveMessage=async(sender_id, receiver_id, message)=>{
     const result = await Pool.query(
         "INSERT INTO messages (sender_id, receiver_id, message) VALUES ($1, $2, $3) RETURNING *",
@@ -94,4 +76,4 @@ const getMessages = async (sender_id, receiver_id) => {
     }
   };
   
-module.exports = {ExistingUser,saveMessage,getMessages,SearchDataAllStudents,FindOneStudentModels}
+module.exports = {saveMessage,getMessages,SearchDataAllStudents,FindOneStudentModels}
