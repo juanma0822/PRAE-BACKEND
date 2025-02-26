@@ -1,4 +1,4 @@
-const { ExistingUser } = require("../models/user.model");
+const { ExistingUser } = require("../models/usuario.model");
 
 const verifyEmail = async (value) => {
     
