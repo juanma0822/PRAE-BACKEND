@@ -9,7 +9,8 @@ const generateToken = (data) => {
         id: data.documento_identidad,
         rol: data.rol,
         nombre: data.nombre,
-        apellido: data.apellido
+        apellido: data.apellido,
+        institucion: data.institucion
     };
 
     if (data.rol === 'estudiante') {
