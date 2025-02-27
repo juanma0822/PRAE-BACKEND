@@ -8,12 +8,12 @@ const getCursoById = async (id) => {
     return await cursoModel.getCursoById(id);
 };
 
-const createCurso = async (nombre) => {
-    return await cursoModel.createCurso(nombre);
+const createCurso = async (nombre, institucion) => {
+    return await cursoModel.createCurso(nombre, institucion);
 };
 
-const updateCurso = async (id, nombre) => {
-    return await cursoModel.updateCurso(id, nombre);
+const updateCurso = async (id, nombre, institucion) => {
+    return await cursoModel.updateCurso(id, nombre, institucion);
 };
 
 const deleteCurso = async (id) => {
@@ -33,14 +33,17 @@ const findCursoByName = async (nombre) => {
 // Obtener estudiantes por curso
 const obtenerEstudiantesPorCurso = async (id_curso) => {
     try {
-      // Llamamos al modelo para obtener los estudiantes por id_curso
-      
       const estudiantes = await cursoModel.obtenerEstudiantesPorCurso(id_curso);
       return estudiantes;
     } catch (error) {
       throw new Error('Error al obtener los estudiantes service');
     }
-  };
+};
+
+// Obtener todos los cursos de una institución específica
+const getCursosByInstitucion = async (institucion) => {
+    return await cursoModel.getCursosByInstitucion(institucion);
+};
 
 module.exports = {
     getCursos,
@@ -51,4 +54,5 @@ module.exports = {
     activateCurso,
     findCursoByName,
     obtenerEstudiantesPorCurso,
+    getCursosByInstitucion,
 };

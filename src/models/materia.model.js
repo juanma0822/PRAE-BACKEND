@@ -1,13 +1,13 @@
 const pool = require('../db');
 
 // Insertar una materia
-const insertMateria = async (nombre, color) => {
+const insertMateria = async (nombre, color, institucion) => {
   const query = `
-    INSERT INTO Materia (nombre, activo, color)
-    VALUES ($1, TRUE, $2)
+    INSERT INTO Materia (nombre, activo, color, institucion)
+    VALUES ($1, TRUE, $2, $3)
     RETURNING *;
   `;
-  const values = [nombre, color];
+  const values = [nombre, color, institucion];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
@@ -32,15 +32,25 @@ const getAllMaterias = async () => {
   return result.rows;
 };
 
+// Obtener todas las materias de una institución específica
+const getMateriasByInstitucion = async (institucion) => {
+  const query = `
+    SELECT * FROM Materia
+    WHERE institucion = $1 AND activo = TRUE;
+  `;
+  const result = await pool.query(query, [institucion]);
+  return result.rows;
+};
+
 // Actualizar una materia
-const updateMateria = async (id_materia, nombre) => {
+const updateMateria = async (id_materia, nombre, institucion) => {
   const query = `
     UPDATE Materia
-    SET nombre = $1
-    WHERE id_materia = $2 AND activo = TRUE
+    SET nombre = $1, institucion = $2
+    WHERE id_materia = $3 AND activo = TRUE
     RETURNING *;
   `;
-  const values = [nombre, id_materia];
+  const values = [nombre, institucion, id_materia];
   const result = await pool.query(query, values);
   return result.rows[0];
 };
@@ -73,6 +83,7 @@ module.exports = {
   insertMateria,
   getMateriaById,
   getAllMaterias,
+  getMateriasByInstitucion,
   updateMateria,
   deleteMateria,
   activateMateria,

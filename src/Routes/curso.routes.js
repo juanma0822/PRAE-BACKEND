@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const verifyToken = require("../middleware/auth.middleware")
 const { 
     getCursos, 
     getCursoById, 
@@ -8,7 +9,8 @@ const {
     deleteCurso, 
     activateCurso, 
     getIdByName, 
-    getEstudiantesPorCurso 
+    getEstudiantesPorCurso,
+    getCursosByInstitucion 
 } = require('../controllers/curso.controller');
 
 /**
@@ -45,11 +47,22 @@ router.get('/:id', getCursoById);
  * /cursos:
  *   post:
  *     summary: Crea un nuevo curso
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               institucion:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Curso creado exitosamente
  */
-router.post('/', createCurso);
+router.post('/',verifyToken, createCurso);
 
 /**
  * @swagger
@@ -63,6 +76,17 @@ router.post('/', createCurso);
  *         schema:
  *           type: integer
  *         description: ID del curso
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               institucion:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Curso actualizado correctamente
@@ -141,5 +165,22 @@ router.get('/getId/:nombre', getIdByName);
  */
 router.get('/:id_curso/estudiantes', getEstudiantesPorCurso);
 
+/**
+ * @swagger
+ * /cursos/institucion:
+ *   get:
+ *     summary: Obtiene la lista de cursos de una institución específica
+ *     parameters:
+ *       - in: query
+ *         name: institucion
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Nombre de la institución
+ *     responses:
+ *       200:
+ *         description: Lista de cursos obtenida correctamente
+ */
+router.get('/institucion/:institucion', verifyToken, getCursosByInstitucion);
 
 module.exports = router;

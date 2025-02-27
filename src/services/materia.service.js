@@ -1,9 +1,9 @@
 const materiaModel = require('../models/materia.model');
 
 // Crear una materia
-const addMateria = async (nombre, color) => {
+const addMateria = async (nombre, color, institucion) => {
   try {
-    const materia = await materiaModel.insertMateria(nombre, color);
+    const materia = await materiaModel.insertMateria(nombre, color, institucion);
     return materia;
   } catch (error) {
     throw new Error(`Error al crear la materia: ${error.message}`);
@@ -31,10 +31,20 @@ const getAllMaterias = async () => {
   }
 };
 
-// Actualizar una materia
-const updateMateria = async (id_materia, nombre) => {
+// Obtener todas las materias de una institución específica
+const getMateriasByInstitucion = async (institucion) => {
   try {
-    const materia = await materiaModel.updateMateria(id_materia, nombre);
+    const materias = await materiaModel.getMateriasByInstitucion(institucion);
+    return materias;
+  } catch (error) {
+    throw new Error(`Error al obtener las materias de la institución: ${error.message}`);
+  }
+};
+
+// Actualizar una materia
+const updateMateria = async (id_materia, nombre, institucion) => {
+  try {
+    const materia = await materiaModel.updateMateria(id_materia, nombre, institucion);
     if (!materia) throw new Error('Materia no encontrada');
     return materia;
   } catch (error) {
@@ -68,6 +78,7 @@ module.exports = {
   addMateria,
   getMateriaById,
   getAllMaterias,
+  getMateriasByInstitucion,
   updateMateria,
   deleteMateria,
   activateMateria,

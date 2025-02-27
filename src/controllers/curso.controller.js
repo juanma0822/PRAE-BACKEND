@@ -22,8 +22,8 @@ const getCursoById = async (req, res) => {
 
 const createCurso = async (req, res) => {
     try {
-        const { nombre } = req.body;
-        const nuevoCurso = await cursoService.createCurso(nombre);
+        const { nombre, institucion } = req.body;
+        const nuevoCurso = await cursoService.createCurso(nombre, institucion);
         res.status(201).json(nuevoCurso);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,8 +33,8 @@ const createCurso = async (req, res) => {
 const updateCurso = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre } = req.body;
-        const cursoActualizado = await cursoService.updateCurso(id, nombre);
+        const { nombre, institucion } = req.body;
+        const cursoActualizado = await cursoService.updateCurso(id, nombre, institucion);
         if (!cursoActualizado) return res.status(404).json({ message: "Curso no encontrado" });
         res.status(200).json({ message: "Curso actualizado exitosamente" });
     } catch (error) {
@@ -93,6 +93,17 @@ const getEstudiantesPorCurso = async (req, res) => {
     }
 };
 
+// Obtener todos los cursos de una institución específica
+const getCursosByInstitucion = async (req, res) => {
+    try {
+        const { institucion } = req.params;
+        const cursos = await cursoService.getCursosByInstitucion(institucion);
+        res.status(200).json(cursos);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getCursos,
     getCursoById,
@@ -102,4 +113,5 @@ module.exports = {
     activateCurso,
     getIdByName,
     getEstudiantesPorCurso,
+    getCursosByInstitucion,
 };

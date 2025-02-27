@@ -12,15 +12,15 @@ const getCursoById = async (id) => {
     return result.rows[0];
 };
 
-const createCurso = async (nombre) => {
-    const query = `INSERT INTO Curso (nombre) VALUES ($1) RETURNING *;`;
-    const result = await pool.query(query, [nombre]);
+const createCurso = async (nombre, institucion) => {
+    const query = `INSERT INTO Curso (nombre, institucion) VALUES ($1, $2) RETURNING *;`;
+    const result = await pool.query(query, [nombre, institucion]);
     return result.rows[0];
 };
 
-const updateCurso = async (id, nombre) => {
-    const query = `UPDATE Curso SET nombre = $1 WHERE id_curso = $2 AND activo = TRUE RETURNING *;`;
-    const result = await pool.query(query, [nombre, id]);
+const updateCurso = async (id, nombre, institucion) => {
+    const query = `UPDATE Curso SET nombre = $1, institucion = $2 WHERE id_curso = $3 AND activo = TRUE RETURNING *;`;
+    const result = await pool.query(query, [nombre, institucion, id]);
     return result.rowCount > 0;
 };
 
@@ -40,10 +40,10 @@ const activateCurso = async (id) => {
 const findCursoByName = async (nombre) => {
     const result = await pool.query('SELECT id_curso FROM Curso WHERE nombre = $1', [nombre]);
     return result.rows[0]; 
-  };
+};
 
+// Obtener estudiantes por curso
 const obtenerEstudiantesPorCurso = async (id_curso) => {
-// Consulta SQL para obtener los estudiantes de un curso dado su id_curso
     const query = `
     SELECT 
     usuario.documento_identidad, 
@@ -58,7 +58,14 @@ const obtenerEstudiantesPorCurso = async (id_curso) => {
   
     const { rows } = await pool.query(query, [id_curso]);
     return rows;
-  };
+};
+
+// Obtener todos los cursos de una institución específica
+const getCursosByInstitucion = async (institucion) => {
+    const query = `SELECT * FROM Curso WHERE institucion = $1 AND activo = TRUE;`;
+    const result = await pool.query(query, [institucion]);
+    return result.rows;
+};
 
 module.exports = {
     getCursos,
@@ -69,4 +76,5 @@ module.exports = {
     activateCurso,
     findCursoByName,
     obtenerEstudiantesPorCurso,
+    getCursosByInstitucion,
 };
