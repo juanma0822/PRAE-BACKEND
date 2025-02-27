@@ -144,10 +144,7 @@ Este proyecto está bajo la licencia **MIT**. Puedes usarlo, modificarlo y distr
 
 - **[Juan Manuel Valencia Triana]**
 - **[Juan Camilo Henao]**
-- **[Esteban Castro]**
 - **[Jean Carlo Londoño Neira]**
-- **[Julian Castro]**
-- **[Jhon Rodas]**  
 - 📧 Contacto: [juanmanuelva3243@gmail.com]  
 - 🔗 GitHub: [juanma0822]  
 
