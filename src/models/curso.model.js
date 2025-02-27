@@ -19,8 +19,14 @@ const createCurso = async (nombre, institucion) => {
     if (checkResult.rows.length > 0) {
         throw new Error('Ya existe un curso con ese nombre en la institución');
     }
-    const query = `INSERT INTO Curso (nombre, institucion) VALUES ($1, $2) RETURNING *;`;
-    const result = await pool.query(query, [nombre, institucion]);
+
+    // Asignar un color aleatorio si no se proporciona uno
+    const colores = ['azul', 'amarillo', 'morado'];
+    const colorAsignado = color || colores[Math.floor(Math.random() * colores.length)];
+
+    // Insertar el nuevo curso
+    const query = `INSERT INTO Curso (nombre, institucion, color) VALUES ($1, $2, $3) RETURNING *;`;
+    const result = await pool.query(query, [nombre, institucion, colorAsignado]);
     return result.rows[0];
 };
 

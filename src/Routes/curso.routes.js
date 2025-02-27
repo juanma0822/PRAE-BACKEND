@@ -58,6 +58,8 @@ router.get('/:id', getCursoById);
  *                 type: string
  *               institucion:
  *                 type: string
+ *              color:
+ *                 type: string
  *     responses:
  *       201:
  *         description: Curso creado exitosamente

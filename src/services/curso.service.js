@@ -8,8 +8,8 @@ const getCursoById = async (id) => {
     return await cursoModel.getCursoById(id);
 };
 
-const createCurso = async (nombre, institucion) => {
-    return await cursoModel.createCurso(nombre, institucion);
+const createCurso = async (nombre, institucion ) => {
+    return await cursoModel.createCurso(nombre, institucion );
 };
 
 const updateCurso = async (id, nombre, institucion) => {
