@@ -13,6 +13,12 @@ const getCursoById = async (id) => {
 };
 
 const createCurso = async (nombre, institucion) => {
+    // Verificar si ya existe un curso con el mismo nombre en la misma institución
+    const checkQuery = `SELECT * FROM Curso WHERE nombre = $1 AND institucion = $2 AND activo = TRUE;`;
+    const checkResult = await pool.query(checkQuery, [nombre, institucion]);
+    if (checkResult.rows.length > 0) {
+        throw new Error('Ya existe un curso con ese nombre en la institución');
+    }
     const query = `INSERT INTO Curso (nombre, institucion) VALUES ($1, $2) RETURNING *;`;
     const result = await pool.query(query, [nombre, institucion]);
     return result.rows[0];
