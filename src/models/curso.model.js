@@ -22,7 +22,7 @@ const createCurso = async (nombre, institucion) => {
 
     // Asignar un color aleatorio si no se proporciona uno
     const colores = ['azul', 'amarillo', 'morado'];
-    const colorAsignado = color || colores[Math.floor(Math.random() * colores.length)];
+    const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
 
     // Insertar el nuevo curso
     const query = `INSERT INTO Curso (nombre, institucion, color) VALUES ($1, $2, $3) RETURNING *;`;
