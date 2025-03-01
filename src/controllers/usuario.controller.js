@@ -36,7 +36,6 @@ const createProfesor = async (req, res) => {
       contraseña,
       institucion,
       area_ensenanza,
-      id_materia,
     } = req.body;
     const newProfesor = await usuarioService.addProfesor(
       documento_identidad,
@@ -46,7 +45,6 @@ const createProfesor = async (req, res) => {
       contraseña,
       institucion,
       area_ensenanza,
-      id_materia
     );
     res.status(201).json(newProfesor);
   } catch (error) {

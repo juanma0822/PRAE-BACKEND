@@ -91,7 +91,7 @@ router.post('/',verifyToken, createCurso);
  *       200:
  *         description: Curso actualizado correctamente
  */
-router.put('/:id', updateCurso);
+router.put('/:id', verifyToken, updateCurso);
 
 /**
  * @swagger
@@ -127,7 +127,7 @@ router.delete('/:id', deleteCurso);
  *       200:
  *         description: Curso activado correctamente
  */
-router.put('/:id/activate', activateCurso);
+router.put('/:id/activate',verifyToken, activateCurso);
 
 /**
  * @swagger
@@ -163,7 +163,7 @@ router.get('/getId/:nombre', getIdByName);
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
  */
-router.get('/:id_curso/estudiantes', getEstudiantesPorCurso);
+router.get('/:id_curso/estudiantes',verifyToken, getEstudiantesPorCurso);
 
 /**
  * @swagger

@@ -3,8 +3,8 @@ const materiaService = require('../services/materia.service');
 // Crear una materia
 const addMateria = async (req, res) => {
   try {
-    const { nombre, color, institucion } = req.body;
-    const nuevaMateria = await materiaService.addMateria(nombre, color, institucion);
+    const { nombre, institucion } = req.body;
+    const nuevaMateria = await materiaService.addMateria(nombre, institucion);
     res.status(201).json(nuevaMateria);
   } catch (error) {
     res.status(500).json({ message: error.message });

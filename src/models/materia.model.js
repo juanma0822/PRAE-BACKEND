@@ -1,13 +1,24 @@
 const pool = require('../db');
 
 // Insertar una materia
-const insertMateria = async (nombre, color, institucion) => {
+const insertMateria = async (nombre, institucion) => {
+  // Verificar si ya existe un curso con el mismo nombre en la misma institución
+  const checkQuery = `SELECT * FROM Materia WHERE nombre = $1 AND institucion = $2 AND activo = TRUE;`;
+  const checkResult = await pool.query(checkQuery, [nombre, institucion]);
+  if (checkResult.rows.length > 0) {
+    throw new Error(`Ya existe una materia con el nombre "${nombre}" en la institución "${institucion}"`);
+  }
+
+  // Asignar un color aleatorio si no se proporciona uno
+  const colores = ['azul', 'amarillo', 'morado'];
+  const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
+
   const query = `
     INSERT INTO Materia (nombre, activo, color, institucion)
     VALUES ($1, TRUE, $2, $3)
     RETURNING *;
   `;
-  const values = [nombre, color, institucion];
+  const values = [nombre, colorAsignado, institucion];
   const result = await pool.query(query, values);
   return result.rows[0];
 };

@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const VerifyLogin = async(req, res)=>{
     try {
         const { email, password } = req.body;
-        console.log(email, password);
         if (!email || !password) {
             return res.status(400).json({ error: "Email y contraseña son requeridos" });
         }
@@ -27,8 +26,7 @@ const VerifyLogin = async(req, res)=>{
             payload.curso = user.curso;
         }
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
-        console.log(token);
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
         res.status(200).json({ message: "Login exitoso", token });
 
     } catch (e) {

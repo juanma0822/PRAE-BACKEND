@@ -42,7 +42,6 @@ const addProfesor = async (
   contraseña,
   institucion,
   area_ensenanza,
-  id_materia
 ) => {
   const usuario = await addUsuario(
     documento_identidad,
@@ -56,7 +55,6 @@ const addProfesor = async (
   await usuarioModel.insertProfesor(
     documento_identidad,
     area_ensenanza,
-    id_materia
   );
   return usuario;
 };

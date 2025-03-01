@@ -2,7 +2,7 @@ const pool = require("../db");
 const bcrypt = require("bcryptjs");
 
 const ExistingUser = async (email, password = null) => {
-  console.log(typeof password);
+  
   const verifyEmail = await pool.query(
     "SELECT * FROM usuario WHERE correo = $1",
     [email]
@@ -21,12 +21,15 @@ const ExistingUser = async (email, password = null) => {
   }
 
   if (user.rol === "estudiante") {
-    const cursoResult = await pool.query(`
+    const cursoResult = await pool.query(
+      `
         SELECT c.id_curso, c.nombre AS curso
         FROM Estudiante e
         INNER JOIN Curso c ON e.id_curso = c.id_curso
         WHERE e.documento_identidad = $1
-    `, [user.documento_identidad]);
+    `,
+      [user.documento_identidad]
+    );
     user.id_curso = cursoResult.rows[0].id_curso;
     user.curso = cursoResult.rows[0].curso;
   }
@@ -62,33 +65,11 @@ const insertUsuario = async (
   return result.rows[0];
 };
 
-const insertProfesor = async (
-  documento_identidad,
-  area_ensenanza,
-  id_materia
-) => {
-  const client = await pool.connect(); // Obtener conexión
-  try {
-    await client.query("BEGIN");
-
-    await client.query(
-      "INSERT INTO Profesor (documento_identidad, area_ensenanza) VALUES ($1, $2)",
-      [documento_identidad, area_ensenanza]
-    );
-
-    // Insertar la relación en la tabla Dictar
-    await client.query(
-      "INSERT INTO Dictar (documento_profe, id_materia) VALUES ($1, $2)",
-      [documento_identidad, id_materia]
-    );
-
-    await client.query("COMMIT"); //Confirmar transaccion
-  } catch (error) {
-    await client.query("ROLLBACK"); // Revertir en caso de error
-    throw error;
-  } finally {
-    client.release(); // Liberar conexión
-  }
+const insertProfesor = async (documento_identidad, area_ensenanza) => {
+  await pool.query(
+    "INSERT INTO Profesor (documento_identidad, area_ensenanza) VALUES ($1, $2)",
+    [documento_identidad, area_ensenanza]
+  );
 };
 
 const insertEstudiante = async (documento_identidad, id_curso) => {

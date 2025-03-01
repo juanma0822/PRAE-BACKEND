@@ -1,9 +1,9 @@
 const materiaModel = require('../models/materia.model');
 
 // Crear una materia
-const addMateria = async (nombre, color, institucion) => {
+const addMateria = async (nombre, institucion) => {
   try {
-    const materia = await materiaModel.insertMateria(nombre, color, institucion);
+    const materia = await materiaModel.insertMateria(nombre, institucion);
     return materia;
   } catch (error) {
     throw new Error(`Error al crear la materia: ${error.message}`);
