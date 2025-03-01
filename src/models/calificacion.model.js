@@ -1,12 +1,12 @@
-const pool = require('../db');
+const { consultarDB } = require('../db');
 
 const insertCalificacion = async (id_actividad, id_estudiante, nota) => {
     const query = `
         INSERT INTO Calificacion (id_actividad, id_estudiante, nota) 
         VALUES ($1, $2, $3) RETURNING *`;
     const values = [id_actividad, id_estudiante, nota];
-    const { rows } = await pool.query(query, values);
-    return rows[0];
+    const result = await consultarDB(query, values);
+    return result[0];
 };
 
 const updateCalificacion = async (id_calificacion, nota) => {
@@ -15,8 +15,8 @@ const updateCalificacion = async (id_calificacion, nota) => {
         SET nota = $1 
         WHERE id_calificacion = $2 RETURNING *`;
     const values = [nota, id_calificacion];
-    const { rows } = await pool.query(query, values);
-    return rows[0];
+    const result = await consultarDB(query, values);
+    return result[0];
 };
 
 const selectCalificacionesEstudiante = async (id_materia, id_estudiante) => {
@@ -25,8 +25,8 @@ const selectCalificacionesEstudiante = async (id_materia, id_estudiante) => {
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad
         WHERE a.id_materia = $1 AND c.id_estudiante = $2`;
-    const { rows } = await pool.query(query, [id_materia, id_estudiante]);
-    return rows;
+    const result = await consultarDB(query, [id_materia, id_estudiante]);
+    return result;
 };
 
 const selectCalificacionesCurso = async (id_materia, id_curso) => {
@@ -37,10 +37,10 @@ const selectCalificacionesCurso = async (id_materia, id_curso) => {
         JOIN Estudiante e ON c.id_estudiante = e.documento_identidad
         JOIN Usuario u ON e.documento_identidad = u.documento_identidad
         WHERE a.id_materia = $1 AND e.id_curso = $2`;
-    const { rows } = await pool.query(query, [id_materia, id_curso]);
+    const result = await consultarDB(query, [id_materia, id_curso]);
 
     // Agrupar las actividades por estudiante
-    const result = rows.reduce((acc, row) => {
+    const groupedResult = result.reduce((acc, row) => {
         const { documento_identidad, nombre, apellido, nota, actividad } = row;
         if (!acc[documento_identidad]) {
             acc[documento_identidad] = {
@@ -54,8 +54,8 @@ const selectCalificacionesCurso = async (id_materia, id_curso) => {
         return acc;
     }, {});
 
-    // Convertir el objeto result a un array
-    return Object.values(result);
+    // Convertir el objeto groupedResult a un array
+    return Object.values(groupedResult);
 };
 
 const selectPromedioEstudiante = async (id_materia, id_estudiante) => {
@@ -64,8 +64,8 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante) => {
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad
         WHERE a.id_materia = $1 AND c.id_estudiante = $2`;
-    const { rows } = await pool.query(query, [id_materia, id_estudiante]);
-    return rows[0].promedio;
+    const result = await consultarDB(query, [id_materia, id_estudiante]);
+    return result[0].promedio;
 };
 
 module.exports = {

@@ -1,4 +1,4 @@
-const pool = require('../db');
+const { consultarDB } = require('../db');
 
 // Insertar una relación Dictar
 const insertDictar = async (documento_profe, id_materia) => {
@@ -8,8 +8,8 @@ const insertDictar = async (documento_profe, id_materia) => {
     RETURNING *;
   `;
   const values = [documento_profe, id_materia];
-  const result = await pool.query(query, values);
-  return result.rows[0];
+  const result = await consultarDB(query, values);
+  return result[0];
 };
 
 // Obtener todas las relaciones Dictar con detalles adicionales
@@ -29,9 +29,9 @@ const getAllDictar = async () => {
     JOIN Curso c ON a.id_curso = c.id_curso
     WHERE m.activo = TRUE AND c.activo = TRUE;
   `;
-  const result = await pool.query(query);
-  return result.rows;
-}
+  const result = await consultarDB(query);
+  return result;
+};
 
 // Obtener las materias que dicta un profesor
 const getMateriasPorProfesor = async (documento_profe) => {
@@ -47,8 +47,8 @@ const getMateriasPorProfesor = async (documento_profe) => {
     JOIN Curso c ON a.id_curso = c.id_curso
     WHERE d.documento_profe = $1 AND m.activo = TRUE AND c.activo = TRUE;
   `;
-  const result = await pool.query(query, [documento_profe]);
-  return result.rows;
+  const result = await consultarDB(query, [documento_profe]);
+  return result;
 };
 
 // Obtener los profesores que dictan una materia
@@ -59,8 +59,8 @@ const getProfesoresPorMateria = async (id_materia) => {
     JOIN Profesor p ON d.documento_profe = p.documento_identidad
     WHERE d.id_materia = $1;
   `;
-  const result = await pool.query(query, [id_materia]);
-  return result.rows;
+  const result = await consultarDB(query, [id_materia]);
+  return result;
 };
 
 // Eliminar una relación Dictar
@@ -70,23 +70,21 @@ const deleteDictar = async (id_materiadictada) => {
     WHERE id_materiadictada = $1
     RETURNING *;
   `;
-  const result = await pool.query(query, [id_materiadictada]);
-  return result.rows[0];
+  const result = await consultarDB(query, [id_materiadictada]);
+  return result[0];
 };
 
-//Actualizar materia que da un profesor
+// Actualizar materia que da un profesor
 const updateMateriaProfesor = async (documento_identidad, id_materia) => {
   const query = `
-      UPDATE Dictar 
-      SET id_materia = $1 
-      WHERE documento_profe = $2
-      RETURNING *;
+    UPDATE Dictar 
+    SET id_materia = $1 
+    WHERE documento_profe = $2
+    RETURNING *;
   `;
-
-  const result = await pool.query(query, [id_materia, documento_identidad]);
-  return result.rows[0];
+  const result = await consultarDB(query, [id_materia, documento_identidad]);
+  return result[0];
 };
-
 
 module.exports = {
   insertDictar,
