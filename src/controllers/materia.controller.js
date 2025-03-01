@@ -4,6 +4,11 @@ const materiaService = require('../services/materia.service');
 const addMateria = async (req, res) => {
   try {
     const { nombre, institucion } = req.body;
+
+    if (!nombre || !institucion) {
+      return res.status(400).json({ message: "El nombre y la institución son requeridos y no pueden estar vacíos" });
+    }
+
     const nuevaMateria = await materiaService.addMateria(nombre, institucion);
     res.status(201).json(nuevaMateria);
   } catch (error) {
