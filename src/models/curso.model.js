@@ -17,7 +17,7 @@ const createCurso = async (nombre, institucion) => {
     const checkQuery = `SELECT * FROM Curso WHERE nombre = $1 AND institucion = $2 AND activo = TRUE;`;
     const checkResult = await pool.query(checkQuery, [nombre, institucion]);
     if (checkResult.rows.length > 0) {
-        throw new Error(`Ya existe una materia con el nombre "${nombre}" en la institución "${institucion}"`);
+        throw new Error(`Ya existe un curso con el nombre "${nombre}" en la institución "${institucion}"`);
     }
 
     // Asignar un color aleatorio si no se proporciona uno
