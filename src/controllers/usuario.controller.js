@@ -279,6 +279,18 @@ const updateEstudiante = async (req, res) => {
   }
 };
 
+//Obtener docentes por institucion
+const getDocentesPorInstitucion = async (req, res) => {
+  try {
+    const { institucion } = req.params;
+    const docentes = await usuarioService.getDocentesPorInstitucion(institucion);
+    res.status(200).json(docentes);
+  } catch (error) {
+    console.error(`Error al obtener docentes en la institución "${institucion}":`, error);
+    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${institucion}"` });
+  }
+};
+
 module.exports = {
   createAdmin,
   createProfesor,
@@ -296,4 +308,5 @@ module.exports = {
   getEstudiantesPorProfesor,
   getEstudianteById,
   getProfesorById,
+  getDocentesPorInstitucion,
 };

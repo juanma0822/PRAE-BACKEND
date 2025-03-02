@@ -323,6 +323,20 @@ const updateEstudiante = async (
   return result[0];
 };
 
+// Obtener docentes por institución
+const getDocentesPorInstitucion = async (institucion) => {
+  const query = `
+    SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, p.area_ensenanza
+    FROM Usuario u
+    INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
+    WHERE u.institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+  `;
+  const result = await consultarDB(query, [institucion]);
+  return result;
+};
+
+
+
 module.exports = {
   ExistingUser,
   insertUsuario,
@@ -339,4 +353,5 @@ module.exports = {
   getEstudiantesPorProfesor,
   getProfesorById,
   getEstudianteById,
+  getDocentesPorInstitucion,
 };

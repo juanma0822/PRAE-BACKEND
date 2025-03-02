@@ -17,7 +17,8 @@ const {
     getEstudiantesPorInstitucion,
     getEstudiantesPorProfesor,
     getProfesorById,
-    getEstudianteById
+    getEstudianteById,
+    getDocentesPorInstitucion,
 } = require("../controllers/usuario.controller");
 
 /**
@@ -258,5 +259,23 @@ router.get('/profesor/:id', verifyToken, getProfesorById);
  *         description: Estudiante obtenido correctamente
  */
 router.get('/estudiante/:id', verifyToken, getEstudianteById);
+
+/**
+ * @swagger
+ * /usuarios/docentes/institucion/{institucion}:
+ *   get:
+ *     summary: Obtiene los docentes de una institución
+ *     parameters:
+ *       - in: path
+ *         name: institucion
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Nombre de la institución
+ *     responses:
+ *       200:
+ *         description: Lista de docentes obtenida correctamente
+ */
+router.get('/docentes/institucion/:institucion', verifyToken, getDocentesPorInstitucion);
 
 module.exports = router;
