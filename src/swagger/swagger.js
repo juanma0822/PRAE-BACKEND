@@ -6,9 +6,9 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API Documentation",
+      title: "API-PRAE Documentation",
       version: "1.0.0",
-      description: "Documentación de la API con Swagger",
+      description: "Documentación de la API PRAE con Swagger",
     },
     servers: [
       {
