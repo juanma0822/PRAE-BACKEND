@@ -33,19 +33,19 @@ const createCurso = async (nombre, institucion) => {
 const updateCurso = async (id, nombre, institucion) => {
     const query = `UPDATE Curso SET nombre = $1, institucion = $2 WHERE id_curso = $3 AND activo = TRUE RETURNING *;`;
     const result = await consultarDB(query, [nombre, institucion, id]);
-    return result.rowCount > 0;
+    return result;
 };
 
 const deleteCurso = async (id) => {
     const query = `UPDATE Curso SET activo = FALSE WHERE id_curso = $1 RETURNING *;`;
     const result = await consultarDB(query, [id]);
-    return result.rowCount > 0;
+    return result;
 };
 
 const activateCurso = async (id) => {
     const query = `UPDATE Curso SET activo = TRUE WHERE id_curso = $1 RETURNING *;`;
     const result = await consultarDB(query, [id]);
-    return result.rowCount > 0;
+    return result;
 };
 
 const findCursoByName = async (nombre) => {

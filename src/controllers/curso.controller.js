@@ -46,7 +46,7 @@ const deleteCurso = async (req, res) => {
     try {
         const { id } = req.params;
         const eliminado = await cursoService.deleteCurso(id);
-        if (!eliminado) return res.status(404).json({ message: "Curso no encontrado" });
+        if (eliminado.length === 0) return res.status(404).json({ message: "Curso no encontrado" });
         res.status(200).json({ message: "Curso eliminado correctamente (estado inactivo)" });
     } catch (error) {
         res.status(500).json({ message: error.message });
