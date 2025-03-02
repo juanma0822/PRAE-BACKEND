@@ -46,9 +46,23 @@ const insertUsuario = async (
   rol,
   institucion
 ) => {
+  // Verificar si el usuario ya existe
+  const existingUser = await consultarDB(
+    "SELECT * FROM Usuario WHERE documento_identidad = $1 OR correo = $2",
+    [documento_identidad, correo]
+  );
+
+  if (existingUser.length > 0) {
+    throw new Error(`El usuario con nombre: ${nombre} ya existe en la institución: ${institucion}`);
+  }
+
+  // Asignar un color aleatorio si no se proporciona uno
+  const colores = ['azul', 'amarillo', 'morado'];
+  const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
+
   const query = `
-        INSERT INTO Usuario (documento_identidad, nombre, apellido, correo, contraseña, rol, institucion)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO Usuario (documento_identidad, nombre, apellido, correo, contraseña, rol, institucion, color)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *;
     `;
   const values = [
@@ -59,6 +73,7 @@ const insertUsuario = async (
     contraseña,
     rol,
     institucion,
+    colorAsignado,
   ];
   const result = await consultarDB(query, values);
   return result[0];
@@ -123,14 +138,14 @@ const getUsuariosByRol = async (rol) => {
   if (rol === "admin") {
     query = `
             SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo
+                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color
             FROM Usuario u
             WHERE u.rol = $1 AND u.activo = TRUE;
         `;
   } else if (rol === "docente") {
     query = `
             SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color
                 p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
@@ -143,7 +158,7 @@ const getUsuariosByRol = async (rol) => {
   } else if (rol === "estudiante") {
     query = `
             SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color
                 e.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
@@ -168,6 +183,7 @@ const getUsuariosByRol = async (rol) => {
           rol: row.rol,
           institucion: row.institucion,
           activo: row.activo,
+          color: row.color,
           area_ensenanza: row.area_ensenanza,
           materias: [],
         };
@@ -191,7 +207,7 @@ const getUsuariosByRol = async (rol) => {
 const getProfesorById = async (documento_identidad) => {
   const query = `
         SELECT 
-            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
             p.area_ensenanza
         FROM Usuario u
         INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
@@ -205,7 +221,7 @@ const getProfesorById = async (documento_identidad) => {
 const getEstudianteById = async (documento_identidad) => {
   const query = `
         SELECT 
-            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo,
+            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
             e.id_curso, c.nombre AS curso
         FROM Usuario u
         INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
@@ -219,7 +235,7 @@ const getEstudianteById = async (documento_identidad) => {
 // Obtener estudiantes por institución
 const getEstudiantesPorInstitucion = async (institucion) => {
   const query = `
-        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, e.id_curso, c.nombre AS curso
+        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, e.id_curso, c.nombre AS curso
         FROM Usuario u
         INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
         INNER JOIN Curso c ON e.id_curso = c.id_curso
@@ -232,7 +248,7 @@ const getEstudiantesPorInstitucion = async (institucion) => {
 // Obtener estudiantes por profesor
 const getEstudiantesPorProfesor = async (documento_profe) => {
   const query = `
-        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, e.id_curso, c.nombre AS curso
+        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, e.id_curso, c.nombre AS curso
         FROM Usuario u
         INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
         INNER JOIN Curso c ON e.id_curso = c.id_curso
@@ -326,7 +342,7 @@ const updateEstudiante = async (
 // Obtener docentes por institución
 const getDocentesPorInstitucion = async (institucion) => {
   const query = `
-    SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, p.area_ensenanza
+    SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, p.area_ensenanza
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     WHERE u.institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;

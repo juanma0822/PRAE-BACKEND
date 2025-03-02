@@ -22,7 +22,7 @@ const createAdmin = async (req, res) => {
     res.status(201).json(newAdmin);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error al crear el administrador");
+    res.status(500).json({ error: "Error al crear el administrador: " + error.message });
   }
 };
 
@@ -49,7 +49,7 @@ const createProfesor = async (req, res) => {
     res.status(201).json(newProfesor);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al crear un docente" });
+    res.status(500).json({ error: "Error al crear un docente: " + error.message });
   }
 };
 
@@ -77,7 +77,7 @@ const createEstudiante = async (req, res) => {
     res.status(201).json(newEstudiante);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error al crear el estudiante");
+    res.status(500).json({ error: "Error al crear el estudiante: " + error.message });
   }
 
 };
@@ -107,7 +107,7 @@ const updateUsuario = async (req, res) => {
     res.status(200).json(updatedUser);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error en el servidor");
+    res.status(500).json({ error: "Error en el servidor: " + error.message });
   }
 };
 
@@ -118,7 +118,7 @@ const deleteUsuario = async (req, res) => {
     res.status(200).send("Usuario desactivado correctamente");
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error en el servidor");
+    res.status(500).json({ error: "Error en el servidor: " + error.message });
   }
 };
 
@@ -135,7 +135,7 @@ const activarUsuario = async (req, res) => {
         usuario: usuarioActivado,
       });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: "Error al activar el usuario: " + error.message });
   }
 };
 
@@ -144,7 +144,7 @@ const getAdmins = async (req, res) => {
     const admins = await usuarioService.getUsuariosByRol("admin");
     res.status(200).json(admins);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: "Error al obtener administradores: " + error.message });
   }
 };
 
@@ -153,7 +153,7 @@ const getDocentes = async (req, res) => {
     const docentes = await usuarioService.getUsuariosByRol("docente");
     res.status(200).json(docentes);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: "Error al obtener docentes: " + error.message });
   }
 };
 
@@ -162,7 +162,7 @@ const getEstudiantes = async (req, res) => {
     const estudiantes = await usuarioService.getUsuariosByRol("estudiante");
     res.status(200).json(estudiantes);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: "Error al obtener estudiantes: " + error.message });
   }
 };
 
@@ -176,7 +176,7 @@ const getEstudiantesPorInstitucion = async (req, res) => {
     res.status(200).json(estudiantes);
   } catch (error) {
     console.error("Error al obtener estudiantes por institución:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
   }
 };
 
@@ -190,7 +190,7 @@ const getEstudiantesPorProfesor = async (req, res) => {
     res.status(200).json(estudiantes);
   } catch (error) {
     console.error("Error al obtener estudiantes por profesor:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
   }
 };
 
@@ -202,7 +202,7 @@ const getProfesorById = async (req, res) => {
     res.status(200).json(profesor);
   } catch (error) {
     console.error("Error al obtener el profesor:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
   }
 };
 
@@ -214,7 +214,7 @@ const getEstudianteById = async (req, res) => {
     res.status(200).json(estudiante);
   } catch (error) {
     console.error("Error al obtener el estudiante:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
   }
 };
 
@@ -246,7 +246,7 @@ const updateProfesor = async (req, res) => {
       .json({ message: "Profesor actualizado con éxito", usuarioActualizado });
   } catch (error) {
     console.error("Error al actualizar el profesor:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
   }
 };
 
@@ -275,7 +275,7 @@ const updateEstudiante = async (req, res) => {
       });
   } catch (error) {
     console.error("Error al actualizar el estudiante:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
   }
 };
 
@@ -287,7 +287,7 @@ const getDocentesPorInstitucion = async (req, res) => {
     res.status(200).json(docentes);
   } catch (error) {
     console.error(`Error al obtener docentes en la institución "${institucion}":`, error);
-    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${institucion}"` });
+    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${institucion}": ${error.message}` });
   }
 };
 

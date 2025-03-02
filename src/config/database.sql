@@ -7,7 +7,8 @@ CREATE TABLE Usuario (
     contraseña TEXT NOT NULL,
     rol VARCHAR(50) NOT NULL,
     activo BOOLEAN DEFAULT TRUE,
-    institucion VARCHAR(100) NOT NULL
+    institucion VARCHAR(100) NOT NULL,
+    color VARCHAR(50) DEFAULT 'azul'
 );
 
 CREATE TABLE Profesor (
