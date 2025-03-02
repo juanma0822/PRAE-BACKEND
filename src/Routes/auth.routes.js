@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { getUser } = require('../controllers/register.controller');
-const { recoverPassword, validateResetToken, VerifyLogin, } = require("./rutascontroller");
+const { recoverPassword, validateResetToken, VerifyLogin } = require("../controllers/rutascontroller");
 
 /**
  * @swagger
  * /auth/addRegister:
  *   post:
  *     summary: Registra un nuevo usuario
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -15,7 +16,6 @@ const { recoverPassword, validateResetToken, VerifyLogin, } = require("./rutasco
  *           schema:
  *             type: object
  *             properties:
- *              
  *               username:
  *                 type: string
  *               email:
@@ -31,6 +31,7 @@ router.post('/addRegister', getUser);
  * /auth/Login:
  *   post:
  *     summary: Realiza la verificación de login del usuario
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -80,6 +81,7 @@ router.post('/Login', VerifyLogin);
  * /auth/recoverPassword:
  *   post:
  *     summary: Inicia el proceso de recuperación de contraseña
+ *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
@@ -100,6 +102,7 @@ router.post('/recoverPassword', recoverPassword);
  * /auth/validate/{token}:
  *   get:
  *     summary: Valida el token de reinicio de contraseña
+ *     tags: [Auth]
  *     parameters:
  *       - in: path
  *         name: token

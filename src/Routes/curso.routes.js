@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require("../middleware/auth.middleware")
+const verifyToken = require("../middleware/auth.middleware");
 const { 
     getCursos, 
     getCursoById, 
@@ -18,6 +18,7 @@ const {
  * /cursos:
  *   get:
  *     summary: Obtiene la lista de cursos
+ *     tags: [Cursos]
  *     responses:
  *       200:
  *         description: Lista de cursos obtenida correctamente
@@ -29,6 +30,7 @@ router.get('/', getCursos);
  * /cursos/{id}:
  *   get:
  *     summary: Obtiene un curso por su ID
+ *     tags: [Cursos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -47,6 +49,7 @@ router.get('/:id', getCursoById);
  * /cursos:
  *   post:
  *     summary: Crea un nuevo curso
+ *     tags: [Cursos]
  *     requestBody:
  *       required: true
  *       content:
@@ -62,13 +65,14 @@ router.get('/:id', getCursoById);
  *       201:
  *         description: Curso creado exitosamente
  */
-router.post('/',verifyToken, createCurso);
+router.post('/', verifyToken, createCurso);
 
 /**
  * @swagger
  * /cursos/{id}:
  *   put:
  *     summary: Actualiza un curso por su ID
+ *     tags: [Cursos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -98,6 +102,7 @@ router.put('/:id', verifyToken, updateCurso);
  * /cursos/{id}:
  *   delete:
  *     summary: Elimina un curso por su ID
+ *     tags: [Cursos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -109,13 +114,14 @@ router.put('/:id', verifyToken, updateCurso);
  *       200:
  *         description: Curso eliminado correctamente
  */
-router.delete('/:id', deleteCurso);
+router.delete('/:id', verifyToken, deleteCurso);
 
 /**
  * @swagger
  * /cursos/{id}/activate:
  *   put:
  *     summary: Activa un curso por su ID
+ *     tags: [Cursos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -127,13 +133,14 @@ router.delete('/:id', deleteCurso);
  *       200:
  *         description: Curso activado correctamente
  */
-router.put('/:id/activate',verifyToken, activateCurso);
+router.put('/:id/activate', verifyToken, activateCurso);
 
 /**
  * @swagger
  * /cursos/getId/{nombre}:
  *   get:
  *     summary: Obtiene el ID de un curso a partir de su nombre
+ *     tags: [Cursos]
  *     parameters:
  *       - in: path
  *         name: nombre
@@ -152,6 +159,7 @@ router.get('/getId/:nombre', getIdByName);
  * /cursos/{id_curso}/estudiantes:
  *   get:
  *     summary: Obtiene la lista de estudiantes de un curso por su ID
+ *     tags: [Cursos]
  *     parameters:
  *       - in: path
  *         name: id_curso
@@ -163,15 +171,16 @@ router.get('/getId/:nombre', getIdByName);
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
  */
-router.get('/:id_curso/estudiantes',verifyToken, getEstudiantesPorCurso);
+router.get('/:id_curso/estudiantes', verifyToken, getEstudiantesPorCurso);
 
 /**
  * @swagger
- * /cursos/institucion:
+ * /cursos/institucion/{institucion}:
  *   get:
  *     summary: Obtiene la lista de cursos de una institución específica
+ *     tags: [Cursos]
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: institucion
  *         required: true
  *         schema:

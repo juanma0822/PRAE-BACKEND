@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getUser } = require('../controllers/register.controller');
-const { recoverPassword, validateResetToken, VerifyLogin, sendMessage, getChatHistory, generatePdf,NotesBySubject } = require("./rutascontroller");
+const { recoverPassword, validateResetToken, VerifyLogin, sendMessage, getChatHistory, generatePdf,NotesBySubject } = require("../controllers/rutascontroller");
 
 /**
  * @swagger

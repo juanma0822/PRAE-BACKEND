@@ -49,7 +49,7 @@ const createProfesor = async (req, res) => {
     res.status(201).json(newProfesor);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error al crear el profesor");
+    res.status(500).json({ error: "Error al crear un docente" });
   }
 };
 
