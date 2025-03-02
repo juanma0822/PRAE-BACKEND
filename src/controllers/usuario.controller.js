@@ -283,7 +283,8 @@ const updateEstudiante = async (req, res) => {
 const getDocentesPorInstitucion = async (req, res) => {
   try {
     const { institucion } = req.params;
-    const docentes = await usuarioService.getDocentesPorInstitucion(institucion);
+    const decodedInstitucion = decodeURIComponent(institucion);
+    const docentes = await usuarioService.getDocentesPorInstitucion(decodedInstitucion);
     res.status(200).json(docentes);
   } catch (error) {
     console.error(`Error al obtener docentes en la institución "${institucion}":`, error);
