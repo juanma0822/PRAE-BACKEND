@@ -13,11 +13,8 @@ const addUsuario = async (
   institucion
 ) => {
   try {
-    // Encriptar la contraseña antes de guardarla
-    const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
-
-    // Enviar los datos al modelo para insertarlos en la BD
-    const newUser = await usuarioModel.insertUsuario(
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
+    return await usuarioModel.insertUsuario(
       documento_identidad,
       nombre,
       apellido,
@@ -26,11 +23,8 @@ const addUsuario = async (
       rol,
       institucion
     );
- 
-    return newUser;
   } catch (error) {
-    console.error("Error al registrar usuario: ", error);
-    throw new Error("Error al registrar usuario: " + error.detail);
+    throw new Error(error.message);
   }
 };
 
@@ -41,22 +35,23 @@ const addProfesor = async (
   correo,
   contraseña,
   institucion,
-  area_ensenanza,
+  area_ensenanza
 ) => {
-  const usuario = await addUsuario(
-    documento_identidad,
-    nombre,
-    apellido,
-    correo,
-    contraseña,
-    "docente",
-    institucion
-  );
-  await usuarioModel.insertProfesor(
-    documento_identidad,
-    area_ensenanza,
-  );
-  return usuario;
+  try {
+    const usuario = await addUsuario(
+      documento_identidad,
+      nombre,
+      apellido,
+      correo,
+      contraseña,
+      "docente",
+      institucion
+    );
+    await usuarioModel.insertProfesor(documento_identidad, area_ensenanza);
+    return usuario;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 const addEstudiante = async (
@@ -68,17 +63,21 @@ const addEstudiante = async (
   institucion,
   id_curso
 ) => {
-  const usuario = await addUsuario(
-    documento_identidad,
-    nombre,
-    apellido,
-    correo,
-    contraseña,
-    "estudiante",
-    institucion
-  );
-  await usuarioModel.insertEstudiante(documento_identidad, id_curso);
-  return usuario;
+  try {
+    const usuario = await addUsuario(
+      documento_identidad,
+      nombre,
+      apellido,
+      correo,
+      contraseña,
+      "estudiante",
+      institucion
+    );
+    await usuarioModel.insertEstudiante(documento_identidad, id_curso);
+    return usuario;
+  } catch (error) {
+    throw new Error(error.message);
+  }
 };
 
 const getAllUsuarios = async () => {

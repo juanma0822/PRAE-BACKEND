@@ -22,7 +22,7 @@ const createAdmin = async (req, res) => {
     res.status(201).json(newAdmin);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al crear el administrador: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -49,7 +49,7 @@ const createProfesor = async (req, res) => {
     res.status(201).json(newProfesor);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al crear un docente: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -77,7 +77,7 @@ const createEstudiante = async (req, res) => {
     res.status(201).json(newEstudiante);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al crear el estudiante: " + error.message });
+    res.status(500).json({ error: error.message });
   }
 
 };
