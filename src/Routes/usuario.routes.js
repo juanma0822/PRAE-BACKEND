@@ -41,7 +41,7 @@ router.post('/admin', createAdmin);
  *       201:
  *         description: Docente creado exitosamente
  */
-router.post('/docente', createProfesor);
+router.post('/docente', verifyToken, createProfesor);
 
 /**
  * @swagger
@@ -52,7 +52,7 @@ router.post('/docente', createProfesor);
  *       201:
  *         description: Estudiante creado exitosamente
  */
-router.post('/estudiante', createEstudiante);
+router.post('/estudiante', verifyToken, createEstudiante);
 
 /**
  * @swagger
