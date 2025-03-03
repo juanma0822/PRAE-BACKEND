@@ -63,6 +63,11 @@ app.get('/', (req, res) => {
     res.send('<h1>Bienvenido al API REST de PRAE</h1><p>Este es el index</p>');
 });
 
+app.get("/swagger.json", (req, res) => {
+    res.json(swagger.swaggerDocs);
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

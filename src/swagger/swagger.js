@@ -50,6 +50,9 @@ const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger
 const options = {
   customCssUrl: CSS_URL,
   customSiteTitle: "PRAE API Documentation",
+  swaggerOptions: {
+    url: "https://prae-backend.vercel.app/swagger.json", // Asegura que puedas servir este JSON
+  },
 };
 
 console.log("Swagger Docs:", JSON.stringify(swaggerDocs, null, 2));
@@ -58,4 +61,5 @@ console.log("Swagger Docs:", JSON.stringify(swaggerDocs, null, 2));
 module.exports = {
   serve: swaggerUi.serve,
   setup: swaggerUi.setup(swaggerDocs, options),
+  swaggerDocs,
 };
