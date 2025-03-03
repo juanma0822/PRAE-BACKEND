@@ -7,7 +7,6 @@ const testRoute = require('./Routes/testRoute');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
 const { initializeSocket } = require("./sockets/sockets");
-const swagger = require('./swagger/swagger');
 const materiaRoutes = require('./Routes/materia.routes');
 const dictarRoutes = require('./Routes/dictar.route');
 const comentarioRoutes = require('./Routes/comentario.routes');
@@ -15,11 +14,17 @@ const asignarCursoMateriaRoutes = require('./Routes/asignar.routes');
 const actividadRoutes = require('./Routes/actividad.routes');
 const calificacionRoutes = require('./Routes/calificacion.routes');
 const authRoutes = require('./Routes/auth.routes');
+const swaggerRoutes = require("./swagger/swagger");
+
+const corsOptions = {
+    origin: "*", // Permite que cualquier origen acceda
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type, Authorization"
+};
 
 //--------------MIDDLEWARE
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use('/api-docs', swagger.serve, swagger.setup);
 const server = http.createServer(app);
 const io = initializeSocket(server);
 
@@ -55,6 +60,9 @@ app.use('/auth', authRoutes);
 //TEST API
 app.use('/test', testRoute);
 
+//Swagger Route
+app.use("/api-docs", swaggerRoutes);
+
 // Usar el puerto asignado por Vercel o el puerto 5000 en desarrollo
 const PORT = process.env.PORT || 5000;
 
@@ -62,11 +70,6 @@ const PORT = process.env.PORT || 5000;
 app.get('/', (req, res) => {
     res.send('<h1>Bienvenido al API REST de PRAE</h1><p>Este es el index</p>');
 });
-
-app.get("/swagger.json", (req, res) => {
-    res.json(swagger.swaggerDocs);
-});
-
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
