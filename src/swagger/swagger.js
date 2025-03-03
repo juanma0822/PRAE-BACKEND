@@ -38,7 +38,8 @@ const swaggerOptions = {
     "./src/controllers/*.js",
     "./src/controllers/login.controller.js",
     "./src/index.js",
-    "./src/Routes/testrouter/*.js"
+    "./src/Routes/testrouter/*.js",
+    "./src/swagger/*.js"
   ],
 };
 
@@ -51,9 +52,14 @@ const options = {
   customCssUrl: CSS_URL,
   customSiteTitle: "PRAE API Documentation",
   swaggerOptions: {
-    url: "https://prae-backend.vercel.app/swagger.json", // Asegura que puedas servir este JSON
+    url: "https://prae-backend.vercel.app/swagger.json", 
+    presets: [
+      swaggerUi.SwaggerUIStandalonePreset,
+    ],
+    layout: "StandaloneLayout",
   },
 };
+
 
 console.log("Swagger Docs:", JSON.stringify(swaggerDocs, null, 2));
 
