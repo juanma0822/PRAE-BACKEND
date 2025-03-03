@@ -8,6 +8,7 @@ const { recoverPassword, validateResetToken, VerifyLogin, sendMessage, getChatHi
  * /:
  *   get:
  *     summary: Verifica que la API esté funcionando
+ *     tags: [PRUEBAS]
  *     responses:
  *       200:
  *         description: Respuesta de confirmación.
@@ -21,6 +22,7 @@ router.get('/', (req, res) => {
  * /test/addRegister:
  *   post:
  *     summary: Registra un nuevo usuario
+ *     tags: [PRUEBAS]
  *     requestBody:
  *       required: true
  *       content:
@@ -44,6 +46,7 @@ router.post('/addRegister', getUser);
  * /test/Login:
  *   post:
  *     summary: Realiza la verificación de login del usuario
+ *     tags: [PRUEBAS]
  *     requestBody:
  *       required: true
  *       content:
@@ -93,6 +96,7 @@ router.post('/Login', VerifyLogin);
  * /test/chat:
  *   post:
  *     summary: Envía un mensaje de chat
+ *     tags: [PRUEBAS]
  *     requestBody:
  *       required: true
  *       content:
@@ -117,6 +121,7 @@ router.post('/chat', sendMessage);
  * /test/chat/{sender_id}/{receiver_id}:
  *   get:
  *     summary: Obtiene el historial de chat entre dos usuarios
+ *     tags: [PRUEBAS]
  *     parameters:
  *       - in: path
  *         name: sender_id
@@ -141,6 +146,7 @@ router.get("/chat/:sender_id/:receiver_id", getChatHistory);
  * /test/recoverPassword:
  *   post:
  *     summary: Inicia el proceso de recuperación de contraseña
+ *     tags: [PRUEBAS]
  *     requestBody:
  *       required: true
  *       content:
@@ -161,6 +167,7 @@ router.post('/recoverPassword', recoverPassword);
  * /test/generate-pdf/{title}:
  *   post:
  *     summary: Genera un PDF a partir de un título
+ *     tags: [PRUEBAS]
  *     parameters:
  *       - in: path
  *         name: title
@@ -179,6 +186,7 @@ router.post('/generate-pdf/:title', generatePdf);
  * /test/validate/{token}:
  *   get:
  *     summary: Valida el token de reinicio de contraseña
+ *     tags: [PRUEBAS]
  *     parameters:
  *       - in: path
  *         name: token
@@ -199,6 +207,7 @@ router.get('/validate/:token', validateResetToken);
  *   get:
  *     summary: Obtener notas por materia y curso
  *     description: Retorna las notas de un estudiante en una materia y curso específicos.
+ *     tags: [PRUEBAS]
  *     parameters:
  *       - name: id
  *         in: path

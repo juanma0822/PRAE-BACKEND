@@ -8,7 +8,7 @@ const { recoverPassword, validateResetToken, VerifyLogin } = require("../control
  * /auth/addRegister:
  *   post:
  *     summary: Registra un nuevo usuario
- *     tags: [Auth]
+ *     tags: [Auth - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -31,7 +31,7 @@ router.post('/addRegister', getUser);
  * /auth/Login:
  *   post:
  *     summary: Realiza la verificación de login del usuario
- *     tags: [Auth]
+ *     tags: [Auth - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -81,7 +81,7 @@ router.post('/Login', VerifyLogin);
  * /auth/recoverPassword:
  *   post:
  *     summary: Inicia el proceso de recuperación de contraseña
- *     tags: [Auth]
+ *     tags: [Auth - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -102,7 +102,7 @@ router.post('/recoverPassword', recoverPassword);
  * /auth/validate/{token}:
  *   get:
  *     summary: Valida el token de reinicio de contraseña
- *     tags: [Auth]
+ *     tags: [Auth - GET]
  *     parameters:
  *       - in: path
  *         name: token

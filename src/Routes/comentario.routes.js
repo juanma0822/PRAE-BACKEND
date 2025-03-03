@@ -14,7 +14,7 @@ const {
  * /comentarios:
  *   post:
  *     summary: Crear un nuevo comentario
- *     tags: [Comentarios]
+ *     tags: [Comentarios - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -39,7 +39,7 @@ router.post('/', createComentario);
  * /comentarios:
  *   get:
  *     summary: Obtener todos los comentarios
- *     tags: [Comentarios]
+ *     tags: [Comentarios - GET]
  *     responses:
  *       200:
  *         description: Lista de comentarios obtenida correctamente
@@ -51,7 +51,7 @@ router.get('/', getAllComentarios);
  * /comentarios/{id}:
  *   delete:
  *     summary: Eliminar un comentario
- *     tags: [Comentarios]
+ *     tags: [Comentarios - DELETE]
  *     parameters:
  *       - in: path
  *         name: id
@@ -70,7 +70,7 @@ router.delete('/:id', deleteComentario);
  * /comentarios/profesor/{documento_profe}:
  *   get:
  *     summary: Obtener comentarios por profesor
- *     tags: [Comentarios]
+ *     tags: [Comentarios - GET]
  *     parameters:
  *       - in: path
  *         name: documento_profe
@@ -89,7 +89,7 @@ router.get('/profesor/:documento_profe', getComentariosPorProfesor);
  * /comentarios/estudiante/{documento_estudiante}:
  *   get:
  *     summary: Obtener comentarios por estudiante
- *     tags: [Comentarios]
+ *     tags: [Comentarios - GET]
  *     parameters:
  *       - in: path
  *         name: documento_estudiante
@@ -108,7 +108,7 @@ router.get('/estudiante/:documento_estudiante', getComentariosPorEstudiante);
  * /comentarios/profesor/{documento_profe}/estudiante/{documento_estudiante}:
  *   get:
  *     summary: Obtener comentarios por profesor y estudiante
- *     tags: [Comentarios]
+ *     tags: [Comentarios - GET]
  *     parameters:
  *       - in: path
  *         name: documento_profe

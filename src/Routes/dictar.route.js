@@ -14,7 +14,7 @@ const {
  * /dictar:
  *   post:
  *     summary: Crear una relación Dictar
- *     tags: [Dictar materias]
+ *     tags: [Dictar materias - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -37,7 +37,7 @@ router.post('/', createDictar);
  * /dictar:
  *   get:
  *     summary: Obtener todas las relaciones Dictar
- *     tags: [Dictar materias]
+ *     tags: [Dictar materias - GET]
  *     responses:
  *       200:
  *         description: Lista de relaciones Dictar obtenida correctamente
@@ -49,7 +49,7 @@ router.get('/', getAllDictar);
  * /dictar/profesor/{documento_profe}/materias:
  *   get:
  *     summary: Obtener las materias que dicta un profesor
- *     tags: [Dictar materias]
+ *     tags: [Dictar materias - GET]
  *     parameters:
  *       - in: path
  *         name: documento_profe
@@ -68,7 +68,7 @@ router.get('/profesor/:documento_profe/materias', getMateriasPorProfesor);
  * /dictar/materia/{id_materia}/profesores:
  *   get:
  *     summary: Obtener los profesores que dictan una materia
- *     tags: [Dictar materias]
+ *     tags: [Dictar materias - GET]
  *     parameters:
  *       - in: path
  *         name: id_materia
@@ -87,7 +87,7 @@ router.get('/materia/:id_materia/profesores', getProfesoresPorMateria);
  * /dictar/{id_materiadictada}:
  *   delete:
  *     summary: Eliminar una relación Dictar
- *     tags: [Dictar materias]
+ *     tags: [Dictar materias - DELETE]
  *     parameters:
  *       - in: path
  *         name: id_materiadictada
@@ -106,7 +106,7 @@ router.delete('/:id_materiadictada', deleteDictar);
  * /dictar/updateMateriaProfesor/{documento_identidad}:
  *   put:
  *     summary: Actualizar materia que dicta un profesor
- *     tags: [Dictar materias]
+ *     tags: [Dictar materias - PUT]
  *     parameters:
  *       - in: path
  *         name: documento_identidad

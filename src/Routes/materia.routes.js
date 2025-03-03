@@ -16,7 +16,7 @@ const {
  * /materias:
  *   post:
  *     summary: Crea una nueva materia
- *     tags: [Materias]
+ *     tags: [Materias - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -39,7 +39,7 @@ router.post('/', verifyToken, addMateria);
  * /materias/{id_materia}:
  *   get:
  *     summary: Obtiene una materia por su ID
- *     tags: [Materias]
+ *     tags: [Materias - GET]
  *     parameters:
  *       - in: path
  *         name: id_materia
@@ -58,7 +58,7 @@ router.get('/:id_materia', getMateriaById);
  * /materias:
  *   get:
  *     summary: Obtiene todas las materias activas
- *     tags: [Materias]
+ *     tags: [Materias - GET]
  *     responses:
  *       200:
  *         description: Lista de materias obtenida correctamente
@@ -70,7 +70,7 @@ router.get('/', getAllMaterias);
  * /materias/institucion/{institucion}:
  *   get:
  *     summary: Obtiene todas las materias de una institución específica
- *     tags: [Materias]
+ *     tags: [Materias - GET]
  *     parameters:
  *       - in: path
  *         name: institucion
@@ -89,7 +89,7 @@ router.get('/institucion/:institucion', verifyToken, getMateriasByInstitucion);
  * /materias/{id_materia}:
  *   put:
  *     summary: Actualiza una materia
- *     tags: [Materias]
+ *     tags: [Materias - PUT]
  *     parameters:
  *       - in: path
  *         name: id_materia
@@ -119,7 +119,7 @@ router.put('/:id_materia', verifyToken, updateMateria);
  * /materias/{id_materia}:
  *   delete:
  *     summary: Desactiva una materia
- *     tags: [Materias]
+ *     tags: [Materias - DELETE]
  *     parameters:
  *       - in: path
  *         name: id_materia
@@ -138,7 +138,7 @@ router.delete('/:id_materia', verifyToken, deleteMateria);
  * /materias/{id_materia}/activate:
  *   put:
  *     summary: Activa una materia
- *     tags: [Materias]
+ *     tags: [Materias - PUT]
  *     parameters:
  *       - in: path
  *         name: id_materia

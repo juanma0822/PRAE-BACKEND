@@ -18,7 +18,7 @@ const {
  * /cursos:
  *   get:
  *     summary: Obtiene la lista de cursos
- *     tags: [Cursos]
+ *     tags: [Cursos - GET]
  *     responses:
  *       200:
  *         description: Lista de cursos obtenida correctamente
@@ -30,7 +30,7 @@ router.get('/', getCursos);
  * /cursos/{id}:
  *   get:
  *     summary: Obtiene un curso por su ID
- *     tags: [Cursos]
+ *     tags: [Cursos - GET]
  *     parameters:
  *       - in: path
  *         name: id
@@ -49,7 +49,7 @@ router.get('/:id', getCursoById);
  * /cursos:
  *   post:
  *     summary: Crea un nuevo curso
- *     tags: [Cursos]
+ *     tags: [Cursos - POST]
  *     requestBody:
  *       required: true
  *       content:
@@ -72,7 +72,7 @@ router.post('/', verifyToken, createCurso);
  * /cursos/{id}:
  *   put:
  *     summary: Actualiza un curso por su ID
- *     tags: [Cursos]
+ *     tags: [Cursos - PUT]
  *     parameters:
  *       - in: path
  *         name: id
@@ -102,7 +102,7 @@ router.put('/:id', verifyToken, updateCurso);
  * /cursos/{id}:
  *   delete:
  *     summary: Elimina un curso por su ID
- *     tags: [Cursos]
+ *     tags: [Cursos - DELETE]
  *     parameters:
  *       - in: path
  *         name: id
@@ -121,7 +121,7 @@ router.delete('/:id', verifyToken, deleteCurso);
  * /cursos/{id}/activate:
  *   put:
  *     summary: Activa un curso por su ID
- *     tags: [Cursos]
+ *     tags: [Cursos - PUT]
  *     parameters:
  *       - in: path
  *         name: id
@@ -140,7 +140,7 @@ router.put('/:id/activate', verifyToken, activateCurso);
  * /cursos/getId/{nombre}:
  *   get:
  *     summary: Obtiene el ID de un curso a partir de su nombre
- *     tags: [Cursos]
+ *     tags: [Cursos - GET]
  *     parameters:
  *       - in: path
  *         name: nombre
@@ -159,7 +159,7 @@ router.get('/getId/:nombre', getIdByName);
  * /cursos/{id_curso}/estudiantes:
  *   get:
  *     summary: Obtiene la lista de estudiantes de un curso por su ID
- *     tags: [Cursos]
+ *     tags: [Cursos - GET]
  *     parameters:
  *       - in: path
  *         name: id_curso
@@ -178,7 +178,7 @@ router.get('/:id_curso/estudiantes', verifyToken, getEstudiantesPorCurso);
  * /cursos/institucion/{institucion}:
  *   get:
  *     summary: Obtiene la lista de cursos de una institución específica
- *     tags: [Cursos]
+ *     tags: [Cursos - GET]
  *     parameters:
  *       - in: path
  *         name: institucion
