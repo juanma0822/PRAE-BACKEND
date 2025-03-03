@@ -48,9 +48,12 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 
 const options = {
-  customCss: CSS_URL,
+  customCssUrl: CSS_URL,
   customSiteTitle: "PRAE API Documentation",
 };
+
+console.log("Swagger Docs:", JSON.stringify(swaggerDocs, null, 2));
+
 
 module.exports = {
   serve: swaggerUi.serve,
