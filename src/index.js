@@ -16,14 +16,8 @@ const calificacionRoutes = require('./Routes/calificacion.routes');
 const authRoutes = require('./Routes/auth.routes');
 const swaggerRoutes = require("./swagger/swagger");
 
-const corsOptions = {
-    origin: "*", // Permite que cualquier origen acceda
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type, Authorization"
-};
-
 //--------------MIDDLEWARE
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 const server = http.createServer(app);
 const io = initializeSocket(server);

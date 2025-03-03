@@ -342,14 +342,43 @@ const updateEstudiante = async (
 // Obtener docentes por institución
 const getDocentesPorInstitucion = async (institucion) => {
   const query = `
-    SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, p.area_ensenanza
+    SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, p.area_ensenanza,
+           m.id_materia, m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
+    LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
+    LEFT JOIN Materia m ON d.id_materia = m.id_materia
     WHERE u.institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;
   `;
   const result = await consultarDB(query, [institucion]);
-  return result;
+
+  const profesores = {};
+  result.forEach((row) => {
+    if (!profesores[row.documento_identidad]) {
+      profesores[row.documento_identidad] = {
+        documento_identidad: row.documento_identidad,
+        nombre: row.nombre,
+        apellido: row.apellido,
+        correo: row.correo,
+        rol: row.rol,
+        institucion: row.institucion,
+        activo: row.activo,
+        color: row.color,
+        area_ensenanza: row.area_ensenanza,
+        materias: [],
+      };
+    }
+    if (row.id_materia) {
+      profesores[row.documento_identidad].materias.push({
+        id_materia: row.id_materia,
+        nombre_materia: row.materia,
+      });
+    }
+  });
+
+  return Object.values(profesores);
 };
+
 
 
 
