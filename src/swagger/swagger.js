@@ -36,13 +36,7 @@ const swaggerOptions = {
       },
     },
   },
-  apis: [
-    "./src/Routes/*.js",
-    "./src/controllers/*.js",
-    "./src/controllers/login.controller.js",
-    "./src/index.js",
-    "./src/Routes/testrouter/*.js",
-  ],
+  apis: ["./src/Routes/*.js"],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
@@ -53,13 +47,24 @@ router.get("/swagger.json", (req, res) => {
 });
 
 // URL del CDN CSS
-const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
 
 // Configurar Swagger UI para que consuma el JSON
 const options = {
   swaggerOptions: {
     url: "/api-docs/swagger.json", // Swagger cargará el JSON desde aquí
   },
+  customCss: `
+    .swagger-ui .opblock .opblock-summary-path-description-wrapper {
+      align-items: center; 
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 0 10px; 
+      padding: 0 10px; 
+      width: 100%;
+    }
+  `,
   customCssUrl: CSS_URL,
   customSiteTitle: "PRAE API Documentation",
 };
