@@ -67,6 +67,7 @@ const options = {
   `,
   customCssUrl: CSS_URL,
   customSiteTitle: "PRAE API Documentation",
+  customfavIcon: "https://petstore.swagger.io/favicon-32x32.png",
 };
 
 // Ruta para la interfaz de Swagger
