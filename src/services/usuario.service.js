@@ -13,7 +13,7 @@ const addUsuario = async (
   institucion
 ) => {
   try {
-    const hashedPassword = await bcrypt.hash(contraseña, 10);
+    const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
     return await usuarioModel.insertUsuario(
       documento_identidad,
       nombre,
@@ -89,14 +89,17 @@ const updateUsuario = async (
   nombre,
   apellido,
   correo,
+  contraseña,
   rol,
   institucion
 ) => {
+  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
   return await usuarioModel.updateUsuario(
     documento_identidad,
     nombre,
     apellido,
     correo,
+    hashedPassword,
     rol,
     institucion
   );
@@ -140,7 +143,7 @@ const updateProfesor = async (
   institucion,
   area_ensenanza
 ) => {
-  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, 10) : null;
+  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
   return await usuarioModel.updateProfesor(
     documento_identidad,
     nombre,
@@ -162,7 +165,7 @@ const updateEstudiante = async (
   institucion,
   id_curso
 ) => {
-  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, 10) : null;
+  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
   return await usuarioModel.updateEstudiante(
     documento_identidad,
     nombre,
@@ -179,7 +182,7 @@ const getEstudiantesPorInstitucion = async (institucion) => {
   return await usuarioModel.getEstudiantesPorInstitucion(institucion);
 };
 
-// Servicio para obtener los estudiantes que un porfesor les da clase
+// Servicio para obtener los estudiantes que un profesor les da clase
 const getEstudiantesPorProfesor = async (documento_profe) => {
   return await usuarioModel.getEstudiantesPorProfesor(documento_profe);
 };

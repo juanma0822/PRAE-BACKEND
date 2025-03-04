@@ -104,14 +104,44 @@ const updateUsuario = async (
   apellido,
   correo,
   rol,
-  institucion
+  institucion,
+  contraseña
 ) => {
-  const result = await consultarDB(
-    "UPDATE Usuario SET nombre = $1, apellido = $2, correo = $3, rol = $4, institucion = $5 WHERE documento_identidad = $6 RETURNING *",
-    [nombre, apellido, correo, rol, institucion, documento_identidad]
+  // Verificar si el correo ya está en uso por otro usuario
+  const existingUser = await consultarDB(
+    "SELECT * FROM Usuario WHERE correo = $1 AND documento_identidad != $2",
+    [correo, documento_identidad]
   );
+
+  if (existingUser.length > 0) {
+    throw new Error("El correo ya está en uso por otro usuario");
+  }
+
+  let query;
+  let values;
+
+  if (contraseña) {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, rol = $5, institucion = $6
+      WHERE documento_identidad = $7
+      RETURNING *;
+    `;
+    values = [nombre, apellido, correo, contraseña, rol, institucion, documento_identidad];
+  } else {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, rol = $4, institucion = $5
+      WHERE documento_identidad = $6
+      RETURNING *;
+    `;
+    values = [nombre, apellido, correo, rol, institucion, documento_identidad];
+  }
+
+  const result = await consultarDB(query, values);
   return result[0];
 };
+
 
 const desactivarUsuario = async (documento_identidad) => {
   await consultarDB(
@@ -145,7 +175,7 @@ const getUsuariosByRol = async (rol) => {
   } else if (rol === "docente") {
     query = `
             SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color
+                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
                 p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
@@ -158,7 +188,7 @@ const getUsuariosByRol = async (rol) => {
   } else if (rol === "estudiante") {
     query = `
             SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color
+                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
                 e.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
@@ -206,15 +236,44 @@ const getUsuariosByRol = async (rol) => {
 // Obtener un profesor por su ID
 const getProfesorById = async (documento_identidad) => {
   const query = `
-        SELECT 
-            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
-            p.area_ensenanza
-        FROM Usuario u
-        INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
-        WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE;
-    `;
+    SELECT 
+      u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
+      p.area_ensenanza, m.id_materia, m.nombre AS materia
+    FROM Usuario u
+    INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
+    LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
+    LEFT JOIN Materia m ON d.id_materia = m.id_materia
+    WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+  `;
   const result = await consultarDB(query, [documento_identidad]);
-  return result[0];
+
+  if (result.length === 0) {
+    return null;
+  }
+
+  const profesor = {
+    documento_identidad: result[0].documento_identidad,
+    nombre: result[0].nombre,
+    apellido: result[0].apellido,
+    correo: result[0].correo,
+    rol: result[0].rol,
+    institucion: result[0].institucion,
+    activo: result[0].activo,
+    color: result[0].color,
+    area_ensenanza: result[0].area_ensenanza,
+    materias: [],
+  };
+
+  result.forEach((row) => {
+    if (row.id_materia) {
+      profesor.materias.push({
+        id_materia: row.id_materia,
+        nombre_materia: row.materia,
+      });
+    }
+  });
+
+  return profesor;
 };
 
 // Obtener un estudiante por su ID
@@ -238,7 +297,7 @@ const getEstudiantesPorInstitucion = async (institucion) => {
         SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, e.id_curso, c.nombre AS curso
         FROM Usuario u
         INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
-        INNER JOIN Curso c ON e.id_curso = c.id_curso
+        INNER INNER JOIN Curso c ON e.id_curso = c.id_curso
         WHERE u.institucion = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
     `;
   const result = await consultarDB(query, [institucion]);
@@ -269,33 +328,52 @@ const updateProfesor = async (
   institucion,
   area_ensenanza
 ) => {
-  const query = `
-        UPDATE Usuario 
-        SET nombre = $1, apellido = $2, correo = $3, ${
-          contraseña ? "contraseña = $4," : ""
-        } institucion = $5
-        WHERE documento_identidad = $6
-        RETURNING *;
+  // Verificar si el correo ya está en uso por otro usuario
+  const existingUser = await consultarDB(
+    "SELECT * FROM Usuario WHERE correo = $1 AND documento_identidad != $2",
+    [correo, documento_identidad]
+  );
+
+  if (existingUser.length > 0) {
+    throw new Error("El correo ya está en uso por otro usuario");
+  }
+
+  let query;
+  let values;
+
+  if (contraseña) {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, institucion = $5
+      WHERE documento_identidad = $6
+      RETURNING *;
     `;
+    values = [nombre, apellido, correo, contraseña, institucion, documento_identidad];
+  } else {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, institucion = $4
+      WHERE documento_identidad = $5
+      RETURNING *;
+    `;
+    values = [nombre, apellido, correo, institucion, documento_identidad];
+  }
 
-  const values = contraseña
-    ? [nombre, apellido, correo, contraseña, institucion, documento_identidad]
-    : [nombre, apellido, correo, institucion, documento_identidad];
-
-  await consultarDB(query, values);
+  const result = await consultarDB(query, values);
 
   // Actualizar el área de enseñanza en la tabla Profesor
   const queryProfesor = `
-        UPDATE Profesor 
-        SET area_ensenanza = $1 
-        WHERE documento_identidad = $2
-        RETURNING *;
-    `;
+    UPDATE Profesor 
+    SET area_ensenanza = $1 
+    WHERE documento_identidad = $2
+    RETURNING *;
+  `;
 
-  const result = await consultarDB(queryProfesor, [
+  const resultProfesor = await consultarDB(queryProfesor, [
     area_ensenanza,
     documento_identidad,
   ]);
+
   return result[0];
 };
 
@@ -309,33 +387,52 @@ const updateEstudiante = async (
   institucion,
   id_curso
 ) => {
-  const query = `
-        UPDATE Usuario 
-        SET nombre = $1, apellido = $2, correo = $3, ${
-          contraseña ? "contraseña = $4," : ""
-        } institucion = $5
-        WHERE documento_identidad = $6
-        RETURNING *;
+  // Verificar si el correo ya está en uso por otro usuario
+  const existingUser = await consultarDB(
+    "SELECT * FROM Usuario WHERE correo = $1 AND documento_identidad != $2",
+    [correo, documento_identidad]
+  );
+
+  if (existingUser.length > 0) {
+    throw new Error("El correo ya está en uso por otro usuario");
+  }
+
+  let query;
+  let values;
+
+  if (contraseña) {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, institucion = $5
+      WHERE documento_identidad = $6
+      RETURNING *;
     `;
+    values = [nombre, apellido, correo, contraseña, institucion, documento_identidad];
+  } else {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, institucion = $4
+      WHERE documento_identidad = $5
+      RETURNING *;
+    `;
+    values = [nombre, apellido, correo, institucion, documento_identidad];
+  }
 
-  const values = contraseña
-    ? [nombre, apellido, correo, contraseña, institucion, documento_identidad]
-    : [nombre, apellido, correo, institucion, documento_identidad];
-
-  await consultarDB(query, values);
+  const result = await consultarDB(query, values);
 
   // Actualizar el curso del estudiante en la tabla Estudiante
   const queryEstudiante = `
-        UPDATE Estudiante 
-        SET id_curso = $1 
-        WHERE documento_identidad = $2
-        RETURNING *;
-    `;
+    UPDATE Estudiante 
+    SET id_curso = $1 
+    WHERE documento_identidad = $2
+    RETURNING *;
+  `;
 
-  const result = await consultarDB(queryEstudiante, [
+  const resultEstudiante = await consultarDB(queryEstudiante, [
     id_curso,
     documento_identidad,
   ]);
+
   return result[0];
 };
 
@@ -378,9 +475,6 @@ const getDocentesPorInstitucion = async (institucion) => {
 
   return Object.values(profesores);
 };
-
-
-
 
 module.exports = {
   ExistingUser,
