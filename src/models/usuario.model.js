@@ -374,7 +374,13 @@ const updateProfesor = async (
     documento_identidad,
   ]);
 
-  return result[0];
+  // Combinar los resultados de las dos consultas
+  const updatedProfesor = {
+    ...result[0],
+    area_ensenanza: resultProfesor[0].area_ensenanza,
+  };
+
+  return updatedProfesor;
 };
 
 // Modelo para actualizar un estudiante
