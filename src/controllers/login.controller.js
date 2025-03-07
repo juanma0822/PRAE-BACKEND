@@ -1,9 +1,9 @@
 const { config } = require('dotenv');
 config();
-const {verifyEmail}= require("../services/login.services")
+const { verifyEmail } = require("../services/login.services");
 const jwt = require("jsonwebtoken");
 
-const VerifyLogin = async(req, res)=>{
+const VerifyLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
@@ -18,7 +18,21 @@ const VerifyLogin = async(req, res)=>{
             rol: user.rol,
             nombre: user.nombre,
             apellido: user.apellido,
-            institucion: user.institucion
+            institucion: {
+                id_institucion: user.id_institucion,
+                nombre: user.nombre_institucion,
+                telefono: user.telefono,
+                instagram: user.instagram,
+                facebook: user.facebook,
+                logo: user.logo,
+                color_principal: user.color_principal,
+                color_secundario: user.color_secundario,
+                fondo: user.fondo,
+                color_pildora1: user.color_pildora1,
+                color_pildora2: user.color_pildora2,
+                color_pildora3: user.color_pildora3,
+                estado: user.estado_institucion
+            }
         };
 
         if (user.rol === 'estudiante') {
@@ -36,5 +50,5 @@ const VerifyLogin = async(req, res)=>{
 };
 
 module.exports = {
-VerifyLogin
+    VerifyLogin
 };

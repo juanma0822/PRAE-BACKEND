@@ -8,7 +8,7 @@ const createAdmin = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
     } = req.body;
     const newAdmin = await usuarioService.addUsuario(
       documento_identidad,
@@ -17,7 +17,7 @@ const createAdmin = async (req, res) => {
       correo,
       contraseña,
       "admin",
-      institucion
+      id_institucion
     );
     res.status(201).json(newAdmin);
   } catch (error) {
@@ -34,7 +34,7 @@ const createProfesor = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
       area_ensenanza,
     } = req.body;
     const newProfesor = await usuarioService.addProfesor(
@@ -43,8 +43,8 @@ const createProfesor = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
-      area_ensenanza,
+      id_institucion,
+      area_ensenanza
     );
     res.status(201).json(newProfesor);
   } catch (error) {
@@ -54,7 +54,6 @@ const createProfesor = async (req, res) => {
 };
 
 const createEstudiante = async (req, res) => {
-
   try {
     const {
       documento_identidad,
@@ -62,7 +61,7 @@ const createEstudiante = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
       id_curso,
     } = req.body;
     const newEstudiante = await usuarioService.addEstudiante(
@@ -71,7 +70,7 @@ const createEstudiante = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
       id_curso
     );
     res.status(201).json(newEstudiante);
@@ -79,7 +78,6 @@ const createEstudiante = async (req, res) => {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
-
 };
 
 const getUsuarios = async (req, res) => {
@@ -95,14 +93,15 @@ const getUsuarios = async (req, res) => {
 const updateUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, apellido, correo, rol, institucion } = req.body;
+    const { nombre, apellido, correo, rol, id_institucion, contraseña } = req.body;
     const updatedUser = await usuarioService.updateUsuario(
       id,
       nombre,
       apellido,
       correo,
+      contraseña,
       rol,
-      institucion
+      id_institucion
     );
     res.status(200).json(updatedUser);
   } catch (error) {
@@ -169,9 +168,9 @@ const getEstudiantes = async (req, res) => {
 // Obtener estudiantes por institución
 const getEstudiantesPorInstitucion = async (req, res) => {
   try {
-    const { institucion } = req.params;
+    const { id_institucion } = req.params;
     const estudiantes = await usuarioService.getEstudiantesPorInstitucion(
-      institucion
+      id_institucion
     );
     res.status(200).json(estudiantes);
   } catch (error) {
@@ -227,7 +226,7 @@ const updateProfesor = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
       area_ensenanza,
     } = req.body;
 
@@ -237,7 +236,7 @@ const updateProfesor = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
       area_ensenanza
     );
 
@@ -254,7 +253,7 @@ const updateProfesor = async (req, res) => {
 const updateEstudiante = async (req, res) => {
   try {
     const { documento_identidad } = req.params;
-    const { nombre, apellido, correo, contraseña, institucion, id_curso } =
+    const { nombre, apellido, correo, contraseña, id_institucion, id_curso } =
       req.body;
 
     const usuarioActualizado = await usuarioService.updateEstudiante(
@@ -263,7 +262,7 @@ const updateEstudiante = async (req, res) => {
       apellido,
       correo,
       contraseña,
-      institucion,
+      id_institucion,
       id_curso
     );
 
@@ -282,13 +281,13 @@ const updateEstudiante = async (req, res) => {
 //Obtener docentes por institucion
 const getDocentesPorInstitucion = async (req, res) => {
   try {
-    const { institucion } = req.params;
-    const decodedInstitucion = decodeURIComponent(institucion);
+    const { id_institucion } = req.params;
+    const decodedInstitucion = decodeURIComponent(id_institucion);
     const docentes = await usuarioService.getDocentesPorInstitucion(decodedInstitucion);
     res.status(200).json(docentes);
   } catch (error) {
-    console.error(`Error al obtener docentes en la institución "${institucion}":`, error);
-    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${institucion}": ${error.message}` });
+    console.error(`Error al obtener docentes en la institución "${id_institucion}":`, error);
+    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${id_institucion}": ${error.message}` });
   }
 };
 

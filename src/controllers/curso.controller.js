@@ -22,8 +22,8 @@ const getCursoById = async (req, res) => {
 
 const createCurso = async (req, res) => {
     try {
-        const { nombre, institucion } = req.body;
-        const nuevoCurso = await cursoService.createCurso(nombre, institucion);
+        const { nombre, id_institucion } = req.body;
+        const nuevoCurso = await cursoService.createCurso(nombre, id_institucion);
         res.status(201).json(nuevoCurso);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -33,8 +33,8 @@ const createCurso = async (req, res) => {
 const updateCurso = async (req, res) => {
     try {
         const { id } = req.params;
-        const { nombre, institucion } = req.body;
-        const cursoActualizado = await cursoService.updateCurso(id, nombre, institucion);
+        const { nombre, id_institucion } = req.body;
+        const cursoActualizado = await cursoService.updateCurso(id, nombre, id_institucion);
         if (!cursoActualizado) return res.status(404).json({ message: "Curso no encontrado" });
         res.status(200).json({ message: "Curso actualizado exitosamente" });
     } catch (error) {
@@ -64,40 +64,35 @@ const activateCurso = async (req, res) => {
     }
 };
 
-// Controlador para obtener el id del curso por nombre
 const getIdByName = async (req, res) => {
     try {
-      const { nombre } = req.params;
-      
-      const curso = await cursoService.findCursoByName(nombre);
-  
-      if (!curso) {
-        return res.status(404).json({ message: 'Curso no encontrado' });
-      }
-  
-      res.status(200).json({ id_curso: curso.id_curso });
+        const { nombre } = req.params;
+        const curso = await cursoService.findCursoByName(nombre);
+        if (!curso) {
+            return res.status(404).json({ message: 'Curso no encontrado' });
+        }
+        res.status(200).json({ id_curso: curso.id_curso });
     } catch (error) {
-      console.log(error);
-      res.status(500).send('Error en el servidor');
+        console.log(error);
+        res.status(500).send('Error en el servidor');
     }
 };
 
 const getEstudiantesPorCurso = async (req, res) => {
     const { id_curso } = req.params;
     try {
-      const estudiantes = await cursoService.obtenerEstudiantesPorCurso(id_curso);
-      res.status(200).json(estudiantes);
+        const estudiantes = await cursoService.obtenerEstudiantesPorCurso(id_curso);
+        res.status(200).json(estudiantes);
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Error al obtener los estudiantes');
+        console.error(error);
+        res.status(500).send('Error al obtener los estudiantes');
     }
 };
 
-// Obtener todos los cursos de una institución específica
 const getCursosByInstitucion = async (req, res) => {
     try {
-        const { institucion } = req.params;
-        const cursos = await cursoService.getCursosByInstitucion(institucion);
+        const { id_institucion } = req.params;
+        const cursos = await cursoService.getCursosByInstitucion(id_institucion);
         res.status(200).json(cursos);
     } catch (error) {
         res.status(500).json({ message: error.message });

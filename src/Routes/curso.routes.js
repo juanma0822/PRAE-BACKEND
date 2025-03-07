@@ -181,7 +181,7 @@ router.get('/:id_curso/estudiantes', verifyToken, getEstudiantesPorCurso);
  *     tags: [Cursos - GET]
  *     parameters:
  *       - in: path
- *         name: institucion
+ *         id: id de institucion
  *         required: true
  *         schema:
  *           type: string
@@ -190,6 +190,6 @@ router.get('/:id_curso/estudiantes', verifyToken, getEstudiantesPorCurso);
  *       200:
  *         description: Lista de cursos obtenida correctamente
  */
-router.get('/institucion/:institucion', verifyToken, getCursosByInstitucion);
+router.get('/institucion/:id_institucion', verifyToken, getCursosByInstitucion);
 
 module.exports = router;

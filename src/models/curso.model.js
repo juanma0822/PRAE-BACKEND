@@ -12,12 +12,12 @@ const getCursoById = async (id) => {
     return result[0];
 };
 
-const createCurso = async (nombre, institucion) => {
+const createCurso = async (nombre, id_institucion) => {
     // Verificar si ya existe un curso con el mismo nombre en la misma institución
-    const checkQuery = `SELECT * FROM Curso WHERE nombre = $1 AND institucion = $2 AND activo = TRUE;`;
-    const checkResult = await consultarDB(checkQuery, [nombre, institucion]);
+    const checkQuery = `SELECT * FROM Curso WHERE nombre = $1 AND id_institucion = $2 AND activo = TRUE;`;
+    const checkResult = await consultarDB(checkQuery, [nombre, id_institucion]);
     if (checkResult.length > 0) {
-        throw new Error(`Ya existe un curso con el nombre "${nombre}" en la institución "${institucion}"`);
+        throw new Error(`Ya existe un curso con el nombre "${nombre}" en la institución con ID "${id_institucion}"`);
     }
 
     // Asignar un color aleatorio si no se proporciona uno
@@ -25,14 +25,14 @@ const createCurso = async (nombre, institucion) => {
     const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
 
     // Insertar el nuevo curso
-    const query = `INSERT INTO Curso (nombre, institucion, color) VALUES ($1, $2, $3) RETURNING *;`;
-    const result = await consultarDB(query, [nombre, institucion, colorAsignado]);
+    const query = `INSERT INTO Curso (nombre, id_institucion, color) VALUES ($1, $2, $3) RETURNING *;`;
+    const result = await consultarDB(query, [nombre, id_institucion, colorAsignado]);
     return result[0];
 };
 
-const updateCurso = async (id, nombre, institucion) => {
-    const query = `UPDATE Curso SET nombre = $1, institucion = $2 WHERE id_curso = $3 AND activo = TRUE RETURNING *;`;
-    const result = await consultarDB(query, [nombre, institucion, id]);
+const updateCurso = async (id, nombre, id_institucion) => {
+    const query = `UPDATE Curso SET nombre = $1, id_institucion = $2 WHERE id_curso = $3 AND activo = TRUE RETURNING *;`;
+    const result = await consultarDB(query, [nombre, id_institucion, id]);
     return result;
 };
 
@@ -69,9 +69,9 @@ const obtenerEstudiantesPorCurso = async (id_curso) => {
     return result;
 };
 
-const getCursosByInstitucion = async (institucion) => {
-    const query = `SELECT * FROM Curso WHERE institucion = $1 AND activo = TRUE;`;
-    const result = await consultarDB(query, [institucion]);
+const getCursosByInstitucion = async (id_institucion) => {
+    const query = `SELECT * FROM Curso WHERE id_institucion = $1 AND activo = TRUE;`;
+    const result = await consultarDB(query, [id_institucion]);
     return result;
 };
 

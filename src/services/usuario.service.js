@@ -10,7 +10,7 @@ const addUsuario = async (
   correo,
   contraseña,
   rol,
-  institucion
+  id_institucion
 ) => {
   try {
     const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
@@ -21,7 +21,7 @@ const addUsuario = async (
       correo,
       hashedPassword,
       rol,
-      institucion
+      id_institucion
     );
   } catch (error) {
     throw new Error(error.message);
@@ -34,7 +34,7 @@ const addProfesor = async (
   apellido,
   correo,
   contraseña,
-  institucion,
+  id_institucion,
   area_ensenanza
 ) => {
   try {
@@ -45,7 +45,7 @@ const addProfesor = async (
       correo,
       contraseña,
       "docente",
-      institucion
+      id_institucion
     );
     await usuarioModel.insertProfesor(documento_identidad, area_ensenanza);
     return usuario;
@@ -60,7 +60,7 @@ const addEstudiante = async (
   apellido,
   correo,
   contraseña,
-  institucion,
+  id_institucion,
   id_curso
 ) => {
   try {
@@ -71,7 +71,7 @@ const addEstudiante = async (
       correo,
       contraseña,
       "estudiante",
-      institucion
+      id_institucion
     );
     await usuarioModel.insertEstudiante(documento_identidad, id_curso);
     return usuario;
@@ -91,7 +91,7 @@ const updateUsuario = async (
   correo,
   contraseña,
   rol,
-  institucion
+  id_institucion
 ) => {
   const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
   return await usuarioModel.updateUsuario(
@@ -101,7 +101,7 @@ const updateUsuario = async (
     correo,
     hashedPassword,
     rol,
-    institucion
+    id_institucion
   );
 };
 
@@ -140,7 +140,7 @@ const updateProfesor = async (
   apellido,
   correo,
   contraseña,
-  institucion,
+  id_institucion,
   area_ensenanza
 ) => {
   const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
@@ -150,7 +150,7 @@ const updateProfesor = async (
     apellido,
     correo,
     hashedPassword,
-    institucion,
+    id_institucion,
     area_ensenanza
   );
 };
@@ -162,7 +162,7 @@ const updateEstudiante = async (
   apellido,
   correo,
   contraseña,
-  institucion,
+  id_institucion,
   id_curso
 ) => {
   const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
@@ -172,14 +172,14 @@ const updateEstudiante = async (
     apellido,
     correo,
     hashedPassword,
-    institucion,
+    id_institucion,
     id_curso
   );
 };
 
 // Servicio para obtener los estudiantes de una institución
-const getEstudiantesPorInstitucion = async (institucion) => {
-  return await usuarioModel.getEstudiantesPorInstitucion(institucion);
+const getEstudiantesPorInstitucion = async (id_institucion) => {
+  return await usuarioModel.getEstudiantesPorInstitucion(id_institucion);
 };
 
 // Servicio para obtener los estudiantes que un profesor les da clase
@@ -198,8 +198,8 @@ const getEstudianteById = async (documento_identidad) => {
 };
 
 // Servicio para obtener los docentes de una institución
-const getDocentesPorInstitucion = async (institucion) => {
-  return await usuarioModel.getDocentesPorInstitucion(institucion);
+const getDocentesPorInstitucion = async (id_institucion) => {
+  return await usuarioModel.getDocentesPorInstitucion(id_institucion);
 };
 
 module.exports = {

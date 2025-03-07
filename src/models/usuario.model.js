@@ -2,10 +2,13 @@ const { consultarDB } = require("../db");
 const bcrypt = require("bcryptjs");
 
 const ExistingUser = async (email, password = null) => {
-  const verifyEmail = await consultarDB(
-    "SELECT * FROM usuario WHERE correo = $1",
-    [email]
-  );
+  const query = `
+    SELECT u.*, i.*
+    FROM Usuario u
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
+    WHERE u.correo = $1
+  `;
+  const verifyEmail = await consultarDB(query, [email]);
 
   const user = verifyEmail[0];
   if (!user) {
@@ -44,7 +47,7 @@ const insertUsuario = async (
   correo,
   contraseña,
   rol,
-  institucion
+  id_institucion
 ) => {
   // Verificar si el usuario ya existe
   const existingUser = await consultarDB(
@@ -53,7 +56,7 @@ const insertUsuario = async (
   );
 
   if (existingUser.length > 0) {
-    throw new Error(`El usuario con nombre: ${nombre} ya existe en la institución: ${institucion}`);
+    throw new Error(`El usuario con nombre: ${nombre} ya existe en la institución: ${id_institucion}`);
   }
 
   // Asignar un color aleatorio si no se proporciona uno
@@ -61,7 +64,7 @@ const insertUsuario = async (
   const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
 
   const query = `
-        INSERT INTO Usuario (documento_identidad, nombre, apellido, correo, contraseña, rol, institucion, color)
+        INSERT INTO Usuario (documento_identidad, nombre, apellido, correo, contraseña, rol, id_institucion, color)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *;
     `;
@@ -72,7 +75,7 @@ const insertUsuario = async (
     correo,
     contraseña,
     rol,
-    institucion,
+    id_institucion,
     colorAsignado,
   ];
   const result = await consultarDB(query, values);
@@ -94,7 +97,13 @@ const insertEstudiante = async (documento_identidad, id_curso) => {
 };
 
 const getUsuariosActivos = async () => {
-  const result = await consultarDB("SELECT * FROM Usuario WHERE activo = TRUE");
+  const query = `
+    SELECT u.*, i.*
+    FROM Usuario u
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
+    WHERE u.activo = TRUE
+  `;
+  const result = await consultarDB(query);
   return result;
 };
 
@@ -104,7 +113,7 @@ const updateUsuario = async (
   apellido,
   correo,
   rol,
-  institucion,
+  id_institucion,
   contraseña
 ) => {
   // Verificar si el correo ya está en uso por otro usuario
@@ -123,25 +132,24 @@ const updateUsuario = async (
   if (contraseña) {
     query = `
       UPDATE Usuario 
-      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, rol = $5, institucion = $6
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, rol = $5, id_institucion = $6
       WHERE documento_identidad = $7
       RETURNING *;
     `;
-    values = [nombre, apellido, correo, contraseña, rol, institucion, documento_identidad];
+    values = [nombre, apellido, correo, contraseña, rol, id_institucion, documento_identidad];
   } else {
     query = `
       UPDATE Usuario 
-      SET nombre = $1, apellido = $2, correo = $3, rol = $4, institucion = $5
+      SET nombre = $1, apellido = $2, correo = $3, rol = $4, id_institucion = $5
       WHERE documento_identidad = $6
       RETURNING *;
     `;
-    values = [nombre, apellido, correo, rol, institucion, documento_identidad];
+    values = [nombre, apellido, correo, rol, id_institucion, documento_identidad];
   }
 
   const result = await consultarDB(query, values);
   return result[0];
 };
-
 
 const desactivarUsuario = async (documento_identidad) => {
   await consultarDB(
@@ -167,32 +175,30 @@ const getUsuariosByRol = async (rol) => {
 
   if (rol === "admin") {
     query = `
-            SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color
+            SELECT u.*, i.*
             FROM Usuario u
+            LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
             WHERE u.rol = $1 AND u.activo = TRUE;
         `;
   } else if (rol === "docente") {
     query = `
-            SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
-                p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
+            SELECT u.*, i.*, p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
             LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
             LEFT JOIN Materia m ON d.id_materia = m.id_materia
             LEFT JOIN Asignar a ON m.id_materia = a.id_materia
             LEFT JOIN Curso c ON a.id_curso = c.id_curso
+            LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
             WHERE u.rol = $1 AND u.activo = TRUE;
         `;
   } else if (rol === "estudiante") {
     query = `
-            SELECT 
-                u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
-                e.id_curso, c.nombre AS curso
+            SELECT u.*, i.*, e.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
             INNER JOIN Curso c ON e.id_curso = c.id_curso
+            LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
             WHERE u.rol = $1 AND u.activo = TRUE;
         `;
   } else {
@@ -236,13 +242,12 @@ const getUsuariosByRol = async (rol) => {
 // Obtener un profesor por su ID
 const getProfesorById = async (documento_identidad) => {
   const query = `
-    SELECT 
-      u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
-      p.area_ensenanza, m.id_materia, m.nombre AS materia
+    SELECT u.*, i.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
     LEFT JOIN Materia m ON d.id_materia = m.id_materia
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
     WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE;
   `;
   const result = await consultarDB(query, [documento_identidad]);
@@ -279,14 +284,13 @@ const getProfesorById = async (documento_identidad) => {
 // Obtener un estudiante por su ID
 const getEstudianteById = async (documento_identidad) => {
   const query = `
-        SELECT 
-            u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color,
-            e.id_curso, c.nombre AS curso
-        FROM Usuario u
-        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
-        INNER JOIN Curso c ON e.id_curso = c.id_curso
-        WHERE u.documento_identidad = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
-    `;
+    SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+    FROM Usuario u
+    INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+    INNER JOIN Curso c ON e.id_curso = c.id_curso
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
+    WHERE u.documento_identidad = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+  `;
   const result = await consultarDB(query, [documento_identidad]);
   return result[0];
 };
@@ -294,12 +298,13 @@ const getEstudianteById = async (documento_identidad) => {
 // Obtener estudiantes por institución
 const getEstudiantesPorInstitucion = async (institucion) => {
   const query = `
-        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, e.id_curso, c.nombre AS curso
-        FROM Usuario u
-        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
-        INNER INNER JOIN Curso c ON e.id_curso = c.id_curso
-        WHERE u.institucion = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
-    `;
+    SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+    FROM Usuario u
+    INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+    INNER JOIN Curso c ON e.id_curso = c.id_curso
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
+    WHERE u.institucion = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+  `;
   const result = await consultarDB(query, [institucion]);
   return result;
 };
@@ -307,13 +312,14 @@ const getEstudiantesPorInstitucion = async (institucion) => {
 // Obtener estudiantes por profesor
 const getEstudiantesPorProfesor = async (documento_profe) => {
   const query = `
-        SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, e.id_curso, c.nombre AS curso
-        FROM Usuario u
-        INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
-        INNER JOIN Curso c ON e.id_curso = c.id_curso
-        INNER JOIN Dictar d ON e.id_curso = d.id_curso
-        WHERE d.documento_profe = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
-    `;
+    SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+    FROM Usuario u
+    INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
+    INNER JOIN Curso c ON e.id_curso = c.id_curso
+    INNER JOIN Dictar d ON e.id_curso = d.id_curso
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
+    WHERE d.documento_profe = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+  `;
   const result = await consultarDB(query, [documento_profe]);
   return result;
 };
@@ -445,12 +451,12 @@ const updateEstudiante = async (
 // Obtener docentes por institución
 const getDocentesPorInstitucion = async (institucion) => {
   const query = `
-    SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.rol, u.institucion, u.activo, u.color, p.area_ensenanza,
-           m.id_materia, m.nombre AS materia
+    SELECT u.*, i.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
     LEFT JOIN Materia m ON d.id_materia = m.id_materia
+    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
     WHERE u.institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;
   `;
   const result = await consultarDB(query, [institucion]);
