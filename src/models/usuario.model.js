@@ -255,7 +255,7 @@ const getUsuariosByRol = async (rol) => {
 // Obtener un profesor por su ID
 const getProfesorById = async (documento_identidad) => {
   const query = `
-    SELECT u.*, i.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
+    SELECT u.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
@@ -275,7 +275,6 @@ const getProfesorById = async (documento_identidad) => {
     apellido: result[0].apellido,
     correo: result[0].correo,
     rol: result[0].rol,
-    institucion: result[0].institucion,
     activo: result[0].activo,
     color: result[0].color,
     area_ensenanza: result[0].area_ensenanza,
