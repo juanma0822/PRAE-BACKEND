@@ -188,14 +188,14 @@ const getUsuariosByRol = async (rol) => {
 
   if (rol === "admin") {
     query = `
-            SELECT u.*, i.*
+            SELECT u.*
             FROM Usuario u
             LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
             WHERE u.rol = $1 AND u.activo = TRUE;
         `;
   } else if (rol === "docente") {
     query = `
-            SELECT u.*, i.*, p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
+            SELECT u.*, p.area_ensenanza, d.id_materia, m.nombre AS materia, c.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
             LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
@@ -207,7 +207,7 @@ const getUsuariosByRol = async (rol) => {
         `;
   } else if (rol === "estudiante") {
     query = `
-            SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+            SELECT u.*, e.id_curso, c.nombre AS curso
             FROM Usuario u
             INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
             INNER JOIN Curso c ON e.id_curso = c.id_curso
@@ -230,7 +230,6 @@ const getUsuariosByRol = async (rol) => {
           apellido: row.apellido,
           correo: row.correo,
           rol: row.rol,
-          institucion: row.institucion,
           activo: row.activo,
           color: row.color,
           area_ensenanza: row.area_ensenanza,
@@ -296,7 +295,7 @@ const getProfesorById = async (documento_identidad) => {
 // Obtener un estudiante por su ID
 const getEstudianteById = async (documento_identidad) => {
   const query = `
-    SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+    SELECT u.*, e.id_curso, c.nombre AS curso
     FROM Usuario u
     INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
     INNER JOIN Curso c ON e.id_curso = c.id_curso
@@ -310,7 +309,7 @@ const getEstudianteById = async (documento_identidad) => {
 // Obtener estudiantes por institución
 const getEstudiantesPorInstitucion = async (institucion) => {
   const query = `
-    SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+    SELECT u.*, e.id_curso, c.nombre AS curso
     FROM Usuario u
     INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
     INNER JOIN Curso c ON e.id_curso = c.id_curso
@@ -324,7 +323,7 @@ const getEstudiantesPorInstitucion = async (institucion) => {
 // Obtener estudiantes por profesor
 const getEstudiantesPorProfesor = async (documento_profe) => {
   const query = `
-    SELECT u.*, i.*, e.id_curso, c.nombre AS curso
+    SELECT u.*, e.id_curso, c.nombre AS curso
     FROM Usuario u
     INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
     INNER JOIN Curso c ON e.id_curso = c.id_curso
