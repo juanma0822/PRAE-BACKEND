@@ -464,7 +464,7 @@ const updateEstudiante = async (
 // Obtener docentes por institución
 const getDocentesPorInstitucion = async (institucion) => {
   const query = `
-    SELECT u.*, i.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
+    SELECT u.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
