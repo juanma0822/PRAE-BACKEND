@@ -44,8 +44,8 @@ const {
  *                 type: string
  *               contraseña:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Administrador creado exitosamente
@@ -75,8 +75,8 @@ router.post('/admin', createAdmin);
  *                 type: string
  *               contraseña:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *               area_ensenanza:
  *                 type: string
  *     responses:
@@ -108,8 +108,8 @@ router.post('/docente', verifyToken, createProfesor);
  *                 type: string
  *               contraseña:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *               id_curso:
  *                 type: integer
  *     responses:
@@ -141,8 +141,8 @@ router.get('/', verifyToken, getUsuarios);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID del usuario
+ *           type: string
+ *         description: Documento de identidad del usuario
  *     requestBody:
  *       required: true
  *       content:
@@ -158,7 +158,9 @@ router.get('/', verifyToken, getUsuarios);
  *                 type: string
  *               rol:
  *                 type: string
- *               institucion:
+ *               id_institucion:
+ *                 type: integer
+ *               contraseña:
  *                 type: string
  *     responses:
  *       200:
@@ -177,8 +179,8 @@ router.put('/:id', verifyToken, updateUsuario);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID del usuario
+ *           type: string
+ *         description: Documento de identidad del usuario
  *     responses:
  *       200:
  *         description: Usuario eliminado correctamente
@@ -268,8 +270,8 @@ router.get('/estudiantes', verifyToken, getEstudiantes);
  *                 type: string
  *               contraseña:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *               area_ensenanza:
  *                 type: string
  *     responses:
@@ -306,8 +308,8 @@ router.put("/updateProfesor/:documento_identidad", verifyToken, updateProfesor);
  *                 type: string
  *               contraseña:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *               id_curso:
  *                 type: integer
  *     responses:
@@ -318,22 +320,22 @@ router.put("/updateEstudiante/:documento_identidad", verifyToken, updateEstudian
 
 /**
  * @swagger
- * /usuarios/institucion/{institucion}:
+ * /usuarios/institucion/{id_institucion}:
  *   get:
  *     summary: Obtiene los estudiantes de una institución
  *     tags: [Usuarios - GET]
  *     parameters:
  *       - in: path
- *         name: institucion
+ *         name: id_institucion
  *         required: true
  *         schema:
- *           type: string
- *         description: Nombre de la institución
+ *           type: integer
+ *         description: ID de la institución
  *     responses:
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
  */
-router.get('/institucion/:institucion', verifyToken, getEstudiantesPorInstitucion);
+router.get('/institucion/:id_institucion', verifyToken, getEstudiantesPorInstitucion);
 
 /**
  * @swagger
@@ -365,8 +367,8 @@ router.get('/profesor/:documento_profe/estudiantes', verifyToken, getEstudiantes
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID del profesor
+ *           type: string
+ *         description: Documento de identidad del profesor
  *     responses:
  *       200:
  *         description: Profesor obtenido correctamente
@@ -384,8 +386,8 @@ router.get('/profesor/:id', verifyToken, getProfesorById);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *         description: ID del estudiante
+ *           type: string
+ *         description: Documento de identidad del estudiante
  *     responses:
  *       200:
  *         description: Estudiante obtenido correctamente
@@ -394,21 +396,21 @@ router.get('/estudiante/:id', verifyToken, getEstudianteById);
 
 /**
  * @swagger
- * /usuarios/docentes/institucion/{institucion}:
+ * /usuarios/docentes/institucion/{id_institucion}:
  *   get:
  *     summary: Obtiene los docentes de una institución
  *     tags: [Usuarios - GET]
  *     parameters:
  *       - in: path
- *         name: institucion
+ *         name: id_institucion
  *         required: true
  *         schema:
- *           type: string
- *         description: Nombre de la institución
+ *           type: integer
+ *         description: ID de la institución
  *     responses:
  *       200:
  *         description: Lista de docentes obtenida correctamente
  */
-router.get('/docentes/institucion/:institucion', verifyToken, getDocentesPorInstitucion);
+router.get('/docentes/institucion/:id_institucion', verifyToken, getDocentesPorInstitucion);
 
 module.exports = router;

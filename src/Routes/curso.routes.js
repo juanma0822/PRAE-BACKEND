@@ -59,8 +59,8 @@ router.get('/:id', getCursoById);
  *             properties:
  *               nombre:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Curso creado exitosamente
@@ -89,8 +89,8 @@ router.post('/', verifyToken, createCurso);
  *             properties:
  *               nombre:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Curso actualizado correctamente
@@ -175,17 +175,17 @@ router.get('/:id_curso/estudiantes', verifyToken, getEstudiantesPorCurso);
 
 /**
  * @swagger
- * /cursos/institucion/{institucion}:
+ * /cursos/institucion/{id_institucion}:
  *   get:
  *     summary: Obtiene la lista de cursos de una institución específica
  *     tags: [Cursos - GET]
  *     parameters:
  *       - in: path
- *         id: id de institucion
+ *         name: id_institucion
  *         required: true
  *         schema:
- *           type: string
- *         description: Nombre de la institución
+ *           type: integer
+ *         description: ID de la institución
  *     responses:
  *       200:
  *         description: Lista de cursos obtenida correctamente

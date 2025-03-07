@@ -26,8 +26,8 @@ const {
  *             properties:
  *               nombre:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *     responses:
  *       201:
  *         description: Materia creada exitosamente
@@ -67,7 +67,7 @@ router.get('/', getAllMaterias);
 
 /**
  * @swagger
- * /materias/institucion/{institucion}:
+ * /materias/institucion/{id_institucion}:
  *   get:
  *     summary: Obtiene todas las materias de una institución específica
  *     tags: [Materias - GET]
@@ -76,8 +76,8 @@ router.get('/', getAllMaterias);
  *         name: id_institucion
  *         required: true
  *         schema:
- *           type: string
- *         description: Nombre de la institución
+ *           type: integer
+ *         description: ID de la institución
  *     responses:
  *       200:
  *         description: Lista de materias obtenida correctamente
@@ -106,8 +106,8 @@ router.get('/institucion/:id_institucion', verifyToken, getMateriasByInstitucion
  *             properties:
  *               nombre:
  *                 type: string
- *               institucion:
- *                 type: string
+ *               id_institucion:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Materia actualizada correctamente
