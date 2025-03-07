@@ -344,7 +344,7 @@ const updateProfesor = async (
   apellido,
   correo,
   contraseña,
-  institucion,
+  id_institucion,
   area_ensenanza
 ) => {
   // Verificar si el correo ya está en uso por otro usuario
@@ -363,19 +363,19 @@ const updateProfesor = async (
   if (contraseña) {
     query = `
       UPDATE Usuario 
-      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, institucion = $5
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, id_institucion = $5
       WHERE documento_identidad = $6
       RETURNING *;
     `;
-    values = [nombre, apellido, correo, contraseña, institucion, documento_identidad];
+    values = [nombre, apellido, correo, contraseña, id_institucion, documento_identidad];
   } else {
     query = `
       UPDATE Usuario 
-      SET nombre = $1, apellido = $2, correo = $3, institucion = $4
+      SET nombre = $1, apellido = $2, correo = $3, id_institucion = $4
       WHERE documento_identidad = $5
       RETURNING *;
     `;
-    values = [nombre, apellido, correo, institucion, documento_identidad];
+    values = [nombre, apellido, correo, id_institucion, documento_identidad];
   }
 
   const result = await consultarDB(query, values);
