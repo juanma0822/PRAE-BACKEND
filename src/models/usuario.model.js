@@ -260,7 +260,7 @@ const getProfesorById = async (documento_identidad) => {
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
     LEFT JOIN Materia m ON d.id_materia = m.id_materia
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+    WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE AND d.estado = TRUE;
   `;
   const result = await consultarDB(query, [documento_identidad]);
 
@@ -468,7 +468,7 @@ const getDocentesPorInstitucion = async (institucion) => {
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
     LEFT JOIN Materia m ON d.id_materia = m.id_materia
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.id_institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+    WHERE u.id_institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE AND d.estado = TRUE;
   `;
   const result = await consultarDB(query, [institucion]);
 
