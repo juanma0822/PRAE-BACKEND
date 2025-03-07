@@ -278,18 +278,18 @@ const updateEstudiante = async (req, res) => {
   }
 };
 
-//Obtener docentes por institucion
+// Obtener docentes por institución
 const getDocentesPorInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const decodedInstitucion = decodeURIComponent(id_institucion);
-    const docentes = await usuarioService.getDocentesPorInstitucion(decodedInstitucion);
+    const docentes = await usuarioService.getDocentesPorInstitucion(id_institucion);
     res.status(200).json(docentes);
   } catch (error) {
-    console.error(`Error al obtener docentes en la institución "${id_institucion}":`, error);
-    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${id_institucion}": ${error.message}` });
+    console.error(`Error al obtener docentes en la institución "${req.params.id_institucion}":`, error);
+    res.status(500).json({ error: `Error interno del servidor al obtener docentes en la institución "${req.params.id_institucion}": ${error.message}` });
   }
 };
+
 
 module.exports = {
   createAdmin,

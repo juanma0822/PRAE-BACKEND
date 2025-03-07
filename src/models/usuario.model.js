@@ -470,7 +470,7 @@ const getDocentesPorInstitucion = async (institucion) => {
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
     LEFT JOIN Materia m ON d.id_materia = m.id_materia
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;
+    WHERE u.id_institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE;
   `;
   const result = await consultarDB(query, [institucion]);
 
