@@ -43,18 +43,18 @@ const getProfesoresPorMateria = async (req, res) => {
   }
 };
 
-// Eliminar una relación Dictar
+// Eliminar una relación Dictar (cambiar estado a false)
 const deleteDictar = async (req, res) => {
   try {
-    const { id_materiadictada } = req.params;
-    const resultado = await dictarService.deleteDictar(id_materiadictada);
+    const { documento_profe, id_materia } = req.body;
+    const resultado = await dictarService.deleteDictar(documento_profe, id_materia);
     res.status(200).json(resultado);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-//Actualizar materia que dicta un profesor
+// Actualizar materia que dicta un profesor
 const updateMateriaProfesor = async (req, res) => {
   try {
       const { documento_identidad } = req.params;
@@ -67,7 +67,6 @@ const updateMateriaProfesor = async (req, res) => {
       res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
-
 
 module.exports = {
   createDictar,

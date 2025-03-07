@@ -1,5 +1,4 @@
 const dictarModel = require('../models/dictar.model');
-const { updateEstudiante } = require('./usuario.service');
 
 // Crear una relación Dictar (asignar una materia a un profesor)
 const createDictar = async (documento_profe, id_materia) => {
@@ -10,8 +9,6 @@ const createDictar = async (documento_profe, id_materia) => {
     throw new Error(`Error al crear la relación Dictar: ${error.message}`);
   }
 };
-
-
 
 // Obtener todas las relaciones Dictar
 const getAllDictar = async () => {
@@ -43,10 +40,10 @@ const getProfesoresPorMateria = async (id_materia) => {
   }
 };
 
-// Eliminar una relación Dictar (desasignar una materia de un profesor)
-const deleteDictar = async (id_materiadictada) => {
+// Eliminar una relación Dictar (cambiar estado a false)
+const deleteDictar = async (documento_profe, id_materia) => {
   try {
-    const dictar = await dictarModel.deleteDictar(id_materiadictada);
+    const dictar = await dictarModel.deleteDictar(documento_profe, id_materia);
     if (!dictar) throw new Error('Relación Dictar no encontrada');
     return { message: 'Relación Dictar eliminada correctamente', dictar };
   } catch (error) {
@@ -54,7 +51,7 @@ const deleteDictar = async (id_materiadictada) => {
   }
 };
 
-//Actualizar materia que da un profesor
+// Actualizar materia que da un profesor
 const updateMateriaProfesor = async (documento_identidad, id_materia) => {
   return await dictarModel.updateMateriaProfesor(documento_identidad, id_materia);
 };

@@ -100,6 +100,7 @@ CREATE TABLE Dictar (
     id_materiadictada SERIAL PRIMARY KEY,
     documento_profe VARCHAR(20) NOT NULL,
     id_materia INT NOT NULL,
+    estado BOOLEAN DEFAULT TRUE,
     CONSTRAINT fk_dictar_profesor FOREIGN KEY (documento_profe)
         REFERENCES Profesor(documento_identidad)
         ON DELETE CASCADE,

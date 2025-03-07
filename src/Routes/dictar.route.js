@@ -84,22 +84,26 @@ router.get('/materia/:id_materia/profesores', getProfesoresPorMateria);
 
 /**
  * @swagger
- * /dictar/{id_materiadictada}:
+ * /dictar:
  *   delete:
- *     summary: Eliminar una relación Dictar
+ *     summary: Eliminar una relación Dictar (cambiar estado a false)
  *     tags: [Dictar materias - DELETE]
- *     parameters:
- *       - in: path
- *         name: id_materiadictada
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID de la relación Dictar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               documento_profe:
+ *                 type: string
+ *               id_materia:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: Relación Dictar eliminada correctamente
  */
-router.delete('/:id_materiadictada', deleteDictar);
+router.delete('/', deleteDictar);
 
 /**
  * @swagger
