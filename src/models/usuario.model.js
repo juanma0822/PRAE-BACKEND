@@ -3,7 +3,20 @@ const bcrypt = require("bcryptjs");
 
 const ExistingUser = async (email, password = null) => {
   const query = `
-    SELECT u.*, i.*
+    SELECT 
+      u.*, 
+      i.nombre AS nombre_institucion, 
+      i.telefono AS telefono_institucion, 
+      i.instagram AS instagram_institucion, 
+      i.facebook AS facebook_institucion, 
+      i.logo AS logo_institucion, 
+      i.color_principal AS color_principal_institucion, 
+      i.color_secundario AS color_secundario_institucion, 
+      i.fondo AS fondo_institucion, 
+      i.color_pildora1 AS color_pildora1_institucion, 
+      i.color_pildora2 AS color_pildora2_institucion, 
+      i.color_pildora3 AS color_pildora3_institucion, 
+      i.estado AS estado_institucion
     FROM Usuario u
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
     WHERE u.correo = $1

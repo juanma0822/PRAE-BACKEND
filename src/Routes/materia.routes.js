@@ -73,7 +73,7 @@ router.get('/', getAllMaterias);
  *     tags: [Materias - GET]
  *     parameters:
  *       - in: path
- *         name: institucion
+ *         name: id_institucion
  *         required: true
  *         schema:
  *           type: string
@@ -82,7 +82,7 @@ router.get('/', getAllMaterias);
  *       200:
  *         description: Lista de materias obtenida correctamente
  */
-router.get('/institucion/:institucion', verifyToken, getMateriasByInstitucion);
+router.get('/institucion/:id_institucion', verifyToken, getMateriasByInstitucion);
 
 /**
  * @swagger

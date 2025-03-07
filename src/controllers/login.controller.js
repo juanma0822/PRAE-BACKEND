@@ -16,21 +16,21 @@ const VerifyLogin = async (req, res) => {
             email: user.correo,
             id: user.documento_identidad,
             rol: user.rol,
-            nombre: user.nombre,
+            nombre: user.nombre, // Asegúrate de que este es el nombre del usuario
             apellido: user.apellido,
             institucion: {
                 id_institucion: user.id_institucion,
-                nombre: user.nombre_institucion,
-                telefono: user.telefono,
-                instagram: user.instagram,
-                facebook: user.facebook,
-                logo: user.logo,
-                color_principal: user.color_principal,
-                color_secundario: user.color_secundario,
-                fondo: user.fondo,
-                color_pildora1: user.color_pildora1,
-                color_pildora2: user.color_pildora2,
-                color_pildora3: user.color_pildora3,
+                nombre: user.nombre_institucion, // Asegúrate de que este es el nombre de la institución
+                telefono: user.telefono_institucion,
+                instagram: user.instagram_institucion,
+                facebook: user.facebook_institucion,
+                logo: user.logo_institucion,
+                color_principal: user.color_principal_institucion,
+                color_secundario: user.color_secundario_institucion,
+                fondo: user.fondo_institucion,
+                color_pildora1: user.color_pildora1_institucion,
+                color_pildora2: user.color_pildora2_institucion,
+                color_pildora3: user.color_pildora3_institucion,
                 estado: user.estado_institucion
             }
         };
@@ -39,6 +39,8 @@ const VerifyLogin = async (req, res) => {
             payload.id_curso = user.id_curso;
             payload.curso = user.curso;
         }
+
+        console.log("Payload:", payload); // Agrega un console.log para verificar el payload
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
         res.status(200).json({ message: "Login exitoso", token });

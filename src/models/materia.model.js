@@ -1,12 +1,12 @@
 const { consultarDB } = require('../db');
 
 // Insertar una materia
-const insertMateria = async (nombre, institucion) => {
+const insertMateria = async (nombre, id_institucion) => {
   // Verificar si ya existe una materia con el mismo nombre en la misma institución
-  const checkQuery = `SELECT * FROM Materia WHERE nombre = $1 AND institucion = $2 AND activo = TRUE;`;
-  const checkResult = await consultarDB(checkQuery, [nombre, institucion]);
+  const checkQuery = `SELECT * FROM Materia WHERE nombre = $1 AND id_institucion = $2 AND activo = TRUE;`;
+  const checkResult = await consultarDB(checkQuery, [nombre, id_institucion]);
   if (checkResult.length > 0) {
-    throw new Error(`Ya existe una materia con el nombre "${nombre}" en la institución "${institucion}"`);
+    throw new Error(`Ya existe una materia con el nombre "${nombre}" en la institución con ID "${id_institucion}"`);
   }
 
   // Asignar un color aleatorio si no se proporciona uno
@@ -14,11 +14,11 @@ const insertMateria = async (nombre, institucion) => {
   const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
 
   const query = `
-    INSERT INTO Materia (nombre, activo, color, institucion)
+    INSERT INTO Materia (nombre, activo, color, id_institucion)
     VALUES ($1, TRUE, $2, $3)
     RETURNING *;
   `;
-  const values = [nombre, colorAsignado, institucion];
+  const values = [nombre, colorAsignado, id_institucion];
   const result = await consultarDB(query, values);
   return result[0];
 };
@@ -44,24 +44,24 @@ const getAllMaterias = async () => {
 };
 
 // Obtener todas las materias de una institución específica
-const getMateriasByInstitucion = async (institucion) => {
+const getMateriasByInstitucion = async (id_institucion) => {
   const query = `
     SELECT * FROM Materia
-    WHERE institucion = $1 AND activo = TRUE;
+    WHERE id_institucion = $1 AND activo = TRUE;
   `;
-  const result = await consultarDB(query, [institucion]);
+  const result = await consultarDB(query, [id_institucion]);
   return result;
 };
 
 // Actualizar una materia
-const updateMateria = async (id_materia, nombre, institucion) => {
+const updateMateria = async (id_materia, nombre, id_institucion) => {
   const query = `
     UPDATE Materia
-    SET nombre = $1, institucion = $2
+    SET nombre = $1, id_institucion = $2
     WHERE id_materia = $3 AND activo = TRUE
     RETURNING *;
   `;
-  const values = [nombre, institucion, id_materia];
+  const values = [nombre, id_institucion, id_materia];
   const result = await consultarDB(query, values);
   return result[0];
 };

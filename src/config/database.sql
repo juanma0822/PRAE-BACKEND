@@ -88,7 +88,11 @@ CREATE TABLE Materia (
     id_materia SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     activo BOOLEAN DEFAULT TRUE,
-    color VARCHAR(20) NOT NULL DEFAULT 'azul'
+    color VARCHAR(20) NOT NULL DEFAULT 'azul',
+    id_institucion INT NOT NULL,
+    CONSTRAINT fk_curso_institucion FOREIGN KEY (id_institucion)
+        REFERENCES Institucion(id_institucion)
+        ON DELETE CASCADE
 );
 
 -- 8. Tabla Dictar (Asignación de Materia a Profesor)

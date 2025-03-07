@@ -3,13 +3,13 @@ const materiaService = require('../services/materia.service');
 // Crear una materia
 const addMateria = async (req, res) => {
   try {
-    const { nombre, institucion } = req.body;
+    const { nombre, id_institucion } = req.body;
 
-    if (!nombre || !institucion) {
+    if (!nombre || !id_institucion) {
       return res.status(400).json({ message: "El nombre y la institución son requeridos y no pueden estar vacíos" });
     }
 
-    const nuevaMateria = await materiaService.addMateria(nombre, institucion);
+    const nuevaMateria = await materiaService.addMateria(nombre, id_institucion);
     res.status(201).json(nuevaMateria);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -40,13 +40,13 @@ const getAllMaterias = async (req, res) => {
 // Obtener todas las materias de una institución específica
 const getMateriasByInstitucion = async (req, res) => {
   try {
-    const { institucion } = req.params;
+    const { id_institucion } = req.params;
 
-    if (!institucion) {
+    if (!id_institucion) {
         return res.status(400).json({ message: "Institución es requerida" });
     }
 
-    const materias = await materiaService.getMateriasByInstitucion(institucion);
+    const materias = await materiaService.getMateriasByInstitucion(id_institucion);
     res.status(200).json(materias);
 } catch (error) {
     console.error("Error al obtener materias:", error);
@@ -58,8 +58,8 @@ const getMateriasByInstitucion = async (req, res) => {
 const updateMateria = async (req, res) => {
   try {
     const { id_materia } = req.params;
-    const { nombre, institucion } = req.body;
-    const materiaActualizada = await materiaService.updateMateria(id_materia, nombre, institucion);
+    const { nombre, id_institucion } = req.body;
+    const materiaActualizada = await materiaService.updateMateria(id_materia, nombre, id_institucion);
     res.status(200).json(materiaActualizada);
   } catch (error) {
     res.status(500).json({ message: error.message });
