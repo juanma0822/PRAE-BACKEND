@@ -203,7 +203,7 @@ const getUsuariosByRol = async (rol) => {
             LEFT JOIN Asignar a ON m.id_materia = a.id_materia
             LEFT JOIN Curso c ON a.id_curso = c.id_curso
             LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-            WHERE u.rol = $1 AND u.activo = TRUE;
+            WHERE u.rol = $1 AND u.activo = TRUE AND d.estado = TRUE;
         `;
   } else if (rol === "estudiante") {
     query = `

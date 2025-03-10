@@ -75,6 +75,16 @@ const deleteMateria = async (id_materia) => {
     RETURNING *;
   `;
   const result = await consultarDB(query, [id_materia]);
+
+  if (result.length > 0) {
+    const updateDictarQuery = `
+      UPDATE Dictar
+      SET estado = FALSE
+      WHERE id_materia = $1;
+    `;
+    await consultarDB(updateDictarQuery, [id_materia]);
+  }
+
   return result[0];
 };
 
@@ -87,6 +97,16 @@ const activateMateria = async (id_materia) => {
     RETURNING *;
   `;
   const result = await consultarDB(query, [id_materia]);
+
+  if (result.length > 0) {
+    const updateDictarQuery = `
+      UPDATE Dictar
+      SET estado = TRUE
+      WHERE id_materia = $1;
+    `;
+    await consultarDB(updateDictarQuery, [id_materia]);
+  }
+
   return result[0];
 };
 
