@@ -15,6 +15,8 @@ const actividadRoutes = require('./Routes/actividad.routes');
 const calificacionRoutes = require('./Routes/calificacion.routes');
 const authRoutes = require('./Routes/auth.routes');
 const swaggerRoutes = require("./swagger/swagger");
+const institucionRoutes = require('./Routes/institucion.routes');
+const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
 
 //--------------MIDDLEWARE
 app.use(cors());
@@ -50,6 +52,12 @@ app.use('/calificacion', calificacionRoutes);
 
 // Auth Route
 app.use('/auth', authRoutes);
+
+// Institution Routes
+app.use('/instituciones', institucionRoutes);
+
+// Periodo Academico Routes
+app.use('/periodosAcademicos', periodoAcademicoRoutes);
 
 //TEST API
 app.use('/test', testRoute);
