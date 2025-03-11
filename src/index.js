@@ -17,6 +17,7 @@ const authRoutes = require('./Routes/auth.routes');
 const swaggerRoutes = require("./swagger/swagger");
 const institucionRoutes = require('./Routes/institucion.routes');
 const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
+const historialGradoRoutes = require('./Routes/historialGrado.routes');
 
 //--------------MIDDLEWARE
 app.use(cors());
@@ -58,6 +59,9 @@ app.use('/instituciones', institucionRoutes);
 
 // Periodo Academico Routes
 app.use('/periodosAcademicos', periodoAcademicoRoutes);
+
+// Historial Grado Routes
+app.use('/historialGrado', historialGradoRoutes); 
 
 //TEST API
 app.use('/test', testRoute);
