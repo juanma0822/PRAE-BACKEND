@@ -46,8 +46,11 @@ const updateInstitucion = async (req, res) => {
     const { id_institucion } = req.params;
     const { nombre, telefono, instagram, facebook, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
 
+    // Obtener la institución actual para mantener el logo si no se proporciona uno nuevo
+    const institucionActual = await institucionService.getInstitucionById(id_institucion);
+    let logoUrl = institucionActual.logo;
+
     // Subir el logo si se proporciona
-    let logoUrl = req.body.logo;
     if (req.file) {
       logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
     }
