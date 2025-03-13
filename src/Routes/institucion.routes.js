@@ -99,7 +99,7 @@ router.get('/:id_institucion', getInstitucionById);
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -113,6 +113,7 @@ router.get('/:id_institucion', getInstitucionById);
  *                 type: string
  *               logo:
  *                 type: string
+ *                 format: binary
  *               color_principal:
  *                 type: string
  *               color_secundario:
@@ -129,7 +130,7 @@ router.get('/:id_institucion', getInstitucionById);
  *       200:
  *         description: Institución actualizada correctamente
  */
-router.put('/:id_institucion', updateInstitucion);
+router.put('/:id_institucion', upload.single('logo'), updateInstitucion);
 
 /**
  * @swagger
@@ -165,7 +166,7 @@ router.delete('/:id_institucion', deleteInstitucion);
  *         description: ID de la institución
  *     responses:
  *       200:
- *         description: Institución desactivada correctamente
+ *         description: Institución activada correctamente
  */
 router.put('/activate/:id_institucion', activateInstitucion);
 

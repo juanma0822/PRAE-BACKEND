@@ -1,5 +1,5 @@
 const institucionService = require('../services/institucion.service');
-const { uploadImageToFirebase } = require('../services/uploadService')
+const { uploadImageToFirebase } = require('../services/uploadService');
 
 // Crear una nueva institución
 const createInstitucion = async (req, res) => {

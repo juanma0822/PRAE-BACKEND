@@ -65,17 +65,18 @@ const deleteInstitucion = async (id_institucion) => {
   return result[0];
 };
 
-// Desactivar una institución (cambiar estado a false)
+// Activar una institución (cambiar estado a true)
 const activateInstitucion = async (id_institucion) => {
-    const query = `
-      UPDATE Institucion
-      SET estado = TRUE
-      WHERE id_institucion = $1
-      RETURNING *;
-    `;
-    const result = await consultarDB(query, [id_institucion]);
-    return result[0];
-  };
+  const query = `
+    UPDATE Institucion
+    SET estado = TRUE
+    WHERE id_institucion = $1
+    RETURNING *;
+  `;
+  const result = await consultarDB(query, [id_institucion]);
+  return result[0];
+};
+
 module.exports = {
   insertInstitucion,
   getAllInstituciones,
