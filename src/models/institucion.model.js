@@ -2,6 +2,14 @@ const { consultarDB } = require('../db');
 
 // Insertar una nueva institución
 const insertInstitucion = async (nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3) => {
+  // Asignar valores por defecto si no se proporcionan
+  color_principal = color_principal || '#157AFE';
+  color_secundario = color_secundario || '#F5F7F9';
+  fondo = fondo || '#FFFFFF';
+  color_pildora1 = color_pildora1 || '#157AFE';
+  color_pildora2 = color_pildora2 || '#4946E2';
+  color_pildora3 = color_pildora3 || '#EF9131';
+
   const query = `
     INSERT INTO Institucion (nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3, estado)
     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, TRUE)
