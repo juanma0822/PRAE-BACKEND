@@ -44,8 +44,15 @@ const getInstitucionById = async (req, res) => {
 const updateInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const { nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
-    const institucionActualizada = await institucionService.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const { nombre, telefono, instagram, facebook, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
+
+    // Subir el logo si se proporciona
+    let logoUrl = req.body.logo;
+    if (req.file) {
+      logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
+    }
+
+    const institucionActualizada = await institucionService.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
     res.status(200).json(institucionActualizada);
   } catch (error) {
     res.status(500).json({ message: error.message });
