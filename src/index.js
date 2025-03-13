@@ -1,3 +1,4 @@
+require('dotenv').config(); 
 const express = require('express');
 const app = express();
 const http = require("http");
@@ -18,6 +19,8 @@ const swaggerRoutes = require("./swagger/swagger");
 const institucionRoutes = require('./Routes/institucion.routes');
 const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
 const historialGradoRoutes = require('./Routes/historialGrado.routes');
+const uploadRoutes = require('./Routes/upload.routes');
+const { admin, bucket } = require('./config/firebase');
 
 //--------------MIDDLEWARE
 app.use(cors());
@@ -56,6 +59,9 @@ app.use('/auth', authRoutes);
 
 // Institution Routes
 app.use('/instituciones', institucionRoutes);
+
+// Logo Upload Route
+app.use('/upload', uploadRoutes);
 
 // Periodo Academico Routes
 app.use('/periodosAcademicos', periodoAcademicoRoutes);

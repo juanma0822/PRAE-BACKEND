@@ -8,6 +8,7 @@ const {
   deleteInstitucion,
   activateInstitucion,
 } = require('../controllers/institucion.controller');
+const { upload } = require('../services/uploadService');
 
 /**
  * @swagger
@@ -18,7 +19,7 @@ const {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -32,6 +33,7 @@ const {
  *                 type: string
  *               logo:
  *                 type: string
+ *                 format: binary
  *               color_principal:
  *                 type: string
  *               color_secundario:
@@ -48,7 +50,7 @@ const {
  *       201:
  *         description: Institución creada exitosamente
  */
-router.post('/', createInstitucion);
+router.post('/', upload.single('logo'), createInstitucion);
 
 /**
  * @swagger
