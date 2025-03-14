@@ -426,7 +426,7 @@ const updateEstudiante = async (
   if (contraseña) {
     query = `
       UPDATE Usuario 
-      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, institucion = $5
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, id_institucion = $5
       WHERE documento_identidad = $6
       RETURNING *;
     `;
@@ -434,7 +434,7 @@ const updateEstudiante = async (
   } else {
     query = `
       UPDATE Usuario 
-      SET nombre = $1, apellido = $2, correo = $3, institucion = $4
+      SET nombre = $1, apellido = $2, correo = $3, id_institucion = $4
       WHERE documento_identidad = $5
       RETURNING *;
     `;
