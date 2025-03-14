@@ -1,9 +1,9 @@
 const institucionModel = require('../models/institucion.model');
 
 // Crear una nueva institución
-const createInstitucion = async (nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3) => {
+const createInstitucion = async (nombre, telefono, instagram, facebook, direccion, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3) => {
   try {
-    const institucion = await institucionModel.insertInstitucion(nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const institucion = await institucionModel.insertInstitucion(nombre, telefono, instagram, facebook, direccion, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
     return institucion;
   } catch (error) {
     throw new Error(`Error al crear la institución: ${error.message}`);
@@ -32,9 +32,9 @@ const getInstitucionById = async (id_institucion) => {
 };
 
 // Actualizar una institución
-const updateInstitucion = async (id_institucion, nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3) => {
+const updateInstitucion = async (id_institucion, nombre, telefono, instagram, facebook, direccion, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3) => {
   try {
-    const institucion = await institucionModel.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const institucion = await institucionModel.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, direccion, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
     if (!institucion) throw new Error('Institución no encontrada');
     return institucion;
   } catch (error) {

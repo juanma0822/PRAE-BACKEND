@@ -112,6 +112,8 @@ router.get('/:id_institucion', verifyToken, getInstitucionById);
  *                 type: string
  *               facebook:
  *                 type: string
+ *               direccion:
+ *                 type: string
  *               logo:
  *                 type: string
  *                 format: binary

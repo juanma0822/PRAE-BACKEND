@@ -4,7 +4,7 @@ const { uploadImageToFirebase } = require('../services/uploadService');
 // Crear una nueva institución
 const createInstitucion = async (req, res) => {
   try {
-    const { nombre, telefono, instagram, facebook, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
+    const { nombre, telefono, instagram, facebook, direccion, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
 
     // Subir el logo si se proporciona
     let logoUrl = null;
@@ -12,7 +12,7 @@ const createInstitucion = async (req, res) => {
       logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
     }
 
-    const nuevaInstitucion = await institucionService.createInstitucion(nombre, telefono, instagram, facebook, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const nuevaInstitucion = await institucionService.createInstitucion(nombre, telefono, instagram, facebook, direccion, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
     res.status(201).json(nuevaInstitucion);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -44,7 +44,7 @@ const getInstitucionById = async (req, res) => {
 const updateInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const { nombre, telefono, instagram, facebook, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
+    const { nombre, telefono, instagram, facebook, direccion, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
 
     // Obtener la institución actual para mantener el logo si no se proporciona uno nuevo
     const institucionActual = await institucionService.getInstitucionById(id_institucion);
@@ -55,7 +55,7 @@ const updateInstitucion = async (req, res) => {
       logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
     }
 
-    const institucionActualizada = await institucionService.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const institucionActualizada = await institucionService.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, direccion, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
     res.status(200).json(institucionActualizada);
   } catch (error) {
     res.status(500).json({ message: error.message });
