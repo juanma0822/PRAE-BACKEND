@@ -314,7 +314,7 @@ const getEstudiantesPorInstitucion = async (institucion) => {
     INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
     INNER JOIN Curso c ON e.id_curso = c.id_curso
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.institucion = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+    WHERE u.id_institucion = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
   `;
   const result = await consultarDB(query, [institucion]);
   return result;

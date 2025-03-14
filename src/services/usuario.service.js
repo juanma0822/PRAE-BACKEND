@@ -1,6 +1,6 @@
 const usuarioModel = require("../models/usuario.model");
 const bcrypt = require("bcryptjs");
-
+const { pool } = require('../db');
 const saltRounds = 10;
 
 const addUsuario = async (
@@ -93,7 +93,9 @@ const updateUsuario = async (
   rol,
   id_institucion
 ) => {
-  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
+  const hashedPassword = contraseña
+    ? await bcrypt.hash(contraseña, saltRounds)
+    : null;
   return await usuarioModel.updateUsuario(
     documento_identidad,
     nombre,
@@ -143,7 +145,9 @@ const updateProfesor = async (
   id_institucion,
   area_ensenanza
 ) => {
-  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
+  const hashedPassword = contraseña
+    ? await bcrypt.hash(contraseña, saltRounds)
+    : null;
   return await usuarioModel.updateProfesor(
     documento_identidad,
     nombre,
@@ -165,7 +169,9 @@ const updateEstudiante = async (
   id_institucion,
   id_curso
 ) => {
-  const hashedPassword = contraseña ? await bcrypt.hash(contraseña, saltRounds) : null;
+  const hashedPassword = contraseña
+    ? await bcrypt.hash(contraseña, saltRounds)
+    : null;
   return await usuarioModel.updateEstudiante(
     documento_identidad,
     nombre,
