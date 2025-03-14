@@ -63,7 +63,10 @@ const addEstudiante = async (
   id_institucion,
   id_curso
 ) => {
+  const client = await pool.connect();
   try {
+    await client.query('BEGIN'); // Inicia la transacción
+
     const usuario = await addUsuario(
       documento_identidad,
       nombre,
@@ -71,12 +74,19 @@ const addEstudiante = async (
       correo,
       contraseña,
       "estudiante",
-      id_institucion
+      id_institucion,
+      client // Pasa el cliente de transacción
     );
-    await usuarioModel.insertEstudiante(documento_identidad, id_curso);
+
+    await usuarioModel.insertEstudiante(documento_identidad, id_curso, client);
+
+    await client.query('COMMIT'); // Confirma la transacción
     return usuario;
   } catch (error) {
+    await client.query('ROLLBACK'); // Deshace la transacción en caso de error
     throw new Error(error.message);
+  } finally {
+    client.release(); // Libera el cliente
   }
 };
 
