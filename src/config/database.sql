@@ -9,6 +9,7 @@ CREATE TABLE Institucion (
     telefono TEXT,
     instagram TEXT,
     facebook TEXT,
+    direccion TEXT NULL
     logo TEXT,  
     color_principal VARCHAR(10) NOT NULL DEFAULT '#157AFE',
     color_secundario VARCHAR(10) NOT NULL DEFAULT '#F5F7F9',
