@@ -9,6 +9,7 @@ const {
   activateInstitucion,
 } = require('../controllers/institucion.controller');
 const { upload } = require('../services/uploadService');
+const verifyToken = require('../middleware/auth.middleware')
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ const { upload } = require('../services/uploadService');
  *       201:
  *         description: Institución creada exitosamente
  */
-router.post('/', upload.single('logo'), createInstitucion);
+router.post('/', verifyToken, upload.single('logo'), createInstitucion);
 
 /**
  * @swagger
@@ -81,7 +82,7 @@ router.get('/', getAllInstituciones);
  *       200:
  *         description: Institución obtenida correctamente
  */
-router.get('/:id_institucion', getInstitucionById);
+router.get('/:id_institucion', verifyToken, getInstitucionById);
 
 /**
  * @swagger
@@ -130,7 +131,7 @@ router.get('/:id_institucion', getInstitucionById);
  *       200:
  *         description: Institución actualizada correctamente
  */
-router.put('/:id_institucion', upload.single('logo'), updateInstitucion);
+router.put('/:id_institucion', verifyToken, upload.single('logo'), updateInstitucion);
 
 /**
  * @swagger
@@ -149,7 +150,7 @@ router.put('/:id_institucion', upload.single('logo'), updateInstitucion);
  *       200:
  *         description: Institución desactivada correctamente
  */
-router.delete('/:id_institucion', deleteInstitucion);
+router.delete('/:id_institucion', verifyToken, deleteInstitucion);
 
 /**
  * @swagger
@@ -168,6 +169,6 @@ router.delete('/:id_institucion', deleteInstitucion);
  *       200:
  *         description: Institución activada correctamente
  */
-router.put('/activate/:id_institucion', activateInstitucion);
+router.put('/activate/:id_institucion', verifyToken, activateInstitucion);
 
 module.exports = router;

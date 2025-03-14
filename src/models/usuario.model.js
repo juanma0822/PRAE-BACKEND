@@ -16,7 +16,8 @@ const ExistingUser = async (email, password = null) => {
       i.color_pildora1 AS color_pildora1_institucion, 
       i.color_pildora2 AS color_pildora2_institucion, 
       i.color_pildora3 AS color_pildora3_institucion, 
-      i.estado AS estado_institucion
+      i.estado AS estado_institucion,
+      i.direccion AS direccion_institucion
     FROM Usuario u
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
     WHERE u.correo = $1

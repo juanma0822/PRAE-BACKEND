@@ -20,7 +20,7 @@ const VerifyLogin = async (req, res) => {
             apellido: user.apellido,
             institucion: {
                 id_institucion: user.id_institucion,
-                nombre: user.nombre_institucion, // Asegúrate de que este es el nombre de la institución
+                nombre: user.nombre_institucion, 
                 telefono: user.telefono_institucion,
                 instagram: user.instagram_institucion,
                 facebook: user.facebook_institucion,
@@ -31,7 +31,8 @@ const VerifyLogin = async (req, res) => {
                 color_pildora1: user.color_pildora1_institucion,
                 color_pildora2: user.color_pildora2_institucion,
                 color_pildora3: user.color_pildora3_institucion,
-                estado: user.estado_institucion
+                estado: user.estado_institucion,
+                direccion: user.direccion_institucion,
             }
         };
 
