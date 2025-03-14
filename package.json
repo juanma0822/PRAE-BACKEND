@@ -25,6 +25,7 @@
     "pg": "^8.13.2",
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^4.6.2"
+    "swagger-ui-express": "^4.6.2",
+    "z-schema": "^6.0.2"
   }
 }
