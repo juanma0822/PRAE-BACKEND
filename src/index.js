@@ -20,7 +20,6 @@ const institucionRoutes = require('./Routes/institucion.routes');
 const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
 const historialGradoRoutes = require('./Routes/historialGrado.routes');
 const uploadRoutes = require('./Routes/upload.routes');
-const { admin, bucket } = require('./config/firebase');
 
 //--------------MIDDLEWARE
 app.use(cors());

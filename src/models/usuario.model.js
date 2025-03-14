@@ -60,8 +60,7 @@ const insertUsuario = async (
   correo,
   contraseña,
   rol,
-  id_institucion,
-  client = null
+  id_institucion
 ) => {
   // Verificar si el usuario ya existe
   const existingUser = await consultarDB(
@@ -78,10 +77,10 @@ const insertUsuario = async (
   const colorAsignado = colores[Math.floor(Math.random() * colores.length)];
 
   const query = `
-    INSERT INTO Usuario (documento_identidad, nombre, apellido, correo, contraseña, rol, id_institucion, color)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    RETURNING *;
-  `;
+        INSERT INTO Usuario (documento_identidad, nombre, apellido, correo, contraseña, rol, id_institucion, color)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *;
+    `;
   const values = [
     documento_identidad,
     nombre,
@@ -92,14 +91,8 @@ const insertUsuario = async (
     id_institucion,
     colorAsignado,
   ];
-
-  if (client) {
-    const result = await client.query(query, values);
-    return result.rows[0];
-  } else {
-    const result = await consultarDB(query, values);
-    return result[0];
-  }
+  const result = await consultarDB(query, values);
+  return result[0];
 };
 
 const insertProfesor = async (documento_identidad, area_ensenanza) => {
@@ -109,18 +102,11 @@ const insertProfesor = async (documento_identidad, area_ensenanza) => {
   );
 };
 
-const insertEstudiante = async (documento_identidad, id_curso, client = null) => {
-  const query = `
-    INSERT INTO Estudiante (documento_identidad, id_curso)
-    VALUES ($1, $2)
-  `;
-  const values = [documento_identidad, id_curso];
-
-  if (client) {
-    await client.query(query, values);
-  } else {
-    await consultarDB(query, values);
-  }
+const insertEstudiante = async (documento_identidad, id_curso) => {
+  await consultarDB(
+    "INSERT INTO Estudiante (documento_identidad, id_curso) VALUES ($1, $2)",
+    [documento_identidad, id_curso]
+  );
 };
 
 const getUsuariosActivos = async () => {

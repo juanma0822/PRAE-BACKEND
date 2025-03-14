@@ -1,6 +1,6 @@
 const usuarioModel = require("../models/usuario.model");
 const bcrypt = require("bcryptjs");
-const { pool } = require('../db');
+
 const saltRounds = 10;
 
 const addUsuario = async (
@@ -63,10 +63,7 @@ const addEstudiante = async (
   id_institucion,
   id_curso
 ) => {
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN'); // Inicia la transacción
-
     const usuario = await addUsuario(
       documento_identidad,
       nombre,
@@ -74,19 +71,12 @@ const addEstudiante = async (
       correo,
       contraseña,
       "estudiante",
-      id_institucion,
-      client // Pasa el cliente de transacción
+      id_institucion
     );
-
-    await usuarioModel.insertEstudiante(documento_identidad, id_curso, client);
-
-    await client.query('COMMIT'); // Confirma la transacción
+    await usuarioModel.insertEstudiante(documento_identidad, id_curso);
     return usuario;
   } catch (error) {
-    await client.query('ROLLBACK'); // Deshace la transacción en caso de error
     throw new Error(error.message);
-  } finally {
-    client.release(); // Libera el cliente
   }
 };
 
