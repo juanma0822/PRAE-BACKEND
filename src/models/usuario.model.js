@@ -166,10 +166,31 @@ const updateUsuario = async (
 };
 
 const desactivarUsuario = async (documento_identidad) => {
-  await consultarDB(
-    "UPDATE Usuario SET activo = FALSE WHERE documento_identidad = $1",
-    [documento_identidad]
-  );
+  // Verificar si el usuario es un docente
+  const queryVerificarDocente = `
+    SELECT 1 
+    FROM Profesor 
+    WHERE documento_identidad = $1
+  `;
+  const esDocente = await consultarDB(queryVerificarDocente, [documento_identidad]);
+
+  if (esDocente.length > 0) {
+    // Si es docente, desactivar todas las relaciones en la tabla Dictar
+    const queryDesactivarDictar = `
+      UPDATE Dictar 
+      SET estado = FALSE 
+      WHERE documento_profe = $1
+    `;
+    await consultarDB(queryDesactivarDictar, [documento_identidad]);
+  }
+
+  // Desactivar el usuario
+  const queryDesactivarUsuario = `
+    UPDATE Usuario 
+    SET activo = FALSE 
+    WHERE documento_identidad = $1
+  `;
+  await consultarDB(queryDesactivarUsuario, [documento_identidad]);
 };
 
 const activarUsuario = async (documento_identidad) => {
