@@ -1,18 +1,49 @@
-const institucionService = require('../services/institucion.service');
-const { uploadImageToFirebase } = require('../services/uploadService');
+const institucionService = require("../services/institucion.service");
+const {
+  uploadImageToFirebase,
+  deleteImageFromFirebase,
+} = require("../services/uploadService");
 
 // Crear una nueva institución
 const createInstitucion = async (req, res) => {
   try {
-    const { nombre, telefono, instagram, facebook, direccion, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
+    const {
+      nombre,
+      telefono,
+      instagram,
+      facebook,
+      direccion,
+      color_principal,
+      color_secundario,
+      fondo,
+      color_pildora1,
+      color_pildora2,
+      color_pildora3,
+    } = req.body;
 
     // Subir el logo si se proporciona
     let logoUrl = null;
     if (req.file) {
-      logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
+      logoUrl = await uploadImageToFirebase(
+        req.file.buffer,
+        req.file.originalname
+      );
     }
 
-    const nuevaInstitucion = await institucionService.createInstitucion(nombre, telefono, instagram, facebook, direccion, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const nuevaInstitucion = await institucionService.createInstitucion(
+      nombre,
+      telefono,
+      instagram,
+      facebook,
+      direccion,
+      logoUrl,
+      color_principal,
+      color_secundario,
+      fondo,
+      color_pildora1,
+      color_pildora2,
+      color_pildora3
+    );
     res.status(201).json(nuevaInstitucion);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -33,7 +64,9 @@ const getAllInstituciones = async (req, res) => {
 const getInstitucionById = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const institucion = await institucionService.getInstitucionById(id_institucion);
+    const institucion = await institucionService.getInstitucionById(
+      id_institucion
+    );
     res.status(200).json(institucion);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -44,18 +77,52 @@ const getInstitucionById = async (req, res) => {
 const updateInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const { nombre, telefono, instagram, facebook, direccion, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
+    const {
+      nombre,
+      telefono,
+      instagram,
+      facebook,
+      direccion,
+      color_principal,
+      color_secundario,
+      fondo,
+      color_pildora1,
+      color_pildora2,
+      color_pildora3,
+    } = req.body;
 
     // Obtener la institución actual para mantener el logo si no se proporciona uno nuevo
-    const institucionActual = await institucionService.getInstitucionById(id_institucion);
+    const institucionActual = await institucionService.getInstitucionById(
+      id_institucion
+    );
     let logoUrl = institucionActual.logo;
 
     // Subir el logo si se proporciona
     if (req.file) {
-      logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
+      if (logoUrl) {
+        await deleteImageFromFirebase(logoUrl);
+      }
+      logoUrl = await uploadImageToFirebase(
+        req.file.buffer,
+        req.file.originalname
+      );
     }
 
-    const institucionActualizada = await institucionService.updateInstitucion(id_institucion, nombre, telefono, instagram, facebook, direccion, logoUrl, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3);
+    const institucionActualizada = await institucionService.updateInstitucion(
+      id_institucion,
+      nombre,
+      telefono,
+      instagram,
+      facebook,
+      direccion,
+      logoUrl,
+      color_principal,
+      color_secundario,
+      fondo,
+      color_pildora1,
+      color_pildora2,
+      color_pildora3
+    );
     res.status(200).json(institucionActualizada);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -66,7 +133,9 @@ const updateInstitucion = async (req, res) => {
 const deleteInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const resultado = await institucionService.deleteInstitucion(id_institucion);
+    const resultado = await institucionService.deleteInstitucion(
+      id_institucion
+    );
     res.status(200).json(resultado);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -74,14 +143,16 @@ const deleteInstitucion = async (req, res) => {
 };
 
 const activateInstitucion = async (req, res) => {
-    try {
-        const {id_institucion} = req.params;
-        const resultado = await institucionService.activateInstitucion(id_institucion);
-        res.status(200).json(resultado);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
+  try {
+    const { id_institucion } = req.params;
+    const resultado = await institucionService.activateInstitucion(
+      id_institucion
+    );
+    res.status(200).json(resultado);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 module.exports = {
   createInstitucion,

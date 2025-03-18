@@ -42,4 +42,26 @@ const uploadImageToFirebase = async (fileBuffer, originalName) => {
   });
 };
 
-module.exports = { upload, uploadImageToFirebase };
+/**
+ * Elimina una imagen de Firebase Storage
+ * @param {string} imageUrl - URL pública de la imagen a eliminar
+ * @returns {Promise<void>}
+ */
+const deleteImageFromFirebase = async (imageUrl) => {
+  if (!imageUrl) return;
+
+  try {
+    // Extraer solo el path del archivo después del bucket
+    const bucketName = bucket.name; // Nombre del bucket desde config/firebase
+    const filePath = imageUrl.replace(`https://storage.googleapis.com/${bucketName}/`, "");
+
+    // Eliminar la imagen de Firebase Storage
+    await bucket.file(filePath).delete();
+    console.log(`Imagen eliminada: ${filePath}`);
+  } catch (error) {
+    console.error("Error al eliminar la imagen de Firebase:", error);
+  }
+};
+
+
+module.exports = { upload, uploadImageToFirebase, deleteImageFromFirebase };
