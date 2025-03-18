@@ -8,11 +8,6 @@ const asignarMateria = async (id_curso, id_materia, id_docente) => {
   }
 };
 
-module.exports = {
-  ...,
-  asignarMateria,
-};
-
 const obtenerMateriasPorCurso = async (id_curso) => {
   return await asignarModel.obtenerMateriasPorCurso(id_curso);
 };
