@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { asignarMateria, obtenerMateriasPorCurso, eliminarAsignacion } = require('../controllers/asignar.controller');
+const { asignarMateria, obtenerMateriasPorCurso, eliminarAsignacion, obtenerAsignacionesPorInstitucion, obtenerMateriasPorGrado, obtenerGradosPorProfesor, obtenerAsignacionesPorProfesor } = require('../controllers/asignar.controller');
 
 router.post('/asignarMateria', asignarMateria);
 router.get('/curso/:id_curso', obtenerMateriasPorCurso);
