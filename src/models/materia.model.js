@@ -46,18 +46,8 @@ const getAllMaterias = async () => {
 // Obtener todas las materias de una institución específica
 const getMateriasByInstitucion = async (id_institucion) => {
   const query = `
-    SELECT 
-      m.id_materia, 
-      m.nombre, 
-      m.color, 
-      m.activo, 
-      u.nombre AS profesor_nombre, 
-      u.apellido AS profesor_apellido
-    FROM Materia m
-    LEFT JOIN Dictar d ON m.id_materia = d.id_materia
-    LEFT JOIN Profesor p ON d.documento_profe = p.documento_identidad
-    LEFT JOIN Usuario u ON p.documento_identidad = u.documento_identidad
-    WHERE m.id_institucion = $1 AND m.activo = TRUE;
+    SELECT * FROM Materia
+    WHERE id_institucion = $1 AND activo = TRUE;
   `;
   const result = await consultarDB(query, [id_institucion]);
   return result;
