@@ -48,14 +48,15 @@ const getMateriasByInstitucion = async (id_institucion) => {
   const query = `
     SELECT 
       m.id_materia, 
-      m.nombre,
+      m.nombre, 
       m.color, 
       m.activo, 
-      p.nombre AS profesor_nombre, 
-      p.apellido AS profesor_apellido
+      u.nombre AS profesor_nombre, 
+      u.apellido AS profesor_apellido
     FROM Materia m
     LEFT JOIN Dictar d ON m.id_materia = d.id_materia
     LEFT JOIN Profesor p ON d.documento_profe = p.documento_identidad
+    LEFT JOIN Usuario u ON p.documento_identidad = u.documento_identidad
     WHERE m.id_institucion = $1 AND m.activo = TRUE;
   `;
   const result = await consultarDB(query, [id_institucion]);
