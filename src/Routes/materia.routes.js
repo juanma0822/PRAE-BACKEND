@@ -6,6 +6,7 @@ const {
   getMateriaById,
   getAllMaterias,
   getMateriasByInstitucion,
+  getMateriasConDocentes,
   updateMateria,
   deleteMateria,
   activateMateria,
@@ -83,6 +84,25 @@ router.get('/', getAllMaterias);
  *         description: Lista de materias obtenida correctamente
  */
 router.get('/institucion/:id_institucion', verifyToken, getMateriasByInstitucion);
+
+/**
+ * @swagger
+ * /materias/institucion/{id_institucion}/docentes:
+ *   get:
+ *     summary: Obtiene todas las materias de una institución con los docentes que las dictan
+ *     tags: [Materias - GET]
+ *     parameters:
+ *       - in: path
+ *         name: id_institucion
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la institución
+ *     responses:
+ *       200:
+ *         description: Lista de materias con docentes obtenida correctamente
+ */
+router.get('/institucion/:id_institucion/docentes', verifyToken, getMateriasConDocentes);
 
 /**
  * @swagger

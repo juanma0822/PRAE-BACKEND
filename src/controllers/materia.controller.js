@@ -54,6 +54,23 @@ const getMateriasByInstitucion = async (req, res) => {
 }
 };
 
+// Obtener todas las materias con los profesores que se dan de una institución específica
+const getMateriasConDocentes = async (req, res) => {
+  try {
+    const { id_institucion } = req.params;
+
+    if (!id_institucion) {
+      return res.status(400).json({ message: "El ID de la institución es requerido" });
+    }
+
+    const materiasConDocentes = await materiaService.getMateriasConDocentes(id_institucion);
+    res.status(200).json(materiasConDocentes);
+  } catch (error) {
+    console.error("Error al obtener materias con docentes:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Actualizar una materia
 const updateMateria = async (req, res) => {
   try {
@@ -93,6 +110,7 @@ module.exports = {
   getMateriaById,
   getAllMaterias,
   getMateriasByInstitucion,
+  getMateriasConDocentes,
   updateMateria,
   deleteMateria,
   activateMateria,

@@ -53,6 +53,28 @@ const getMateriasByInstitucion = async (id_institucion) => {
   return result;
 };
 
+//Obtener todas las materias con el docente que la da que este ACTIVO de una institucion especìfica
+const getMateriasConDocentes = async (id_institucion) => {
+  const query = `
+    SELECT 
+      m.id_materia, 
+      m.nombre, 
+      m.color, 
+      u.documento_identidad AS docente_documento, 
+      u.nombre AS docente_nombre, 
+      u.apellido AS docente_apellido
+    FROM Materia m
+    LEFT JOIN Dictar d ON m.id_materia = d.id_materia
+    LEFT JOIN Usuario u ON d.documento_profe = u.documento_identidad
+    WHERE m.id_institucion = $1 
+      AND m.activo = TRUE
+      AND d.estado = TRUE
+      AND u.activo = TRUE;
+  `;
+  const result = await consultarDB(query, [id_institucion]);
+  return result;
+};
+
 // Actualizar una materia
 const updateMateria = async (id_materia, nombre, id_institucion) => {
   const query = `
@@ -115,6 +137,7 @@ module.exports = {
   getMateriaById,
   getAllMaterias,
   getMateriasByInstitucion,
+  getMateriasConDocentes,
   updateMateria,
   deleteMateria,
   activateMateria,

@@ -41,6 +41,16 @@ const getMateriasByInstitucion = async (id_institucion) => {
   }
 };
 
+//Obtener todas las materias-docente que dan en una institucion especifica
+const getMateriasConDocentes = async (id_institucion) => {
+  try {
+    const materiasConDocentes = await materiaModel.getMateriasConDocentes(id_institucion);
+    return materiasConDocentes;
+  } catch (error) {
+    throw new Error(`Error al obtener las materias con docentes: ${error.message}`);
+  }
+};
+
 // Actualizar una materia
 const updateMateria = async (id_materia, nombre, id_institucion) => {
   try {
@@ -79,6 +89,7 @@ module.exports = {
   getMateriaById,
   getAllMaterias,
   getMateriasByInstitucion,
+  getMateriasConDocentes,
   updateMateria,
   deleteMateria,
   activateMateria,
