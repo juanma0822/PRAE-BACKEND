@@ -1,7 +1,16 @@
 const asignarModel = require("../models/asignar.model");
 
-const asignarMateria = async (id_curso, id_materia) => {
-  return await asignarModel.asignarMateria(id_curso, id_materia);
+const asignarMateria = async (id_curso, id_materia, id_docente) => {
+  try {
+    return await asignarModel.asignarMateria(id_curso, id_materia, id_docente);
+  } catch (error) {
+    throw new Error(`Error al asignar la materia: ${error.message}`);
+  }
+};
+
+module.exports = {
+  ...,
+  asignarMateria,
 };
 
 const obtenerMateriasPorCurso = async (id_curso) => {

@@ -124,16 +124,21 @@ CREATE TABLE Actividades (
 
 -- 10. Tabla Asignar (Asignación de Materia a Curso)
 CREATE TABLE Asignar (
-    id_asignacion SERIAL PRIMARY KEY,
-    id_curso INT NOT NULL,
+    id_asignar SERIAL PRIMARY KEY,
     id_materia INT NOT NULL,
-    CONSTRAINT fk_asignar_curso FOREIGN KEY (id_curso)
-        REFERENCES Curso(id_curso)
+    id_grado INT NOT NULL,
+    id_docente VARCHAR(20), -- Nueva columna para almacenar el ID del profesor
+    CONSTRAINT fk_asignar_materia FOREIGN KEY (id_materia) 
+        REFERENCES Materia(id_materia) 
         ON DELETE CASCADE,
-    CONSTRAINT fk_asignar_materia FOREIGN KEY (id_materia)
-        REFERENCES Materia(id_materia)
-        ON DELETE CASCADE
+    CONSTRAINT fk_asignar_grado FOREIGN KEY (id_grado) 
+        REFERENCES Grado(id_grado) 
+        ON DELETE CASCADE,
+    CONSTRAINT fk_asignar_profesor FOREIGN KEY (id_docente) 
+        REFERENCES Profesor(documento_identidad) 
+        ON DELETE SET NULL
 );
+
 
 -- 11. Tabla Calificacion
 CREATE TABLE Calificacion (

@@ -1,12 +1,12 @@
 const { consultarDB } = require("../db");
 
-const asignarMateria = async (id_curso, id_materia) => {
+const asignarMateria = async (id_curso, id_materia, id_docente) => {
   const query = `
-        INSERT INTO Asignar (id_curso, id_materia)
-        VALUES ($1, $2)
-        RETURNING *;
-    `;
-  const result = await consultarDB(query, [id_curso, id_materia]);
+    INSERT INTO Asignar (id_curso, id_materia, id_docente)
+    VALUES ($1, $2, $3)
+    RETURNING *;
+  `;
+  const result = await consultarDB(query, [id_curso, id_materia, id_docente]);
   return result[0];
 };
 

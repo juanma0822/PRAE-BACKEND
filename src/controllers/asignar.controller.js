@@ -2,8 +2,13 @@ const asignarService = require("../services/asignar.service");
 
 const asignarMateria = async (req, res) => {
   try {
-    const { id_curso, id_materia } = req.body;
-    const resultado = await asignarService.asignarMateria(id_curso, id_materia);
+    const { id_curso, id_materia, id_docente } = req.body;
+
+    if (!id_curso || !id_materia || !id_docente) {
+      return res.status(400).json({ message: "Todos los campos son requeridos: id_curso, id_materia, id_docente" });
+    }
+
+    const resultado = await asignarService.asignarMateria(id_curso, id_materia, id_docente);
     res.status(201).json({ message: "Materia asignada con éxito", resultado });
   } catch (error) {
     console.error("Error al asignar materia:", error);
