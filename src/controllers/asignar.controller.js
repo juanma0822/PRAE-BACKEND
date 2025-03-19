@@ -78,15 +78,20 @@ const obtenerGradosPorProfesor = async (req, res) => {
 };
 
 const obtenerAsignacionesPorProfesor = async (req, res) => {
-    try {
-      const { documento_profe } = req.params;
-      const resultado = await asignarService.obtenerAsignacionesPorProfesor(documento_profe);
-      res.status(200).json(resultado);
-    } catch (error) {
-      console.error('Error al obtener asignaciones por profesor:', error);
-      res.status(500).json({ error: 'Error interno del servidor' });
+  try {
+    const { documento_profe, id_institucion } = req.params;
+
+    if (!documento_profe || !id_institucion) {
+      return res.status(400).json({ message: "El documento del profesor y el ID de la institución son requeridos" });
     }
-  };
+
+    const resultado = await asignarService.obtenerAsignacionesPorProfesor(documento_profe, id_institucion);
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.error("Error al obtener asignaciones por profesor:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
 
 module.exports = {
   asignarMateria,

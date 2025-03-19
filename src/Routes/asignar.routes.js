@@ -179,9 +179,9 @@ router.get('/profesor/:documento_profe', obtenerGradosPorProfesor);
 
 /**
  * @swagger
- * /asignaciones/profesor/{documento_profe}:
+ * /asignaciones/profesor/{documento_profe}/institucion/{id_institucion}:
  *   get:
- *     summary: Obtiene todas las asignaciones de un profesor
+ *     summary: Obtiene todas las asignaciones de un profesor en una institución específica
  *     tags: [Asignaciones - GET]
  *     parameters:
  *       - in: path
@@ -190,6 +190,12 @@ router.get('/profesor/:documento_profe', obtenerGradosPorProfesor);
  *         schema:
  *           type: string
  *         description: Documento de identidad del profesor
+ *       - in: path
+ *         name: id_institucion
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la institución
  *     responses:
  *       200:
  *         description: Lista de asignaciones obtenida correctamente
@@ -229,6 +235,6 @@ router.get('/profesor/:documento_profe', obtenerGradosPorProfesor);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/asignaciones/profesor/:documento_profe', obtenerAsignacionesPorProfesor);
+router.get('/asignaciones/profesor/:documento_profe/institucion/:id_institucion', obtenerAsignacionesPorProfesor);
 
 module.exports = router;

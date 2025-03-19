@@ -28,9 +28,9 @@ const obtenerGradosPorProfesor = async (documento_profe) => {
   return await asignarModel.obtenerGradosPorProfesor(documento_profe);
 };
 
-const obtenerAsignacionesPorProfesor = async (documento_profe) => {
-    return await asignarModel.obtenerAsignacionesPorProfesor(documento_profe);
-  };
+const obtenerAsignacionesPorProfesor = async (documento_profe, id_institucion) => {
+  return await asignarModel.obtenerAsignacionesPorProfesor(documento_profe, id_institucion);
+};
 
 module.exports = {
   asignarMateria,

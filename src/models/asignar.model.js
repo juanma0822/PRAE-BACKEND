@@ -129,7 +129,7 @@ const obtenerGradosPorProfesor = async (documento_profe) => {
   return result;
 };
 
-const obtenerAsignacionesPorProfesor = async (documento_profe) => {
+const obtenerAsignacionesPorProfesor = async (documento_profe, id_institucion) => {
   const query = `
     SELECT DISTINCT 
       a.id_asignacion,
@@ -147,9 +147,9 @@ const obtenerAsignacionesPorProfesor = async (documento_profe) => {
     INNER JOIN Curso c ON a.id_curso = c.id_curso
     INNER JOIN Profesor p ON d.documento_profe = p.documento_identidad
     INNER JOIN Usuario u ON p.documento_identidad = u.documento_identidad
-    WHERE d.documento_profe = $1 AND a.estado = TRUE;
+    WHERE a.id_docente = $1 AND c.id_institucion = $2 AND a.estado = TRUE;
   `;
-  const result = await consultarDB(query, [documento_profe]);
+  const result = await consultarDB(query, [documento_profe, id_institucion]);
   return result;
 };
 
