@@ -82,8 +82,9 @@ const obtenerAsignacionesPorInstitucion = async (id_institucion) => {
     INNER JOIN Materia m ON a.id_materia = m.id_materia
     LEFT JOIN Profesor p ON a.id_docente = p.documento_identidad
     LEFT JOIN Usuario u ON p.documento_identidad = u.documento_identidad
-    WHERE c.id_institucion = $1;
+    WHERE c.id_institucion = $1 AND a.estado = TRUE;
   `;
+  
   const result = await consultarDB(query, [id_institucion]);
   return result;
 };
