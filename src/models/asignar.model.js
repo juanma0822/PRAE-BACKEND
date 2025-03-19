@@ -103,7 +103,7 @@ const obtenerMateriasPorGrado = async (id_curso, id_institucion) => {
     INNER JOIN Curso c ON a.id_curso = c.id_curso
     LEFT JOIN Profesor p ON a.id_docente = p.documento_identidad
     LEFT JOIN Usuario u ON p.documento_identidad = u.documento_identidad
-    WHERE a.id_curso = $1 AND c.id_institucion = $2;
+    WHERE a.id_curso = $1 AND c.id_institucion = $2, AND a.estado = TRUE;
   `;
   const result = await consultarDB(query, [id_curso, id_institucion]);
   return result;
