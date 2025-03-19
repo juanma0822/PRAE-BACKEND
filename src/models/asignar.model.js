@@ -84,7 +84,7 @@ const obtenerAsignacionesPorInstitucion = async (id_institucion) => {
     LEFT JOIN Usuario u ON p.documento_identidad = u.documento_identidad
     WHERE c.id_institucion = $1 AND a.estado = TRUE;
   `;
-  
+
   const result = await consultarDB(query, [id_institucion]);
   return result;
 };
@@ -147,7 +147,7 @@ const obtenerAsignacionesPorProfesor = async (documento_profe) => {
     INNER JOIN Curso c ON a.id_curso = c.id_curso
     INNER JOIN Profesor p ON d.documento_profe = p.documento_identidad
     INNER JOIN Usuario u ON p.documento_identidad = u.documento_identidad
-    WHERE d.documento_profe = $1;
+    WHERE d.documento_profe = $1 AND a.estado = TRUE;
   `;
   const result = await consultarDB(query, [documento_profe]);
   return result;
