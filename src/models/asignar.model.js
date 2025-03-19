@@ -30,9 +30,11 @@ const obtenerMateriasPorCurso = async (id_curso) => {
 
 const eliminarAsignacion = async (id_asignacion) => {
   const query = `
-        DELETE FROM Asignar WHERE id_asignacion = $1
-        RETURNING *;
-    `;
+    UPDATE Asignar
+    SET estado = FALSE
+    WHERE id_asignacion = $1
+    RETURNING *;
+  `;
   const result = await consultarDB(query, [id_asignacion]);
   return result[0];
 };

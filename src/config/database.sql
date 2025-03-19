@@ -128,6 +128,7 @@ CREATE TABLE Asignar (
     id_materia INT NOT NULL,
     id_grado INT NOT NULL,
     id_docente VARCHAR(20),
+    estado BOOLEAN DEFAULT TRUE, -- Nuevo campo de estado (activo/inactivo)
     CONSTRAINT fk_asignar_materia FOREIGN KEY (id_materia) 
         REFERENCES Materia(id_materia) 
         ON DELETE CASCADE,
@@ -138,6 +139,7 @@ CREATE TABLE Asignar (
         REFERENCES Profesor(documento_identidad) 
         ON DELETE SET NULL
 );
+
 
 
 -- 11. Tabla Calificacion
