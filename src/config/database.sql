@@ -127,7 +127,7 @@ CREATE TABLE Asignar (
     id_asignar SERIAL PRIMARY KEY,
     id_materia INT NOT NULL,
     id_grado INT NOT NULL,
-    id_docente VARCHAR(20), -- Nueva columna para almacenar el ID del profesor
+    id_docente VARCHAR(20),
     CONSTRAINT fk_asignar_materia FOREIGN KEY (id_materia) 
         REFERENCES Materia(id_materia) 
         ON DELETE CASCADE,
