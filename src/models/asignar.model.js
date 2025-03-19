@@ -14,7 +14,8 @@ const obtenerMateriasPorCurso = async (id_curso) => {
   const query = `
     SELECT 
       m.id_materia, 
-      m.nombre AS materia, 
+      m.nombre AS materia,
+      m.color, 
       u.documento_identidad, 
       u.nombre AS profesor_nombre, 
       u.apellido AS profesor_apellido
@@ -45,7 +46,8 @@ const obtenerAsignacionesPorInstitucion = async (id_institucion) => {
       a.id_asignacion,
       c.id_curso, 
       c.nombre AS curso,
-      m.id_materia, 
+      m.id_materia,
+      m.color, 
       m.nombre AS materia, 
       u.documento_identidad AS profesor_documento, 
       u.nombre AS profesor_nombre, 
@@ -65,7 +67,8 @@ const obtenerMateriasPorGrado = async (id_curso, id_institucion) => {
   const query = `
     SELECT 
       m.id_materia, 
-      m.nombre AS materia, 
+      m.nombre AS materia,
+      m.color, 
       u.documento_identidad AS profesor_documento, 
       u.nombre AS profesor_nombre, 
       u.apellido AS profesor_apellido
@@ -84,7 +87,8 @@ const obtenerGradosPorProfesor = async (documento_profe) => {
   const query = `
     SELECT DISTINCT 
       c.id_curso, 
-      c.nombre AS curso, 
+      c.nombre AS curso,
+      c.color, 
       u.documento_identidad AS profesor_documento, 
       u.nombre AS profesor_nombre, 
       u.apellido AS profesor_apellido
@@ -107,6 +111,7 @@ const obtenerAsignacionesPorProfesor = async (documento_profe) => {
       c.nombre AS curso,
       m.id_materia,
       m.nombre AS materia,
+      m.color,
       u.documento_identidad AS profesor_documento,
       u.nombre AS profesor_nombre,
       u.apellido AS profesor_apellido
