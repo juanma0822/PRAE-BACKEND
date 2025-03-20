@@ -64,7 +64,8 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
         LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad
         JOIN Materia m ON a.id_materia = m.id_materia
         WHERE e.id_curso = $2 
-          AND m.id_institucion = $4;
+          AND m.id_institucion = $4
+        ORDER BY u.nombre ASC;
     `;
     const result = await consultarDB(query, [id_materia, id_curso, id_docente, id_institucion]);
 
@@ -84,7 +85,7 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
     }, {});
 
     // Convertir el objeto groupedResult a un array
-    return Object.values(groupedResult);
+    return Object.values(groupedResult).sort((a, b) => a.apellido.localeCompare(b.apellido));
 };
 
 const selectPromedioEstudiante = async (id_materia, id_estudiante) => {
