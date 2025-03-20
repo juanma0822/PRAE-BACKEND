@@ -48,19 +48,29 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia, 
     return result;
 };
 
-const selectCalificacionesCurso = async (id_materia, id_curso) => {
+const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_institucion) => {
     const query = `
-        SELECT e.documento_identidad, u.nombre, u.apellido, c.nota, a.nombre AS actividad, c.id_actividad
-        FROM Calificacion c
-        JOIN Actividades a ON c.id_actividad = a.id_actividad
-        JOIN Estudiante e ON c.id_estudiante = e.documento_identidad
-        JOIN Usuario u ON e.documento_identidad = u.documento_identidad
-        WHERE a.id_materia = $1 AND e.id_curso = $2`;
-    const result = await consultarDB(query, [id_materia, id_curso]);
+        SELECT 
+            u.documento_identidad, 
+            u.nombre, 
+            u.apellido, 
+            COALESCE(c.nota, 0) AS nota,
+            a.nombre AS actividad, 
+            a.peso,
+            a.id_actividad
+        FROM Estudiante e
+        LEFT JOIN Usuario u ON e.documento_identidad = u.documento_identidad
+        LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3
+        LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad
+        JOIN Materia m ON a.id_materia = m.id_materia
+        WHERE e.id_curso = $2 
+          AND m.id_institucion = $4;
+    `;
+    const result = await consultarDB(query, [id_materia, id_curso, id_docente, id_institucion]);
 
     // Agrupar las actividades por estudiante
     const groupedResult = result.reduce((acc, row) => {
-        const { documento_identidad, nombre, apellido, nota, actividad } = row;
+        const { documento_identidad, nombre, apellido, nota, actividad, peso, id_actividad } = row;
         if (!acc[documento_identidad]) {
             acc[documento_identidad] = {
                 documento_identidad,
@@ -69,7 +79,7 @@ const selectCalificacionesCurso = async (id_materia, id_curso) => {
                 actividades: []
             };
         }
-        acc[documento_identidad].actividades.push({ nota, actividad });
+        acc[documento_identidad].actividades.push({ id_actividad, actividad, peso, nota });
         return acc;
     }, {});
 

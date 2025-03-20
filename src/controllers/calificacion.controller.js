@@ -64,8 +64,13 @@ const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (req, res) =
 
 const obtenerCalificacionesCurso = async (req, res) => {
     try {
-        const { id_materia, id_curso } = req.params;
-        const calificaciones = await calificacionService.obtenerCalificacionesCurso(id_materia, id_curso);
+        const { id_materia, id_curso, id_docente, id_institucion } = req.params;
+        const calificaciones = await calificacionService.obtenerCalificacionesCurso(
+            id_materia,
+            id_curso,
+            id_docente,
+            id_institucion
+        );
 
         // Emitir evento de WebSocket para actualizar las calificaciones del curso
         const io = getIo();

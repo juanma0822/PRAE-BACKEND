@@ -16,8 +16,8 @@ const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia,
     return await calificacionModel.selectCalificacionesEstudiantePorDocenteEInstitucion(id_materia, id_estudiante, id_docente, id_institucion);
 };
 
-const obtenerCalificacionesCurso = async (id_materia, id_curso) => {
-    return await calificacionModel.selectCalificacionesCurso(id_materia, id_curso);
+const obtenerCalificacionesCurso = async (id_materia, id_curso, id_docente, id_institucion) => {
+    return await calificacionModel.selectCalificacionesCurso(id_materia, id_curso, id_docente, id_institucion);
 };
 
 const obtenerPromedioEstudiante = async (id_materia, id_estudiante) => {
