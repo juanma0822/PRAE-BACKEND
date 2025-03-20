@@ -18,6 +18,11 @@ const initializeSocket = (server) => {
       console.log(`Usuario ${roomId} unido a la sala`);
     });
 
+    socket.on("testMessage", (data) => {
+      console.log("Mensaje recibido del cliente:", data);
+      socket.emit("nuevaCalificacion", { message: "Mensaje recibido correctamente" });
+  });
+
     socket.on("disconnect", () => {
       console.log("Usuario desconectado:", socket.id);
     });

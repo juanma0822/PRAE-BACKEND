@@ -82,6 +82,6 @@ app.get('/', (req, res) => {
     res.send('<h1>Bienvenido al API REST de PRAE</h1><p>Este es el index</p>');
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
