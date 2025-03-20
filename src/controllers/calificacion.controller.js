@@ -42,6 +42,26 @@ const obtenerCalificacionesEstudiante = async (req, res) => {
     }
 };
 
+const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (req, res) => {
+    try {
+        const { id_materia, id_estudiante, id_docente, id_institucion } = req.params;
+        const calificaciones = await calificacionService.obtenerCalificacionesEstudiantePorDocenteEInstitucion(
+            id_materia,
+            id_estudiante,
+            id_docente,
+            id_institucion
+        );
+
+        // Emitir evento de WebSocket para actualizar las calificaciones del estudiante
+        const io = getIo();
+        io.to(id_estudiante).emit('actualizarCalificaciones', calificaciones);
+
+        res.status(200).json(calificaciones);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener calificaciones' });
+    }
+};
+
 const obtenerCalificacionesCurso = async (req, res) => {
     try {
         const { id_materia, id_curso } = req.params;
@@ -81,6 +101,7 @@ module.exports = {
     asignarCalificacion,
     actualizarCalificacion,
     obtenerCalificacionesEstudiante,
+    obtenerCalificacionesEstudiantePorDocenteEInstitucion,
     obtenerCalificacionesCurso,
     obtenerPromedioEstudiante,
     obtenerPromedioCurso

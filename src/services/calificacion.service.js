@@ -12,6 +12,10 @@ const obtenerCalificacionesEstudiante = async (id_materia, id_estudiante) => {
     return await calificacionModel.selectCalificacionesEstudiante(id_materia, id_estudiante);
 };
 
+const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia, id_estudiante, id_docente, id_institucion) => {
+    return await calificacionModel.selectCalificacionesEstudiantePorDocenteEInstitucion(id_materia, id_estudiante, id_docente, id_institucion);
+};
+
 const obtenerCalificacionesCurso = async (id_materia, id_curso) => {
     return await calificacionModel.selectCalificacionesCurso(id_materia, id_curso);
 };
@@ -28,6 +32,7 @@ module.exports = {
     asignarCalificacion,
     actualizarCalificacion,
     obtenerCalificacionesEstudiante,
+    obtenerCalificacionesEstudiantePorDocenteEInstitucion,
     obtenerCalificacionesCurso,
     obtenerPromedioEstudiante,
     obtenerPromedioCurso
