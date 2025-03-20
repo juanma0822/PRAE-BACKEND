@@ -3,6 +3,7 @@ const {
   uploadImageToFirebase,
   deleteImageFromFirebase,
 } = require("../services/uploadService");
+const jwt = require("jsonwebtoken");
 
 // Crear una nueva institución
 const createInstitucion = async (req, res) => {
@@ -123,7 +124,33 @@ const updateInstitucion = async (req, res) => {
       color_pildora2,
       color_pildora3
     );
-    res.status(200).json(institucionActualizada);
+    
+    // Generar un nuevo token con los datos actualizados
+    const payload = {
+      institucion: {
+        id_institucion: institucionActualizada.id_institucion,
+        nombre: institucionActualizada.nombre,
+        telefono: institucionActualizada.telefono,
+        instagram: institucionActualizada.instagram,
+        facebook: institucionActualizada.facebook,
+        logo: institucionActualizada.logo,
+        color_principal: institucionActualizada.color_principal,
+        color_secundario: institucionActualizada.color_secundario,
+        fondo: institucionActualizada.fondo,
+        color_pildora1: institucionActualizada.color_pildora1,
+        color_pildora2: institucionActualizada.color_pildora2,
+        color_pildora3: institucionActualizada.color_pildora3,
+        direccion: institucionActualizada.direccion,
+      },
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
+
+    res.status(200).json({
+      message: "Institución actualizada correctamente",
+      institucion: institucionActualizada,
+      token,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
