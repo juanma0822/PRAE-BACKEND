@@ -1,9 +1,15 @@
 const calificacionService = require('../services/calificacion.service');
+const { getIo } = require('../sockets/sockets');
 
 const asignarCalificacion = async (req, res) => {
     try {
         const { id_actividad, id_estudiante, nota } = req.body;
         const nuevaCalificacion = await calificacionService.asignarCalificacion(id_actividad, id_estudiante, nota);
+
+        // Emitir evento de WebSocket para actualizar las notas del estudiante
+        const io = getIo();
+        io.to(id_estudiante).emit('nuevaCalificacion', nuevaCalificacion);
+
         res.status(201).json(nuevaCalificacion);
     } catch (error) {
         res.status(500).json({ error: 'Error al asignar calificación' });
@@ -25,6 +31,11 @@ const obtenerCalificacionesEstudiante = async (req, res) => {
     try {
         const { id_materia, id_estudiante } = req.params;
         const calificaciones = await calificacionService.obtenerCalificacionesEstudiante(id_materia, id_estudiante);
+
+        // Emitir evento de WebSocket para actualizar las calificaciones del estudiante
+        const io = getIo();
+        io.to(id_estudiante).emit('actualizarCalificaciones', calificaciones);
+
         res.status(200).json(calificaciones);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener calificaciones' });
@@ -35,6 +46,11 @@ const obtenerCalificacionesCurso = async (req, res) => {
     try {
         const { id_materia, id_curso } = req.params;
         const calificaciones = await calificacionService.obtenerCalificacionesCurso(id_materia, id_curso);
+
+        // Emitir evento de WebSocket para actualizar las calificaciones del curso
+        const io = getIo();
+        io.to(`curso_${id_curso}`).emit('actualizarCalificacionesCurso', calificaciones);
+
         res.status(200).json(calificaciones);
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener calificaciones del curso' });
