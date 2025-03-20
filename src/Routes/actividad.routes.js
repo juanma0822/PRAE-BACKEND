@@ -54,6 +54,37 @@ router.get('/materia/:id_materia', actividadController.obtenerActividadesPorMate
 
 /**
  * @swagger
+ * /actividades/institucion/{id_institucion}/docente/{id_docente}/materia/{id_materia}:
+ *   get:
+ *     summary: Obtiene todas las actividades de una materia específica creadas por un docente en una institución
+ *     tags: [Actividades]
+ *     parameters:
+ *       - in: path
+ *         name: id_institucion
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la institución
+ *       - in: path
+ *         name: id_docente
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Documento de identidad del docente
+ *       - in: path
+ *         name: id_materia
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la materia
+ *     responses:
+ *       200:
+ *         description: Lista de actividades obtenida correctamente
+ */
+router.get('/institucion/:id_institucion/docente/:id_docente/materia/:id_materia', actividadController.obtenerActividadesPorMateriaDocenteInstitucion);
+
+/**
+ * @swagger
  * /actividades/actualizar/{id_actividad}:
  *   put:
  *     summary: Actualiza una actividad

@@ -20,6 +20,16 @@ const obtenerActividadesPorMateria = async (req, res) => {
     }
 };
 
+const obtenerActividadesPorMateriaDocenteInstitucion = async (req, res) => {
+    try {
+        const { id_institucion, id_docente, id_materia } = req.params;
+        const actividades = await actividadService.obtenerActividadesPorMateriaDocenteInstitucion(id_institucion, id_docente, id_materia);
+        res.status(200).json(actividades);
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener actividades' });
+    }
+};
+
 const actualizarActividad = async (req, res) => {
     try {
         const { id_actividad } = req.params;
@@ -44,6 +54,7 @@ const eliminarActividad = async (req, res) => {
 module.exports = {
     crearActividad,
     obtenerActividadesPorMateria,
+    obtenerActividadesPorMateriaDocenteInstitucion,
     actualizarActividad,
-    eliminarActividad
+    eliminarActividad,
 };
