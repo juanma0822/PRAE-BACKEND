@@ -31,12 +31,16 @@ const selectCalificacionesEstudiante = async (id_materia, id_estudiante) => {
 
 const selectCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia, id_estudiante, id_docente, id_institucion) => {
     const query = `
-        SELECT c.id_calificacion, c.nota, a.nombre AS actividad, a.peso, c.id_actividad
-        FROM Calificacion c
-        JOIN Actividades a ON c.id_actividad = a.id_actividad
+        SELECT 
+            a.id_actividad,
+            a.nombre AS actividad,
+            a.peso,
+            COALESCE(c.nota, 0) AS nota,
+            c.id_calificacion
+        FROM Actividades a
+        LEFT JOIN Calificacion c ON a.id_actividad = c.id_actividad AND c.id_estudiante = $2
         JOIN Materia m ON a.id_materia = m.id_materia
         WHERE a.id_materia = $1 
-          AND c.id_estudiante = $2 
           AND a.id_docente = $3 
           AND m.id_institucion = $4;
     `;
