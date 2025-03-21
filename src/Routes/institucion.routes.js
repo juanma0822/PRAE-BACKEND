@@ -104,6 +104,9 @@ router.get('/:id_institucion', verifyToken, getInstitucionById);
  *           schema:
  *             type: object
  *             properties:
+ *               documento_identidad:
+ *                 type: string
+ *                 description: Documento de identidad del administrador
  *               nombre:
  *                 type: string
  *               telefono:

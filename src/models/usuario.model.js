@@ -110,6 +110,15 @@ const insertEstudiante = async (documento_identidad, id_curso) => {
   );
 };
 
+const getUsuarioByDocumento = async (documento_identidad) => {
+  const query = `
+    SELECT * FROM Usuario
+    WHERE documento_identidad = $1 AND activo = TRUE;
+  `;
+  const result = await consultarDB(query, [documento_identidad]);
+  return result[0];
+};
+
 const getUsuariosActivos = async () => {
   const query = `
     SELECT u.*, i.*
@@ -589,6 +598,7 @@ module.exports = {
   insertUsuario,
   insertProfesor,
   insertEstudiante,
+  getUsuarioByDocumento,
   getUsuariosActivos,
   updateUsuario,
   desactivarUsuario,

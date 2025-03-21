@@ -1,4 +1,5 @@
 const institucionService = require("../services/institucion.service");
+const usuarioService = require("../services/usuario.service");
 const {
   uploadImageToFirebase,
   deleteImageFromFirebase,
@@ -78,24 +79,10 @@ const getInstitucionById = async (req, res) => {
 const updateInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
-    const {
-      nombre,
-      telefono,
-      instagram,
-      facebook,
-      direccion,
-      color_principal,
-      color_secundario,
-      fondo,
-      color_pildora1,
-      color_pildora2,
-      color_pildora3,
-    } = req.body;
+    const { documento_identidad, nombre, telefono, instagram, facebook, direccion, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3 } = req.body;
 
     // Obtener la institución actual para mantener el logo si no se proporciona uno nuevo
-    const institucionActual = await institucionService.getInstitucionById(
-      id_institucion
-    );
+    const institucionActual = await institucionService.getInstitucionById(id_institucion);
     let logoUrl = institucionActual.logo;
 
     // Subir el logo si se proporciona
@@ -103,12 +90,10 @@ const updateInstitucion = async (req, res) => {
       if (logoUrl) {
         await deleteImageFromFirebase(logoUrl);
       }
-      logoUrl = await uploadImageToFirebase(
-        req.file.buffer,
-        req.file.originalname
-      );
+      logoUrl = await uploadImageToFirebase(req.file.buffer, req.file.originalname);
     }
 
+    // Actualizar la institución
     const institucionActualizada = await institucionService.updateInstitucion(
       id_institucion,
       nombre,
@@ -124,9 +109,20 @@ const updateInstitucion = async (req, res) => {
       color_pildora2,
       color_pildora3
     );
-    
-    // Generar un nuevo token con los datos actualizados
+
+    // Obtener los datos del administrador
+    const admin = await usuarioService.getUsuarioByDocumento(documento_identidad);
+    if (!admin) {
+      return res.status(404).json({ message: "Administrador no encontrado" });
+    }
+
+    // Crear el payload para el token
     const payload = {
+      email: admin.correo,
+      id: admin.documento_identidad,
+      rol: admin.rol,
+      nombre: admin.nombre,
+      apellido: admin.apellido,
       institucion: {
         id_institucion: institucionActualizada.id_institucion,
         nombre: institucionActualizada.nombre,
@@ -144,14 +140,17 @@ const updateInstitucion = async (req, res) => {
       },
     };
 
+    // Generar un nuevo token
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
 
+    // Responder con la institución actualizada y el nuevo token
     res.status(200).json({
       message: "Institución actualizada correctamente",
       institucion: institucionActualizada,
       token,
     });
   } catch (error) {
+    console.error("Error al actualizar la institución:", error);
     res.status(500).json({ message: error.message });
   }
 };

@@ -84,6 +84,16 @@ const getAllUsuarios = async () => {
   return await usuarioModel.getUsuariosActivos();
 };
 
+const getUsuarioByDocumento = async (documento_identidad) => {
+  try {
+    const usuario = await usuarioModel.getUsuarioByDocumento(documento_identidad);
+    if (!usuario) throw new Error("Usuario no encontrado");
+    return usuario;
+  } catch (error) {
+    throw new Error(`Error al obtener el usuario: ${error.message}`);
+  }
+};
+
 const updateUsuario = async (
   documento_identidad,
   nombre,
@@ -226,6 +236,7 @@ module.exports = {
   addUsuario,
   addProfesor,
   addEstudiante,
+  getUsuarioByDocumento,
   getAllUsuarios,
   updateUsuario,
   deleteUsuario,
