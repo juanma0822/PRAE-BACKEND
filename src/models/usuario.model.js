@@ -70,7 +70,7 @@ const insertUsuario = async (
   );
 
   if (existingUser.length > 0) {
-    throw new Error(`El usuario con nombre: ${nombre} ya existe en la institución: ${id_institucion}`);
+    throw new Error(`El id ${documento_identidad} del usuario ${nombre} ya existe en la base de datos`);
   }
 
   // Asignar un color aleatorio si no se proporciona uno
