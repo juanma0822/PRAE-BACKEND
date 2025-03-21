@@ -70,7 +70,13 @@ const insertUsuario = async (
   );
 
   if (existingUser.length > 0) {
-    throw new Error(`El id ${documento_identidad} del usuario ${nombre} ya existe en la base de datos`);
+    const user = existingUser[0];
+    if (user.documento_identidad === documento_identidad) {
+      throw new Error(`El documento de identidad ${documento_identidad} ya está registrado, por favor usa uno nuevo.`);
+    }
+    if (user.correo === correo) {
+      throw new Error(`El correo ${correo} ya está registrado, por favor usa uno nuevo.`);
+    }
   }
 
   // Asignar un color aleatorio si no se proporciona uno
