@@ -136,6 +136,7 @@ const updateInstitucion = async (req, res) => {
         color_pildora1: institucionActualizada.color_pildora1,
         color_pildora2: institucionActualizada.color_pildora2,
         color_pildora3: institucionActualizada.color_pildora3,
+        estado: institucionActualizada.estado,
         direccion: institucionActualizada.direccion,
       },
     };
