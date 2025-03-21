@@ -197,8 +197,14 @@ const getEstudiantesPorProfesor = async (req, res) => {
 // Obtener un profesor por su ID
 const getProfesorById = async (req, res) => {
   try {
-    const { id } = req.params;
-    const profesor = await usuarioService.getProfesorById(id);
+    const { documento_identidad } = req.params;
+
+    // Verificar si el parámetro está definido
+    if (!documento_identidad) {
+      return res.status(400).json({ error: "El documento de identidad es requerido" });
+    }
+    
+    const profesor = await usuarioService.getProfesorById(documento_identidad);
     res.status(200).json(profesor);
   } catch (error) {
     console.error("Error al obtener el profesor:", error);

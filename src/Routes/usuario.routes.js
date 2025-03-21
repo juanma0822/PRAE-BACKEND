@@ -401,7 +401,7 @@ router.get('/profesor/:documento_profe/estudiantes', verifyToken, getEstudiantes
  *     tags: [Usuarios - GET]
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: documento_identidad
  *         required: true
  *         schema:
  *           type: string
@@ -410,7 +410,7 @@ router.get('/profesor/:documento_profe/estudiantes', verifyToken, getEstudiantes
  *       200:
  *         description: Profesor obtenido correctamente
  */
-router.get('/profesor/:id', verifyToken, getProfesorById);
+router.get('/profesor/:documento_identidad', verifyToken, getProfesorById);
 
 /**
  * @swagger

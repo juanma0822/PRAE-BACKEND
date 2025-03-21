@@ -20,13 +20,18 @@ const ExistingUser = async (email, password = null) => {
       i.direccion AS direccion_institucion
     FROM Usuario u
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.correo = $1
+    WHERE u.correo = $1;
   `;
   const verifyEmail = await consultarDB(query, [email]);
 
   const user = verifyEmail[0];
   if (!user) {
     throw new Error("El email no está registrado");
+  }
+
+  // Verificar si el usuario está desactivado
+  if (!user.activo) {
+    throw new Error("Usuario desactivado, comunícate con tu institución para ingresar");
   }
 
   if (password) {
@@ -301,10 +306,12 @@ const getProfesorById = async (documento_identidad) => {
   `;
   const result = await consultarDB(query, [documento_identidad]);
 
+  // Verificar si se encontraron resultados
   if (result.length === 0) {
-    return null;
+    throw new Error(`No se encontró un docente con el documento de identidad ${documento_identidad}`);
   }
 
+  // Construir el objeto del profesor
   const profesor = {
     documento_identidad: result[0].documento_identidad,
     nombre: result[0].nombre,
@@ -317,6 +324,7 @@ const getProfesorById = async (documento_identidad) => {
     materias: [],
   };
 
+  // Agregar las materias al objeto del profesor
   result.forEach((row) => {
     if (row.id_materia) {
       profesor.materias.push({
