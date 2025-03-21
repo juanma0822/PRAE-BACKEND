@@ -357,6 +357,48 @@ const getEstudiantesPorProfesor = async (documento_profe) => {
   return result;
 };
 
+//Modelo para actualizar admin
+const updateAdmin = async (documento_identidad, nombre, apellido, correo, id_institucion, contraseña) => {
+  // Verificar si el correo ya está en uso por otro usuario
+  const existingUser = await consultarDB(
+    "SELECT * FROM Usuario WHERE correo = $1 AND documento_identidad != $2",
+    [correo, documento_identidad]
+  );
+
+  if (existingUser.length > 0) {
+    throw new Error("El correo ya está en uso por otro usuario");
+  }
+
+  let query;
+  let values;
+
+  if (contraseña) {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, id_institucion = $5
+      WHERE documento_identidad = $6 AND rol = 'admin'
+      RETURNING *;
+    `;
+    values = [nombre, apellido, correo, contraseña, id_institucion, documento_identidad];
+  } else {
+    query = `
+      UPDATE Usuario 
+      SET nombre = $1, apellido = $2, correo = $3, id_institucion = $4
+      WHERE documento_identidad = $5 AND rol = 'admin'
+      RETURNING *;
+    `;
+    values = [nombre, apellido, correo, id_institucion, documento_identidad];
+  }
+
+  const result = await consultarDB(query, values);
+  return result[0];
+};
+
+module.exports = {
+  ...module.exports,
+  updateAdmin,
+};
+
 // Modelo para actualizar un profesor
 const updateProfesor = async (
   documento_identidad,
@@ -531,6 +573,7 @@ module.exports = {
   desactivarUsuario,
   activarUsuario,
   getUsuariosByRol,
+  updateAdmin,
   updateEstudiante,
   updateProfesor,
   getEstudiantesPorInstitucion,

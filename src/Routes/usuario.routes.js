@@ -12,6 +12,7 @@ const {
     getAdmins, 
     getDocentes, 
     getEstudiantes,
+    updateAdmin,
     updateEstudiante,
     updateProfesor,
     getEstudiantesPorInstitucion,
@@ -241,6 +242,42 @@ router.get('/docentes', verifyToken, getDocentes);
  *         description: Lista de estudiantes obtenida correctamente
  */
 router.get('/estudiantes', verifyToken, getEstudiantes);
+
+/**
+ * @swagger
+ * /usuarios/updateAdmin/{documento_identidad}:
+ *   put:
+ *     summary: Actualiza los datos de un administrador
+ *     tags: [Usuarios - PUT]
+ *     parameters:
+ *       - in: path
+ *         name: documento_identidad
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Documento de identidad del administrador
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               apellido:
+ *                 type: string
+ *               correo:
+ *                 type: string
+ *               contraseña:
+ *                 type: string
+ *               id_institucion:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Administrador actualizado correctamente
+ */
+router.put("/updateAdmin/:documento_identidad", verifyToken, updateAdmin);
 
 /**
  * @swagger

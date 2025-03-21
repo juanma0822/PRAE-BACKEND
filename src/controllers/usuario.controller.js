@@ -217,6 +217,31 @@ const getEstudianteById = async (req, res) => {
   }
 };
 
+//Actualizar admin
+const updateAdmin = async (req, res) => {
+  try {
+    const { documento_identidad } = req.params;
+    const { nombre, apellido, correo, id_institucion, contraseña } = req.body;
+
+    const adminActualizado = await usuarioService.updateAdmin(
+      documento_identidad,
+      nombre,
+      apellido,
+      correo,
+      id_institucion,
+      contraseña
+    );
+
+    res.status(200).json({
+      message: "Administrador actualizado con éxito",
+      adminActualizado,
+    });
+  } catch (error) {
+    console.error("Error al actualizar el administrador:", error);
+    res.status(500).json({ error: "Error interno del servidor: " + error.message });
+  }
+};
+
 // Actualizar datos de un profesor
 const updateProfesor = async (req, res) => {
   try {
@@ -303,6 +328,7 @@ module.exports = {
   getDocentes,
   getEstudiantes,
   updateEstudiante,
+  updateAdmin,
   updateProfesor,
   getEstudiantesPorInstitucion,
   getEstudiantesPorProfesor,

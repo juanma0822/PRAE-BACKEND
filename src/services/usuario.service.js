@@ -135,6 +135,20 @@ const getUsuariosByRol = async (rol) => {
   }
 };
 
+const updateAdmin = async (documento_identidad, nombre, apellido, correo, id_institucion, contraseña) => {
+  const hashedPassword = contraseña
+    ? await bcrypt.hash(contraseña, saltRounds)
+    : null;
+  return await usuarioModel.updateAdmin(
+    documento_identidad,
+    nombre,
+    apellido,
+    correo,
+    id_institucion,
+    hashedPassword
+  );
+};
+
 // Servicio para actualizar un profesor
 const updateProfesor = async (
   documento_identidad,
@@ -217,6 +231,7 @@ module.exports = {
   deleteUsuario,
   activarUsuario,
   getUsuariosByRol,
+  updateAdmin,
   updateProfesor,
   updateEstudiante,
   getEstudiantesPorInstitucion,
