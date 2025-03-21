@@ -377,7 +377,20 @@ const updateAdmin = async (documento_identidad, nombre, apellido, correo, id_ins
       UPDATE Usuario 
       SET nombre = $1, apellido = $2, correo = $3, contraseña = $4, id_institucion = $5
       WHERE documento_identidad = $6 AND rol = 'admin'
-      RETURNING *;
+      RETURNING *, 
+        (SELECT nombre FROM Institucion WHERE id_institucion = $5) AS nombre_institucion,
+        (SELECT telefono FROM Institucion WHERE id_institucion = $5) AS telefono_institucion,
+        (SELECT instagram FROM Institucion WHERE id_institucion = $5) AS instagram_institucion,
+        (SELECT facebook FROM Institucion WHERE id_institucion = $5) AS facebook_institucion,
+        (SELECT logo FROM Institucion WHERE id_institucion = $5) AS logo_institucion,
+        (SELECT color_principal FROM Institucion WHERE id_institucion = $5) AS color_principal_institucion,
+        (SELECT color_secundario FROM Institucion WHERE id_institucion = $5) AS color_secundario_institucion,
+        (SELECT fondo FROM Institucion WHERE id_institucion = $5) AS fondo_institucion,
+        (SELECT color_pildora1 FROM Institucion WHERE id_institucion = $5) AS color_pildora1_institucion,
+        (SELECT color_pildora2 FROM Institucion WHERE id_institucion = $5) AS color_pildora2_institucion,
+        (SELECT color_pildora3 FROM Institucion WHERE id_institucion = $5) AS color_pildora3_institucion,
+        (SELECT estado FROM Institucion WHERE id_institucion = $5) AS estado_institucion,
+        (SELECT direccion FROM Institucion WHERE id_institucion = $5) AS direccion_institucion;
     `;
     values = [nombre, apellido, correo, contraseña, id_institucion, documento_identidad];
   } else {
@@ -385,18 +398,26 @@ const updateAdmin = async (documento_identidad, nombre, apellido, correo, id_ins
       UPDATE Usuario 
       SET nombre = $1, apellido = $2, correo = $3, id_institucion = $4
       WHERE documento_identidad = $5 AND rol = 'admin'
-      RETURNING *;
+      RETURNING *, 
+        (SELECT nombre FROM Institucion WHERE id_institucion = $4) AS nombre_institucion,
+        (SELECT telefono FROM Institucion WHERE id_institucion = $4) AS telefono_institucion,
+        (SELECT instagram FROM Institucion WHERE id_institucion = $4) AS instagram_institucion,
+        (SELECT facebook FROM Institucion WHERE id_institucion = $4) AS facebook_institucion,
+        (SELECT logo FROM Institucion WHERE id_institucion = $4) AS logo_institucion,
+        (SELECT color_principal FROM Institucion WHERE id_institucion = $4) AS color_principal_institucion,
+        (SELECT color_secundario FROM Institucion WHERE id_institucion = $4) AS color_secundario_institucion,
+        (SELECT fondo FROM Institucion WHERE id_institucion = $4) AS fondo_institucion,
+        (SELECT color_pildora1 FROM Institucion WHERE id_institucion = $4) AS color_pildora1_institucion,
+        (SELECT color_pildora2 FROM Institucion WHERE id_institucion = $4) AS color_pildora2_institucion,
+        (SELECT color_pildora3 FROM Institucion WHERE id_institucion = $4) AS color_pildora3_institucion,
+        (SELECT estado FROM Institucion WHERE id_institucion = $4) AS estado_institucion,
+        (SELECT direccion FROM Institucion WHERE id_institucion = $4) AS direccion_institucion;
     `;
     values = [nombre, apellido, correo, id_institucion, documento_identidad];
   }
 
   const result = await consultarDB(query, values);
   return result[0];
-};
-
-module.exports = {
-  ...module.exports,
-  updateAdmin,
 };
 
 // Modelo para actualizar un profesor

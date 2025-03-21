@@ -1,4 +1,5 @@
 const usuarioService = require("../services/usuario.service");
+const jwt = require("jsonwebtoken");
 
 const createAdmin = async (req, res) => {
   try {
@@ -223,6 +224,7 @@ const updateAdmin = async (req, res) => {
     const { documento_identidad } = req.params;
     const { nombre, apellido, correo, id_institucion, contraseña } = req.body;
 
+    // Actualizar el administrador
     const adminActualizado = await usuarioService.updateAdmin(
       documento_identidad,
       nombre,
@@ -232,9 +234,42 @@ const updateAdmin = async (req, res) => {
       contraseña
     );
 
+    // Obtener la información de la institución actualizada
+    const institucion = {
+      id_institucion: adminActualizado.id_institucion,
+      nombre: adminActualizado.nombre_institucion,
+      telefono: adminActualizado.telefono_institucion,
+      instagram: adminActualizado.instagram_institucion,
+      facebook: adminActualizado.facebook_institucion,
+      logo: adminActualizado.logo_institucion,
+      color_principal: adminActualizado.color_principal_institucion,
+      color_secundario: adminActualizado.color_secundario_institucion,
+      fondo: adminActualizado.fondo_institucion,
+      color_pildora1: adminActualizado.color_pildora1_institucion,
+      color_pildora2: adminActualizado.color_pildora2_institucion,
+      color_pildora3: adminActualizado.color_pildora3_institucion,
+      estado: adminActualizado.estado_institucion,
+      direccion: adminActualizado.direccion_institucion,
+    };
+
+    // Crear el payload para el token
+    const payload = {
+      email: adminActualizado.correo,
+      id: adminActualizado.documento_identidad,
+      rol: adminActualizado.rol,
+      nombre: adminActualizado.nombre,
+      apellido: adminActualizado.apellido,
+      institucion,
+    };
+
+    // Generar un nuevo token
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
+
+    // Responder con el administrador actualizado y el nuevo token
     res.status(200).json({
       message: "Administrador actualizado con éxito",
       adminActualizado,
+      token,
     });
   } catch (error) {
     console.error("Error al actualizar el administrador:", error);
