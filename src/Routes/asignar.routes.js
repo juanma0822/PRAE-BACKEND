@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { asignarMateria, obtenerMateriasPorCurso, eliminarAsignacion, obtenerAsignacionesPorInstitucion, obtenerMateriasPorGrado, obtenerGradosPorProfesor, obtenerAsignacionesPorProfesor } = require('../controllers/asignar.controller');
+const verifyToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -32,7 +33,7 @@ const { asignarMateria, obtenerMateriasPorCurso, eliminarAsignacion, obtenerAsig
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/asignarMateria', asignarMateria);
+router.post('/asignarMateria', verifyToken, asignarMateria);
 
 /**
  * @swagger
@@ -77,7 +78,7 @@ router.post('/asignarMateria', asignarMateria);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/curso/:id_curso', obtenerMateriasPorCurso);
+router.get('/curso/:id_curso', verifyToken, obtenerMateriasPorCurso);
 
 /**
  * @swagger
@@ -152,7 +153,7 @@ router.get('/institucion/:id_institucion', obtenerAsignacionesPorInstitucion);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/grado/:id_curso/institucion/:id_institucion', obtenerMateriasPorGrado);
+router.get('/grado/:id_curso/institucion/:id_institucion', verifyToken, obtenerMateriasPorGrado);
 
 /**
  * @swagger
@@ -175,7 +176,7 @@ router.get('/grado/:id_curso/institucion/:id_institucion', obtenerMateriasPorGra
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/profesor/:documento_profe', obtenerGradosPorProfesor);
+router.get('/profesor/:documento_profe', verifyToken, obtenerGradosPorProfesor);
 
 /**
  * @swagger
@@ -235,6 +236,6 @@ router.get('/profesor/:documento_profe', obtenerGradosPorProfesor);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/asignaciones/profesor/:documento_profe/institucion/:id_institucion', obtenerAsignacionesPorProfesor);
+router.get('/asignaciones/profesor/:documento_profe/institucion/:id_institucion', verifyToken, obtenerAsignacionesPorProfesor);
 
 module.exports = router;

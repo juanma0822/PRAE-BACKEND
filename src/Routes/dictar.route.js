@@ -8,6 +8,7 @@ const {
   deleteDictar,
   updateMateriaProfesor
 } = require('../controllers/dictar.controller');
+const verifyToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -30,7 +31,7 @@ const {
  *       201:
  *         description: Relación Dictar creada exitosamente
  */
-router.post('/', createDictar);
+router.post('/', verifyToken, createDictar);
 
 /**
  * @swagger
@@ -80,7 +81,7 @@ router.get('/profesor/:documento_profe/materias', getMateriasPorProfesor);
  *       200:
  *         description: Lista de profesores obtenida correctamente
  */
-router.get('/materia/:id_materia/profesores', getProfesoresPorMateria);
+router.get('/materia/:id_materia/profesores', verifyToken, getProfesoresPorMateria);
 
 /**
  * @swagger
@@ -131,6 +132,6 @@ router.delete('/', deleteDictar);
  *       200:
  *         description: Materia actualizada con éxito
  */
-router.put('/updateMateriaProfesor/:documento_identidad', updateMateriaProfesor);
+router.put('/updateMateriaProfesor/:documento_identidad', verifyToken, updateMateriaProfesor);
 
 module.exports = router;
