@@ -65,6 +65,7 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
         JOIN Materia m ON a.id_materia = m.id_materia
         WHERE e.id_curso = $2 
           AND m.id_institucion = $4
+          AND u.activo = TRUE
         ORDER BY u.nombre ASC;
     `;
     const result = await consultarDB(query, [id_materia, id_curso, id_docente, id_institucion]);
