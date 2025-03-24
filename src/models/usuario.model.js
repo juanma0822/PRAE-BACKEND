@@ -375,16 +375,15 @@ const getEstudiantesPorProfesor = async (documento_profe) => {
       u.correo AS estudiante_correo,
       u.activo AS estudiante_activo,
       c.id_curso,
-      c.nombre AS curso_nombre
+      c.nombre AS curso_nombre,
+      c.color
     FROM Usuario u
     INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
     INNER JOIN Curso c ON e.id_curso = c.id_curso
     WHERE c.id_curso IN (
       SELECT DISTINCT a.id_curso
-      FROM Dictar d
-      INNER JOIN Materia m ON d.id_materia = m.id_materia
-      INNER JOIN Asignar a ON m.id_materia = a.id_materia
-      WHERE d.documento_profe = $1
+      FROM asignar a
+      WHERE a.id_docente = $1 AND a.estado = TRUE
     )
     AND u.rol = 'estudiante'
     AND u.activo = TRUE

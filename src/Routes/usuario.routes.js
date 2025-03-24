@@ -403,6 +403,9 @@ router.get('/institucion/:id_institucion', verifyToken, getEstudiantesPorInstitu
  *                   curso_nombre:
  *                     type: string
  *                     description: Nombre del curso
+ *                   color:
+ *                     type: string
+ *                     description: Color asociado al curso
  *                   estudiantes:
  *                     type: array
  *                     description: Lista de estudiantes en el curso
