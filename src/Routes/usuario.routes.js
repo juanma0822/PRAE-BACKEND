@@ -378,7 +378,7 @@ router.get('/institucion/:id_institucion', verifyToken, getEstudiantesPorInstitu
  * @swagger
  * /usuarios/profesor/{documento_profe}/estudiantes:
  *   get:
- *     summary: Obtiene los estudiantes asociados a un profesor
+ *     summary: Obtiene los estudiantes asociados a los cursos de un profesor
  *     tags: [Usuarios - GET]
  *     parameters:
  *       - in: path
@@ -390,6 +390,44 @@ router.get('/institucion/:id_institucion', verifyToken, getEstudiantesPorInstitu
  *     responses:
  *       200:
  *         description: Lista de estudiantes obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id_curso:
+ *                     type: integer
+ *                     description: ID del curso
+ *                   curso_nombre:
+ *                     type: string
+ *                     description: Nombre del curso
+ *                   estudiantes:
+ *                     type: array
+ *                     description: Lista de estudiantes en el curso
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         documento_identidad:
+ *                           type: string
+ *                           description: Documento de identidad del estudiante
+ *                         nombre:
+ *                           type: string
+ *                           description: Nombre del estudiante
+ *                         apellido:
+ *                           type: string
+ *                           description: Apellido del estudiante
+ *                         correo:
+ *                           type: string
+ *                           description: Correo del estudiante
+ *                         activo:
+ *                           type: boolean
+ *                           description: Estado del estudiante (activo o inactivo)
+ *       400:
+ *         description: Error en la solicitud (parámetro faltante o inválido)
+ *       500:
+ *         description: Error interno del servidor
  */
 router.get('/profesor/:documento_profe/estudiantes', verifyToken, getEstudiantesPorProfesor);
 

@@ -131,14 +131,14 @@ CREATE TABLE Actividades (
 CREATE TABLE Asignar (
     id_asignar SERIAL PRIMARY KEY,
     id_materia INT NOT NULL,
-    id_grado INT NOT NULL,
+    id_curso INT NOT NULL,
     id_docente VARCHAR(20),
     estado BOOLEAN DEFAULT TRUE, -- Nuevo campo de estado (activo/inactivo)
     CONSTRAINT fk_asignar_materia FOREIGN KEY (id_materia) 
         REFERENCES Materia(id_materia) 
         ON DELETE CASCADE,
-    CONSTRAINT fk_asignar_grado FOREIGN KEY (id_grado) 
-        REFERENCES Grado(id_grado) 
+    CONSTRAINT fk_asignar_grado FOREIGN KEY (id_curso) 
+        REFERENCES Grado(id_curso) 
         ON DELETE CASCADE,
     CONSTRAINT fk_asignar_profesor FOREIGN KEY (id_docente) 
         REFERENCES Profesor(documento_identidad) 

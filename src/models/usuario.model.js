@@ -368,15 +368,30 @@ const getEstudiantesPorInstitucion = async (institucion) => {
 // Obtener estudiantes por profesor
 const getEstudiantesPorProfesor = async (documento_profe) => {
   const query = `
-    SELECT u.*, e.id_curso, c.nombre AS curso
+    SELECT DISTINCT
+      u.documento_identidad AS estudiante_id,
+      u.nombre AS estudiante_nombre,
+      u.apellido AS estudiante_apellido,
+      u.correo AS estudiante_correo,
+      u.activo AS estudiante_activo,
+      c.id_curso,
+      c.nombre AS curso_nombre
     FROM Usuario u
     INNER JOIN Estudiante e ON u.documento_identidad = e.documento_identidad
     INNER JOIN Curso c ON e.id_curso = c.id_curso
-    INNER JOIN Dictar d ON e.id_curso = d.id_curso
-    LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE d.documento_profe = $1 AND u.rol = 'estudiante' AND u.activo = TRUE;
+    WHERE c.id_curso IN (
+      SELECT DISTINCT a.id_curso
+      FROM Dictar d
+      INNER JOIN Materia m ON d.id_materia = m.id_materia
+      INNER JOIN Asignar a ON m.id_materia = a.id_materia
+      WHERE d.documento_profe = $1
+    )
+    AND u.rol = 'estudiante'
+    AND u.activo = TRUE
+    ORDER BY c.nombre, u.apellido ASC;
   `;
   const result = await consultarDB(query, [documento_profe]);
+
   return result;
 };
 
