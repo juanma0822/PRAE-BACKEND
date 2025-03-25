@@ -1,10 +1,10 @@
-const comentarioService = require('../services/comentario.service');
+const ComentarioService = require('../services/comentario.service');
 
 // Crear un nuevo comentario
 const createComentario = async (req, res) => {
   try {
     const { comentario, documento_profe, documento_estudiante } = req.body;
-    const nuevoComentario = await comentarioService.createComentario(comentario, documento_profe, documento_estudiante);
+    const nuevoComentario = await ComentarioService.createComentario(comentario, documento_profe, documento_estudiante);
     res.status(201).json(nuevoComentario);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -14,7 +14,7 @@ const createComentario = async (req, res) => {
 // Obtener todos los comentarios
 const getAllComentarios = async (req, res) => {
   try {
-    const comentarios = await comentarioService.getAllComentarios();
+    const comentarios = await ComentarioService.getAllComentarios();
     res.status(200).json(comentarios);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -25,7 +25,7 @@ const getAllComentarios = async (req, res) => {
 const getComentariosPorProfesor = async (req, res) => {
   try {
     const { documento_profe } = req.params;
-    const comentarios = await comentarioService.getComentariosPorProfesor(documento_profe);
+    const comentarios = await ComentarioService.getComentariosPorProfesor(documento_profe);
     res.status(200).json(comentarios);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -36,7 +36,7 @@ const getComentariosPorProfesor = async (req, res) => {
 const getComentariosPorEstudiante = async (req, res) => {
   try {
     const { documento_estudiante } = req.params;
-    const comentarios = await comentarioService.getComentariosPorEstudiante(documento_estudiante);
+    const comentarios = await ComentarioService.getComentariosPorEstudiante(documento_estudiante);
     res.status(200).json(comentarios);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -47,7 +47,7 @@ const getComentariosPorEstudiante = async (req, res) => {
 const getComentariosPorProfesorYEstudiante = async (req, res) => {
   try {
     const { documento_profe, documento_estudiante } = req.params;
-    const comentarios = await comentarioService.getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante);
+    const comentarios = await ComentarioService.getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante);
     res.status(200).json(comentarios);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -58,7 +58,7 @@ const getComentariosPorProfesorYEstudiante = async (req, res) => {
 const deleteComentario = async (req, res) => {
   try {
     const { id_comentario } = req.params;
-    const resultado = await comentarioService.deleteComentario(id_comentario);
+    const resultado = await ComentarioService.deleteComentario(id_comentario);
     res.status(200).json(resultado);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,5 +71,5 @@ module.exports = {
   getComentariosPorProfesor,
   getComentariosPorEstudiante,
   deleteComentario,
-  getComentariosPorProfesorYEstudiante
+  getComentariosPorProfesorYEstudiante,
 };

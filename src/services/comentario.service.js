@@ -1,50 +1,34 @@
-const pool = require('../db'); // Importa la conexión a la base de datos
+const ComentarioModel = require('../models/comentario.modelo');
 
 const ComentarioService = {
   // Crear un nuevo comentario
-async createComentario(comentario, documento_profe, documento_estudiante) {
-    const query = `
-    INSERT INTO Comentarios (comentario, documento_profe, documento_estudiante)
-      VALUES ($1, $2, $3) RETURNING *;
-    `;
-    const values = [comentario, documento_profe, documento_estudiante];
-    const result = await pool.query(query, values);
-    return result.rows[0];
-},
+  async createComentario(comentario, documento_profe, documento_estudiante) {
+    return await ComentarioModel.insertComentario(comentario, documento_profe, documento_estudiante);
+  },
 
   // Obtener todos los comentarios
-async getAllComentarios() {
-    const query = 'SELECT * FROM Comentarios';
-    const result = await pool.query(query);
-    return result.rows;
-},
+  async getAllComentarios() {
+    return await ComentarioModel.getAllComentarios();
+  },
 
   // Obtener comentarios por profesor
-async getComentariosPorProfesor(documento_profe) {
-    const query = 'SELECT * FROM Comentarios WHERE documento_profe = $1';
-    const result = await pool.query(query, [documento_profe]);
-    return result.rows;
-},
+  async getComentariosPorProfesor(documento_profe) {
+    return await ComentarioModel.getComentariosPorProfesor(documento_profe);
+  },
 
   // Obtener comentarios por estudiante
   async getComentariosPorEstudiante(documento_estudiante) {
-    const query = 'SELECT * FROM Comentarios WHERE documento_estudiante = $1';
-    const result = await pool.query(query, [documento_estudiante]);
-    return result.rows;
+    return await ComentarioModel.getComentariosPorEstudiante(documento_estudiante);
   },
 
   // Obtener comentarios por profesor y estudiante
   async getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante) {
-    const query = 'SELECT * FROM Comentarios WHERE documento_profe = $1 AND documento_estudiante = $2';
-    const result = await pool.query(query, [documento_profe, documento_estudiante]);
-    return result.rows;
+    return await ComentarioModel.getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante);
   },
 
   // Eliminar un comentario
   async deleteComentario(id_comentario) {
-    const query = 'DELETE FROM Comentarios WHERE id_comentario = $1 RETURNING *';
-    const result = await pool.query(query, [id_comentario]);
-    return result.rows[0];
+    return await ComentarioModel.deleteComentario(id_comentario);
   },
 };
 
