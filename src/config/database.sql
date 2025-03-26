@@ -117,14 +117,19 @@ CREATE TABLE Actividades (
     peso INTEGER NOT NULL CHECK (peso > 0 AND peso <= 100),
     activo BOOLEAN DEFAULT TRUE,
     id_materia INT NOT NULL,
-    id_docente VARCHAR(20) NOT NULL,  -- Nuevo campo para asociar la actividad a un profesor
+    id_docente VARCHAR(20) NOT NULL,
+    id_curso INT NULL,  -- Nueva columna para asociar la actividad a un curso
     CONSTRAINT fk_actividad_materia FOREIGN KEY (id_materia)
         REFERENCES Materia(id_materia)
         ON DELETE CASCADE,
     CONSTRAINT fk_actividad_profesor FOREIGN KEY (id_docente)
         REFERENCES Profesor(documento_identidad)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_actividad_curso FOREIGN KEY (id_curso)
+        REFERENCES Curso(id_curso)
+        ON DELETE SET NULL
 );
+
 
 
 -- 10. Tabla Asignar (Asignación de Materia a Curso)

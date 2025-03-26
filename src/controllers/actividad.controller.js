@@ -2,13 +2,13 @@ const actividadService = require('../services/actividad.service');
 
 const crearActividad = async (req, res) => {
     try {
-        const { nombre, peso, id_materia, id_docente } = req.body;
-        const nuevaActividad = await actividadService.crearActividad(nombre, peso, id_materia, id_docente);
-        res.status(201).json(nuevaActividad);
+      const { nombre, peso, id_materia, id_docente, id_curso } = req.body;
+      const nuevaActividad = await actividadService.crearActividad(nombre, peso, id_materia, id_docente, id_curso);
+      res.status(201).json(nuevaActividad);
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear la actividad' });
+      res.status(500).json({ error: `Error al crear la actividad: ${error.message}` });
     }
-};
+  };
 
 const obtenerActividadesPorMateria = async (req, res) => {
     try {
@@ -22,13 +22,13 @@ const obtenerActividadesPorMateria = async (req, res) => {
 
 const obtenerActividadesPorMateriaDocenteInstitucion = async (req, res) => {
     try {
-        const { id_institucion, id_docente, id_materia } = req.params;
-        const actividades = await actividadService.obtenerActividadesPorMateriaDocenteInstitucion(id_institucion, id_docente, id_materia);
-        res.status(200).json(actividades);
+      const { id_institucion, id_docente, id_materia, id_curso } = req.params;
+      const actividades = await actividadService.obtenerActividadesPorMateriaDocenteInstitucion(id_institucion, id_docente, id_materia, id_curso);
+      res.status(200).json(actividades);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener actividades' });
+      res.status(500).json({ error: `Error al obtener actividades: ${error.message}` });
     }
-};
+  };
 
 const actualizarActividad = async (req, res) => {
     try {

@@ -27,6 +27,9 @@ const actividadController = require('../controllers/actividad.controller');
  *               id_docente:
  *                 type: string
  *                 description: Documento de identidad del docente
+ *               id_curso:
+ *                 type: integer
+ *                 description: ID del curso al que pertenece la actividad
  *     responses:
  *       201:
  *         description: Actividad creada exitosamente
@@ -54,9 +57,9 @@ router.get('/materia/:id_materia', actividadController.obtenerActividadesPorMate
 
 /**
  * @swagger
- * /actividades/institucion/{id_institucion}/docente/{id_docente}/materia/{id_materia}:
+ * /actividades/institucion/{id_institucion}/docente/{id_docente}/materia/{id_materia}/curso/{id_curso}:
  *   get:
- *     summary: Obtiene todas las actividades de una materia específica creadas por un docente en una institución
+ *     summary: Obtiene todas las actividades de un curso específico creadas por un docente en una materia e institución
  *     tags: [Actividades]
  *     parameters:
  *       - in: path
@@ -77,11 +80,17 @@ router.get('/materia/:id_materia', actividadController.obtenerActividadesPorMate
  *         schema:
  *           type: integer
  *         description: ID de la materia
+ *       - in: path
+ *         name: id_curso
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del curso
  *     responses:
  *       200:
  *         description: Lista de actividades obtenida correctamente
  */
-router.get('/institucion/:id_institucion/docente/:id_docente/materia/:id_materia', actividadController.obtenerActividadesPorMateriaDocenteInstitucion);
+router.get('/institucion/:id_institucion/docente/:id_docente/materia/:id_materia/curso/:id_curso', actividadController.obtenerActividadesPorMateriaDocenteInstitucion);
 
 /**
  * @swagger
