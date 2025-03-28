@@ -4,6 +4,10 @@ const crearActividad = async (nombre, peso, id_materia, id_docente, id_curso) =>
     return await actividadModel.insertActividad(nombre, peso, id_materia, id_docente, id_curso);
 };
 
+const getActividadById = async (id_actividad) => {
+    return await actividadModel.getActividadById(id_actividad);
+};
+
 const obtenerActividadesPorMateria = async (id_materia) => {
     return await actividadModel.selectActividadesPorMateria(id_materia);
 };
@@ -22,6 +26,7 @@ const eliminarActividad = async (id_actividad) => {
 
 module.exports = {
     crearActividad,
+    getActividadById,
     obtenerActividadesPorMateria,
     obtenerActividadesPorMateriaDocenteInstitucion,
     actualizarActividad,

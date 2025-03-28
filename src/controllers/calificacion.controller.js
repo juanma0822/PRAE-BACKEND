@@ -1,10 +1,42 @@
 const calificacionService = require('../services/calificacion.service');
+const usuarioService = require("../services/usuario.service");
+const emailService = require('../services/emailService');
+const actividadService = require('../services/actividad.service');
 const { getIo } = require('../sockets/sockets');
 
 const asignarCalificacion = async (req, res) => {
     try {
         const { id_actividad, id_estudiante, nota } = req.body;
+
+        // Asignar la calificación
         const nuevaCalificacion = await calificacionService.asignarCalificacion(id_actividad, id_estudiante, nota);
+
+        // Obtener información de la actividad y la materia asociada
+        const actividad = await actividadService.getActividadById(id_actividad);
+        const { nombre_actividad: nombreActividad, nombre_materia: nombreMateria } = actividad;
+
+        // Construir el contenido principal del correo
+        const mainContent = `
+            <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; text-align: center; padding: 20px;">
+                <h2 style="color: #157AFE;">¡Nueva calificación asignada!</h2>
+                <p>Se te ha asignado una calificación en la actividad <strong>${nombreActividad}</strong> de la materia <strong>${nombreMateria}</strong>.</p>
+                <p>Revisa tus logros y sigue esforzándote. ¡Tú puedes!</p>
+            </div>
+        `;
+
+        // Generar el correo completo usando la plantilla genérica sin footer
+        const emailContent = emailService.generateEmailTemplate(mainContent, '');
+
+        // Obtener el correo del estudiante
+        const estudiante = await usuarioService.getEstudianteById(id_estudiante);
+        const { correo } = estudiante;
+
+        // Enviar el correo al estudiante
+        await emailService.sendEmail(
+            correo,
+            'Nueva calificación asignada',
+            emailContent
+        );
 
         // Emitir evento de WebSocket para actualizar las notas del estudiante
         const io = getIo();
@@ -12,6 +44,7 @@ const asignarCalificacion = async (req, res) => {
 
         res.status(201).json(nuevaCalificacion);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error al asignar calificación' });
     }
 };

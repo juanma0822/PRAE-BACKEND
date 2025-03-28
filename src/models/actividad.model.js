@@ -13,6 +13,21 @@ const insertActividad = async (nombre, peso, id_materia, id_docente, id_curso) =
     }
   };
 
+const getActividadById = async (id_actividad) => {
+    const query = `
+        SELECT 
+            a.id_actividad, 
+            a.nombre AS nombre_actividad, 
+            a.id_materia, 
+            m.nombre AS nombre_materia
+        FROM Actividades a
+        INNER JOIN Materia m ON a.id_materia = m.id_materia
+        WHERE a.id_actividad = $1;
+    `;
+    const result = await consultarDB(query, [id_actividad]);
+    return result[0];
+};
+
 const selectActividadesPorMateria = async (id_materia) => {
     const query = `
         SELECT a.*, u.nombre AS docente_nombre, u.apellido AS docente_apellido
@@ -60,6 +75,7 @@ const deleteActividad = async (id_actividad) => {
 
 module.exports = {
     insertActividad,
+    getActividadById,
     selectActividadesPorMateria,
     selectActividadesPorMateriaDocenteInstitucion,
     updateActividad,

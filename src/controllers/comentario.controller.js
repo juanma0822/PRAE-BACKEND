@@ -1,12 +1,43 @@
 const ComentarioService = require('../services/comentario.service');
+const usuarioService = require('../services/usuario.service'); 
+const emailService = require('../services/emailService'); 
 
 // Crear un nuevo comentario
 const createComentario = async (req, res) => {
   try {
     const { comentario, documento_profe, documento_estudiante } = req.body;
+
+    // Crear el comentario
     const nuevoComentario = await ComentarioService.createComentario(comentario, documento_profe, documento_estudiante);
+
+    // Obtener el correo del estudiante
+    const estudiante = await usuarioService.getEstudianteById(documento_estudiante);
+    const { correo, nombre } = estudiante;
+
+    // Construir el contenido principal del correo
+    const mainContent = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; text-align: center; padding: 20px;">
+        <h2 style="color: #157AFE;">¡Nueva observación recibida!</h2>
+        <p>Hola ${nombre},</p>
+        <p>Revisa tu apartado de observaciones. Un profesor te ha hecho una nueva observación.</p>
+        <p>Estas observaciones te ayudan a mejorar tu proceso de aprendizaje y a seguir formándote constantemente.</p>
+        <p>¡Sigue esforzándote y creciendo!</p>
+      </div>
+    `;
+
+    // Generar el correo completo usando la plantilla genérica sin footer
+    const emailContent = emailService.generateEmailTemplate(mainContent, '');
+
+    // Enviar el correo al estudiante
+    await emailService.sendEmail(
+      correo,
+      'Nueva observación recibida',
+      emailContent
+    );
+
     res.status(201).json(nuevoComentario);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };

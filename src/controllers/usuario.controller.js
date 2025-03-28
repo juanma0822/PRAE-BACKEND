@@ -1,4 +1,7 @@
 const usuarioService = require("../services/usuario.service");
+const institucionService = require('../services/institucion.service');
+const cursoService = require('../services/curso.service');
+const emailService = require('../services/emailService');
 const jwt = require("jsonwebtoken");
 
 const createAdmin = async (req, res) => {
@@ -65,6 +68,8 @@ const createEstudiante = async (req, res) => {
       id_institucion,
       id_curso,
     } = req.body;
+
+    // Crear el estudiante
     const newEstudiante = await usuarioService.addEstudiante(
       documento_identidad,
       nombre,
@@ -74,6 +79,50 @@ const createEstudiante = async (req, res) => {
       id_institucion,
       id_curso
     );
+
+    // Obtener el logo de la institución
+    const institucion = await institucionService.getInstitucionById(id_institucion);
+    const { logo, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
+
+    // Obtener el nombre del curso
+    const curso = await cursoService.getCursoById(id_curso);
+    const nombreCurso = curso?.nombre || 'Curso desconocido';
+
+    // Construir el contenido principal del correo
+    const mainContent = `
+      <div style="text-align: center; padding: 20px;">
+        <img src="${logo}" alt="Logo de la Institución" style="max-width: 200px; margin-bottom: 20px;" />
+        <h1 style="color: #333;">¡Bienvenido a nuestra aplicación, ${nombre}!</h1>
+        <p>Estamos encantados de tenerte como parte de nuestra comunidad educativa.</p>
+        <p>Has sido añadido al grado <strong>${nombreCurso}</strong>.</p>
+        <p>Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos.</p>
+        <p>¡Te deseamos mucho éxito en tu aprendizaje!</p>
+      </div>
+    `;
+
+    // Construir el footer específico del correo
+    const footerContent = `
+      <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 14px; color: #666;">
+        <p style="font-size: 18px; font-weight: bold;"><strong>${nombreInstitucion}</strong></p>
+        <p>Teléfono: ${telefono || 'No disponible'}</p>
+        <p>Dirección: ${direccion || 'No disponible'}</p>
+        <p>
+          <a href="${instagram || '#'}" style="color: #157AFE; text-decoration: none;">Instagram</a> |
+          <a href="${facebook || '#'}" style="color: #157AFE; text-decoration: none;">Facebook</a>
+        </p>
+      </div>
+    `;
+
+    // Generar el correo completo usando la plantilla genérica
+    const emailContent = emailService.generateEmailTemplate(mainContent, footerContent);
+
+    // Enviar el correo
+    await emailService.sendEmail(
+      correo,
+      'Bienvenido a nuestra aplicación',
+      emailContent
+    );
+
     res.status(201).json(newEstudiante);
   } catch (error) {
     console.error(error);
