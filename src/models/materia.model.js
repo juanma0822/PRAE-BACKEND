@@ -99,12 +99,21 @@ const deleteMateria = async (id_materia) => {
   const result = await consultarDB(query, [id_materia]);
 
   if (result.length > 0) {
+    // Desactivar las relaciones en la tabla Dictar
     const updateDictarQuery = `
       UPDATE Dictar
       SET estado = FALSE
       WHERE id_materia = $1;
     `;
     await consultarDB(updateDictarQuery, [id_materia]);
+
+    // Desactivar las relaciones en la tabla Asignar
+    const updateAsignarQuery = `
+      UPDATE Asignar
+      SET estado = FALSE
+      WHERE id_materia = $1;
+    `;
+    await consultarDB(updateAsignarQuery, [id_materia]);
   }
 
   return result[0];
