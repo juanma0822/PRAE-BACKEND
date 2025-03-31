@@ -57,8 +57,15 @@ const updateInstitucion = async (id_institucion, nombre, telefono, instagram, fa
     RETURNING *;
   `;
   const values = [nombre, telefono, instagram, facebook, direccion, logo, color_principal, color_secundario, fondo, color_pildora1, color_pildora2, color_pildora3, id_institucion];
-  const result = await consultarDB(query, values);
-  return result[0];
+  try {
+    const result = await consultarDB(query, values);
+    return result[0];
+  } catch (error) {
+    if (error.code === '23505') { // Código de error para violación de restricción UNIQUE en PostgreSQL
+      throw new Error('El nombre de la institución ya existe en nuestra base de datos. Por favor, intenta con otro nombre.');
+    }
+    throw new Error(`Error al actualizar la institución: ${error.message}`);
+  }
 };
 
 // Desactivar una institución (cambiar estado a false)

@@ -27,7 +27,7 @@ const getInstitucionById = async (id_institucion) => {
     if (!institucion) throw new Error('Institución no encontrada');
     return institucion;
   } catch (error) {
-    throw new Error(`Error al obtener la institución: ${error.message}`);
+    throw new Error(error.message);
   }
 };
 
