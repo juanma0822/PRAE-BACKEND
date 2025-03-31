@@ -51,25 +51,21 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia, 
 const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_institucion) => {
     const query = `
         SELECT 
-            u.documento_identidad, 
-            u.nombre, 
-            u.apellido, 
-            COALESCE(c.nota, 0) AS nota,
-            a.nombre AS actividad, 
-            a.peso,
-            a.id_actividad
-        FROM Estudiante e
-        LEFT JOIN Usuario u ON e.documento_identidad = u.documento_identidad
-        LEFT JOIN Actividades a ON a.id_materia = $1 
-            AND a.id_docente = $3
-            AND a.id_curso = $2 
-        LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad 
-            AND c.id_estudiante = e.documento_identidad
-        JOIN Materia m ON a.id_materia = m.id_materia
-        WHERE e.id_curso = $2  
-        AND m.id_institucion = $4
-        AND u.activo = TRUE
-        ORDER BY u.nombre ASC;
+             u.documento_identidad, 
+             u.nombre, 
+             u.apellido, 
+             COALESCE(c.nota, 0) AS nota,
+             a.nombre AS actividad, 
+             a.peso,
+             a.id_actividad
+         FROM Estudiante e
+         LEFT JOIN Usuario u ON e.documento_identidad = u.documento_identidad
+         LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3
+         LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad
+         JOIN Materia m ON a.id_materia = m.id_materia
+         WHERE e.id_curso = $2 
+           AND m.id_institucion = $4
+         ORDER BY u.nombre ASC;
     `;
     const result = await consultarDB(query, [id_materia, id_curso, id_docente, id_institucion]);
 
