@@ -27,8 +27,21 @@ const ComentarioModel = {
   },
 
   // Obtener comentarios por estudiante
+  // Obtener comentarios por estudiante con información del docente
   async getComentariosPorEstudiante(documento_estudiante) {
-    const query = 'SELECT * FROM Comentarios WHERE documento_estudiante = $1';
+    const query = `
+      SELECT 
+        c.id_comentario,
+        c.comentario,
+        c.fecha,
+        c.documento_profe,
+        u.nombre AS nombre_docente,
+        u.apellido AS apellido_docente
+      FROM Comentarios c
+      LEFT JOIN Usuario u ON c.documento_profe = u.documento_identidad
+      WHERE c.documento_estudiante = $1
+      ORDER BY c.fecha DESC;
+    `;
     const result = await consultarDB(query, [documento_estudiante]);
     return result;
   },
