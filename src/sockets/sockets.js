@@ -31,4 +31,11 @@ const initializeSocket = (server) => {
   return io;
 };
 
-module.exports = { initializeSocket };
+const getIo = () => {
+  if (!io) {
+    throw new Error("Socket.io no está inicializado");
+  }
+  return io;
+};
+
+module.exports = { initializeSocket, getIo };
