@@ -5,7 +5,7 @@ let io;
 const initializeSocket = (server) => {
   io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: "https://praeweb.netlify.app", // Permitir solo el dominio del frontend
       methods: ["GET", "POST"],
     },
   });
@@ -15,13 +15,13 @@ const initializeSocket = (server) => {
 
     socket.on("join", (roomId) => {
       socket.join(roomId);
-      console.log(`Usuario ${roomId} unido a la sala`);
+      console.log(`Usuario ${socket.id} unido a la sala ${roomId}`);
     });
 
     socket.on("testMessage", (data) => {
       console.log("Mensaje recibido del cliente:", data);
       socket.emit("nuevaCalificacion", { message: "Mensaje recibido correctamente" });
-  });
+    });
 
     socket.on("disconnect", () => {
       console.log("Usuario desconectado:", socket.id);
