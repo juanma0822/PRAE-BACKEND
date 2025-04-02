@@ -1,12 +1,12 @@
 const { Server } = require("socket.io");
 
-let io;
-
 const initializeSocket = (server) => {
-  io = new Server(server, {
+  const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: "*", // Reemplázalo con la URL de tu frontend en producción si es necesario
       methods: ["GET", "POST"],
+      allowedHeaders: ["Content-Type"],
+      credentials: true,
     },
   });
 
@@ -15,13 +15,13 @@ const initializeSocket = (server) => {
 
     socket.on("join", (roomId) => {
       socket.join(roomId);
-      console.log(`Usuario ${roomId} unido a la sala`);
+      console.log(`Usuario ${socket.id} unido a la sala ${roomId}`);
     });
 
     socket.on("testMessage", (data) => {
       console.log("Mensaje recibido del cliente:", data);
       socket.emit("nuevaCalificacion", { message: "Mensaje recibido correctamente" });
-  });
+    });
 
     socket.on("disconnect", () => {
       console.log("Usuario desconectado:", socket.id);
@@ -31,11 +31,4 @@ const initializeSocket = (server) => {
   return io;
 };
 
-const getIo = () => {
-  if (!io) {
-    throw new Error("Socket.io no está inicializado");
-  }
-  return io;
-};
-
-module.exports = { initializeSocket, getIo };
+module.exports = { initializeSocket };

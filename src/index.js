@@ -25,7 +25,7 @@ const uploadRoutes = require('./Routes/upload.routes');
 app.use(cors());
 app.use(express.json());
 const server = http.createServer(app);
-initializeSocket(server);
+const io = initializeSocket(server);
 
 //-------------ROUTES
 
