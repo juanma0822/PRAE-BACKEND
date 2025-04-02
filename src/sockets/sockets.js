@@ -1,9 +1,11 @@
 const { Server } = require("socket.io");
 
+let io; // Declarar la variable io globalmente
+
 const initializeSocket = (server) => {
-  const io = new Server(server, {
+  io = new Server(server, {
     cors: {
-      origin: "*", // Reemplázalo con la URL de tu frontend en producción si es necesario
+      origin: "*", // Cambia esto al dominio de tu frontend
       methods: ["GET", "POST"],
       allowedHeaders: ["Content-Type"],
       credentials: true,
