@@ -20,8 +20,8 @@ const obtenerCalificacionesCurso = async (id_materia, id_curso, id_docente, id_i
     return await calificacionModel.selectCalificacionesCurso(id_materia, id_curso, id_docente, id_institucion);
 };
 
-const obtenerPromedioEstudiante = async (id_materia, id_estudiante) => {
-    return await calificacionModel.selectPromedioEstudiante(id_materia, id_estudiante);
+const obtenerPromedioEstudiante = async (id_materia, id_estudiante, id_docente) => {
+    return await calificacionModel.selectPromedioEstudiante(id_materia, id_estudiante, id_docente);
 };
 
 const obtenerPromedioCurso = async (id_materia, id_curso) => {

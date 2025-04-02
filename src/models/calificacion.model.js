@@ -88,14 +88,21 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
     return Object.values(groupedResult).sort((a, b) => a.apellido.localeCompare(b.apellido));
 };
 
-const selectPromedioEstudiante = async (id_materia, id_estudiante) => {
+const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) => {
     const query = `
-        SELECT AVG(nota) AS promedio
+        SELECT 
+            CASE 
+                WHEN SUM(a.peso) > 0 THEN SUM(c.nota * (a.peso / 100.0)) / SUM(a.peso / 100.0)
+                ELSE 0
+            END AS promedio
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad
-        WHERE a.id_materia = $1 AND c.id_estudiante = $2`;
-    const result = await consultarDB(query, [id_materia, id_estudiante]);
-    return result[0].promedio;
+        WHERE a.id_materia = $1 
+          AND c.id_estudiante = $2
+          AND a.id_docente = $3;
+    `;
+    const result = await consultarDB(query, [id_materia, id_estudiante, id_docente]);
+    return result[0]?.promedio || 0; // Retorna 0 si no hay calificaciones
 };
 
 module.exports = {

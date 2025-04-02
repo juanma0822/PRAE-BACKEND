@@ -10,6 +10,8 @@ const {
   updateMateria,
   deleteMateria,
   activateMateria,
+  getCantidadMateriasPorEstudiante,
+  getCantidadMateriasPorInstitucion,
 } = require('../controllers/materia.controller');
 
 /**
@@ -171,5 +173,43 @@ router.delete('/:id_materia', verifyToken, deleteMateria);
  *         description: Materia activada correctamente
  */
 router.put('/:id_materia/activate', verifyToken, activateMateria);
+
+/**
+ * @swagger
+ * /materias/estudiante/{id_estudiante}/cantidad:
+ *   get:
+ *     summary: Obtiene la cantidad de materias de un estudiante
+ *     tags: [Materias - GET]
+ *     parameters:
+ *       - in: path
+ *         name: id_estudiante
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Documento de identidad del estudiante
+ *     responses:
+ *       200:
+ *         description: Cantidad de materias obtenida correctamente
+ */
+router.get('/estudiante/:id_estudiante/cantidad', verifyToken, getCantidadMateriasPorEstudiante);
+
+/**
+ * @swagger
+ * /materias/institucion/{id_institucion}/cantidad:
+ *   get:
+ *     summary: Obtiene la cantidad de materias activas en una institución
+ *     tags: [Materias - GET]
+ *     parameters:
+ *       - in: path
+ *         name: id_institucion
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la institución
+ *     responses:
+ *       200:
+ *         description: Cantidad de materias obtenida correctamente
+ */
+router.get('/institucion/:id_institucion/cantidad', verifyToken, getCantidadMateriasPorInstitucion);
 
 module.exports = router;

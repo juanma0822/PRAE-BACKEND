@@ -117,10 +117,11 @@ const obtenerCalificacionesCurso = async (req, res) => {
 
 const obtenerPromedioEstudiante = async (req, res) => {
     try {
-        const { id_materia, id_estudiante } = req.params;
-        const promedio = await calificacionService.obtenerPromedioEstudiante(id_materia, id_estudiante);
+        const { id_materia, id_estudiante, id_docente } = req.params;
+        const promedio = await calificacionService.obtenerPromedioEstudiante(id_materia, id_estudiante, id_docente);
         res.status(200).json({ promedio });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Error al obtener promedio del estudiante' });
     }
 };

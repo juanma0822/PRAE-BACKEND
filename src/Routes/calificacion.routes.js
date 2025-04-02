@@ -102,9 +102,9 @@ router.get(
   obtenerCalificacionesCurso
 );
 
-// Obtener el promedio de un estudiante en una materia
+// Obtener el promedio de un estudiante en una materia específica impartida por un docente
 router.get(
-  "/promedio/materia/:id_materia/estudiante/:id_estudiante",
+  "/promedio/materia/:id_materia/estudiante/:id_estudiante/docente/:id_docente",
   obtenerPromedioEstudiante
 );
 

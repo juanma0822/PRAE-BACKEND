@@ -1,4 +1,5 @@
 const materiaService = require('../services/materia.service');
+const { getIo } = require('../sockets/sockets');
 
 // Crear una materia
 const addMateria = async (req, res) => {
@@ -10,8 +11,17 @@ const addMateria = async (req, res) => {
     }
 
     const nuevaMateria = await materiaService.addMateria(nombre, id_institucion);
+
+    // Obtener la cantidad actualizada de materias en la institución
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMateriasInstitucion', { id_institucion, cantidadMaterias });
+
     res.status(201).json(nuevaMateria);
   } catch (error) {
+    console.error("Error al agregar materia:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -105,6 +115,48 @@ const activateMateria = async (req, res) => {
   }
 };
 
+const getCantidadMateriasPorEstudiante = async (req, res) => {
+  try {
+    const { id_estudiante } = req.params;
+
+    if (!id_estudiante) {
+      return res.status(400).json({ message: "El ID del estudiante es requerido" });
+    }
+
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorEstudiante(id_estudiante);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMaterias', { id_estudiante, cantidadMaterias });
+
+    res.status(200).json({ id_estudiante, cantidadMaterias });
+  } catch (error) {
+    console.error("Error al obtener la cantidad de materias:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getCantidadMateriasPorInstitucion = async (req, res) => {
+  try {
+    const { id_institucion } = req.params;
+
+    if (!id_institucion) {
+      return res.status(400).json({ message: "El ID de la institución es requerido" });
+    }
+
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMateriasInstitucion', { id_institucion, cantidadMaterias });
+
+    res.status(200).json({ id_institucion, cantidadMaterias });
+  } catch (error) {
+    console.error("Error al obtener la cantidad de materias:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   addMateria,
   getMateriaById,
@@ -114,4 +166,6 @@ module.exports = {
   updateMateria,
   deleteMateria,
   activateMateria,
+  getCantidadMateriasPorEstudiante,
+  getCantidadMateriasPorInstitucion,
 };

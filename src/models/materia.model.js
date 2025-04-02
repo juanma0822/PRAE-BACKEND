@@ -141,6 +141,28 @@ const activateMateria = async (id_materia) => {
   return result[0];
 };
 
+const getCantidadMateriasPorEstudiante = async (id_estudiante) => {
+  const query = `
+    SELECT COUNT(DISTINCT m.id_materia) AS cantidad_materias
+    FROM Materia m
+    JOIN Asignar a ON m.id_materia = a.id_materia
+    JOIN Estudiante e ON e.id_curso = a.id_curso
+    WHERE e.documento_identidad = $1 AND m.activo = TRUE AND a.estado = TRUE;
+  `;
+  const result = await consultarDB(query, [id_estudiante]);
+  return result[0]?.cantidad_materias || 0; // Retorna 0 si no hay materias
+};
+
+const getCantidadMateriasPorInstitucion = async (id_institucion) => {
+  const query = `
+    SELECT COUNT(*) AS cantidad_materias
+    FROM Materia
+    WHERE id_institucion = $1 AND activo = TRUE;
+  `;
+  const result = await consultarDB(query, [id_institucion]);
+  return result[0]?.cantidad_materias || 0; // Retorna 0 si no hay materias
+};
+
 module.exports = {
   insertMateria,
   getMateriaById,
@@ -150,4 +172,6 @@ module.exports = {
   updateMateria,
   deleteMateria,
   activateMateria,
+  getCantidadMateriasPorEstudiante,
+  getCantidadMateriasPorInstitucion,
 };
