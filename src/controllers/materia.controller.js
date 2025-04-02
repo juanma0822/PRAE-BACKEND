@@ -53,15 +53,23 @@ const getMateriasByInstitucion = async (req, res) => {
     const { id_institucion } = req.params;
 
     if (!id_institucion) {
-        return res.status(400).json({ message: "Institución es requerida" });
+      return res.status(400).json({ message: "Institución es requerida" });
     }
 
     const materias = await materiaService.getMateriasByInstitucion(id_institucion);
+
+    // Obtener la cantidad actualizada de materias en la institución
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMateriasInstitucion', { id_institucion, cantidadMaterias });
+
     res.status(200).json(materias);
-} catch (error) {
+  } catch (error) {
     console.error("Error al obtener materias:", error);
     res.status(500).json({ message: error.message });
-}
+  }
 };
 
 // Obtener todas las materias con los profesores que se dan de una institución específica
@@ -74,6 +82,14 @@ const getMateriasConDocentes = async (req, res) => {
     }
 
     const materiasConDocentes = await materiaService.getMateriasConDocentes(id_institucion);
+
+    // Obtener la cantidad actualizada de materias en la institución
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMateriasInstitucion', { id_institucion, cantidadMaterias });
+    
     res.status(200).json(materiasConDocentes);
   } catch (error) {
     console.error("Error al obtener materias con docentes:", error);
@@ -98,8 +114,18 @@ const deleteMateria = async (req, res) => {
   try {
     const { id_materia } = req.params;
     const resultado = await materiaService.deleteMateria(id_materia);
+
+    // Obtener la cantidad actualizada de materias en la institución
+    const id_institucion = resultado.materia.id_institucion;
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMateriasInstitucion', { id_institucion, cantidadMaterias });
+
     res.status(200).json(resultado);
   } catch (error) {
+    console.error("Error al desactivar la materia:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -109,8 +135,18 @@ const activateMateria = async (req, res) => {
   try {
     const { id_materia } = req.params;
     const materiaActivada = await materiaService.activateMateria(id_materia);
+
+    // Obtener la cantidad actualizada de materias en la institución
+    const id_institucion = materiaActivada.id_institucion;
+    const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+
+    // Emitir el evento del socket
+    const io = getIo();
+    io.emit('cantidadMateriasInstitucion', { id_institucion, cantidadMaterias });
+
     res.status(200).json(materiaActivada);
   } catch (error) {
+    console.error("Error al activar la materia:", error);
     res.status(500).json({ message: error.message });
   }
 };
