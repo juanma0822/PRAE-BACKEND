@@ -2,26 +2,39 @@ const { consultarDB } = require('../db');
 
 // === ESTADÍSTICAS PARA ADMIN (POR INSTITUCIÓN) ===
 const getEstadisticasAdmin = async (id_institucion) => {
-  try {
-    const query = `
-      SELECT
-        (SELECT COUNT(*) FROM Usuario WHERE rol = 'docente' AND id_institucion = $1 AND activo = TRUE) AS docentes_activos,
-        (SELECT COUNT(*) FROM Usuario WHERE rol = 'docente' AND id_institucion = $1 AND activo = FALSE) AS docentes_inactivos,
-        (SELECT COUNT(*) FROM Usuario WHERE rol = 'estudiante' AND id_institucion = $1 AND activo = TRUE) AS estudiantes_activos,
-        (SELECT COUNT(*) FROM Usuario WHERE rol = 'estudiante' AND id_institucion = $1 AND activo = FALSE) AS estudiantes_inactivos,
-        (SELECT COUNT(*) FROM Materia WHERE id_institucion = $1 AND activo = TRUE) AS materias_activas,
-        (SELECT COUNT(*) FROM Materia WHERE id_institucion = $1 AND activo = FALSE) AS materias_inactivas,
-        (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = TRUE) AS cursos_activos,
-        (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = FALSE) AS cursos_inactivos,
-        (SELECT COUNT(*) FROM Asignar a JOIN Curso c ON a.id_curso = c.id_curso WHERE c.id_institucion = $1) AS docentes_asignados,
-        (SELECT COUNT(*) FROM Actividades a JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_actividades,
-        (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones
-    `;
-    const result = await consultarDB(query, [id_institucion]);
-    return result[0];
-  } catch (error) {
-    throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
-  }
+    try {
+      const query = `
+        SELECT
+          (SELECT COUNT(*) FROM Usuario WHERE rol = 'docente' AND id_institucion = $1 AND activo = TRUE) AS docentes_activos,
+          (SELECT COUNT(*) FROM Usuario WHERE rol = 'docente' AND id_institucion = $1 AND activo = FALSE) AS docentes_inactivos,
+          (SELECT COUNT(*) FROM Usuario WHERE rol = 'estudiante' AND id_institucion = $1 AND activo = TRUE) AS estudiantes_activos,
+          (SELECT COUNT(*) FROM Usuario WHERE rol = 'estudiante' AND id_institucion = $1 AND activo = FALSE) AS estudiantes_inactivos,
+          (SELECT COUNT(*) FROM Materia WHERE id_institucion = $1 AND activo = TRUE) AS materias_activas,
+          (SELECT COUNT(*) FROM Materia WHERE id_institucion = $1 AND activo = FALSE) AS materias_inactivas,
+          (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = TRUE) AS cursos_activos,
+          (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = FALSE) AS cursos_inactivos,
+          (SELECT COUNT(*) FROM Asignar a JOIN Curso c ON a.id_curso = c.id_curso WHERE c.id_institucion = $1) AS docentes_asignados,
+          (SELECT COUNT(*) FROM Actividades a JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_actividades,
+          (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones,
+  
+          -- **Nueva consulta para cantidad de estudiantes por grado**
+          (SELECT jsonb_object_agg(c.nombre, COUNT(e.documento_identidad)) FROM Estudiante e
+           JOIN Curso c ON e.id_curso = c.id_curso
+           WHERE c.id_institucion = $1
+           GROUP BY c.nombre) AS estudiantes_por_grado,
+  
+          -- **Nueva consulta para promedio de notas por grado**
+          (SELECT jsonb_object_agg(c.nombre, ROUND(AVG(cal.nota), 2)) FROM Calificacion cal
+           JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+           JOIN Curso c ON e.id_curso = c.id_curso
+           WHERE c.id_institucion = $1
+           GROUP BY c.nombre) AS promedio_notas_por_grado
+      `;
+      const result = await consultarDB(query, [id_institucion]);
+      return result[0];
+    } catch (error) {
+      throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
+    }
 };
 
 // === ESTADÍSTICAS PARA DOCENTE (POR DOCUMENTO) ===
