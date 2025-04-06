@@ -1,5 +1,5 @@
 const { Server } = require("socket.io");
-const materiaService = require("../services/materia.service"); // Importar el servicio de materias
+const estadisticasService = require("../services/estadisticas.service");
 
 let io; // Declarar la variable io globalmente
 
@@ -21,19 +21,29 @@ const initializeSocket = (server) => {
       socket.join(roomId);
       console.log(`Usuario ${socket.id} unido a la sala ${roomId}`);
 
-      // Obtener el ID de la institución desde el roomId (ejemplo: "institucion_1")
-      const id_institucion = roomId.split("_")[1];
+      const [tipo, identificador] = roomId.split("_"); // tipo = institucion|profesor|estudiante
 
-      if (id_institucion) {
-        try {
-          // Obtener la cantidad actualizada de materias en la institución
-          const cantidadMaterias = await materiaService.getCantidadMateriasPorInstitucion(id_institucion);
+      try {
+        let estadisticas = null;
 
-          // Emitir el evento al cliente que se unió
-          socket.emit("cantidadMateriasInstitucion", { id_institucion, cantidadMaterias });
-        } catch (error) {
-          console.error("Error al obtener la cantidad de materias:", error);
+        if (tipo === "institucion") {
+          estadisticas = await estadisticasService.getEstadisticasAdmin(identificador);
+        } else if (tipo === "profesor") {
+          estadisticas = await estadisticasService.getEstadisticasProfesor(identificador);
+        } else if (tipo === "estudiante") {
+          estadisticas = await estadisticasService.getEstadisticasEstudiante(identificador);
         }
+
+        if (estadisticas) {
+          // Emitir todas las estadísticas bajo el mismo evento
+          socket.emit("cantidadMateriasInstitucion", {
+            tipo,
+            identificador,
+            estadisticas
+          });
+        }
+      } catch (error) {
+        console.error("Error al obtener estadísticas:", error);
       }
     });
 

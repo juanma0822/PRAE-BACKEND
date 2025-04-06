@@ -20,6 +20,7 @@ const institucionRoutes = require('./Routes/institucion.routes');
 const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
 const historialGradoRoutes = require('./Routes/historialGrado.routes');
 const uploadRoutes = require('./Routes/upload.routes');
+const estadisticasRoutes = require('./Routes/estadisticas.routes');
 
 //--------------MIDDLEWARE
 app.use(cors());
@@ -68,6 +69,9 @@ app.use('/periodosAcademicos', periodoAcademicoRoutes);
 
 // Historial Grado Routes
 app.use('/historialGrado', historialGradoRoutes); 
+
+// Estadisticas Routes
+app.use('/estadisticas', estadisticasRoutes);
 
 //TEST API
 app.use('/test', testRoute);

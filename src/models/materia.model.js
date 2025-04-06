@@ -153,15 +153,7 @@ const getCantidadMateriasPorEstudiante = async (id_estudiante) => {
   return result[0]?.cantidad_materias || 0; // Retorna 0 si no hay materias
 };
 
-const getCantidadMateriasPorInstitucion = async (id_institucion) => {
-  const query = `
-    SELECT COUNT(*) AS cantidad_materias
-    FROM Materia
-    WHERE id_institucion = $1 AND activo = TRUE;
-  `;
-  const result = await consultarDB(query, [id_institucion]);
-  return result[0]?.cantidad_materias || 0; // Retorna 0 si no hay materias
-};
+
 
 module.exports = {
   insertMateria,
