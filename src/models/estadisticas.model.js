@@ -15,27 +15,50 @@ const getEstadisticasAdmin = async (id_institucion) => {
           (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = FALSE) AS cursos_inactivos,
           (SELECT COUNT(*) FROM Asignar a JOIN Curso c ON a.id_curso = c.id_curso WHERE c.id_institucion = $1) AS docentes_asignados,
           (SELECT COUNT(*) FROM Actividades a JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_actividades,
-          (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones,
-  
-          -- **Nueva consulta para cantidad de estudiantes por grado**
-          (SELECT jsonb_object_agg(c.nombre, COUNT(e.documento_identidad)) FROM Estudiante e
-           JOIN Curso c ON e.id_curso = c.id_curso
-           WHERE c.id_institucion = $1
-           GROUP BY c.nombre) AS estudiantes_por_grado,
-  
-          -- **Nueva consulta para promedio de notas por grado**
-          (SELECT jsonb_object_agg(c.nombre, ROUND(AVG(cal.nota), 2)) FROM Calificacion cal
-           JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
-           JOIN Curso c ON e.id_curso = c.id_curso
-           WHERE c.id_institucion = $1
-           GROUP BY c.nombre) AS promedio_notas_por_grado
+          (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones
       `;
+      // Primero obtenemos las estadísticas generales
       const result = await consultarDB(query, [id_institucion]);
-      return result[0];
+  
+      // **Obtenemos la cantidad de estudiantes por grado**
+      const estudiantesPorGradoQuery = `
+        SELECT c.nombre AS curso, COUNT(e.documento_identidad) AS estudiantes
+        FROM Estudiante e
+        JOIN Curso c ON e.id_curso = c.id_curso
+        WHERE c.id_institucion = $1
+        GROUP BY c.id_curso
+      `;
+      const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [id_institucion]);
+  
+      // **Obtenemos el promedio de notas por grado**
+      const promedioNotasPorGradoQuery = `
+        SELECT c.nombre AS curso, ROUND(AVG(cal.nota), 2) AS promedio
+        FROM Calificacion cal
+        JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+        JOIN Curso c ON e.id_curso = c.id_curso
+        WHERE c.id_institucion = $1
+        GROUP BY c.id_curso
+      `;
+      const promedioNotasPorGrado = await consultarDB(promedioNotasPorGradoQuery, [id_institucion]);
+  
+      // Agregamos las estadísticas de estudiantes y promedio de notas
+      const estadisticas = {
+        ...result[0], // Estadísticas generales
+        estudiantes_por_grado: estudiantesPorGrado.reduce((acc, item) => {
+          acc[item.curso] = item.estudiantes;
+          return acc;
+        }, {}),
+        promedio_notas_por_grado: promedioNotasPorGrado.reduce((acc, item) => {
+          acc[item.curso] = item.promedio;
+          return acc;
+        }, {})
+      };
+  
+      return estadisticas;
     } catch (error) {
       throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
     }
-};
+  };
 
 // === ESTADÍSTICAS PARA DOCENTE (POR DOCUMENTO) ===
 const getEstadisticasProfesor = async (documento_profe) => {
