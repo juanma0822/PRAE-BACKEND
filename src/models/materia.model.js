@@ -164,6 +164,5 @@ module.exports = {
   updateMateria,
   deleteMateria,
   activateMateria,
-  getCantidadMateriasPorEstudiante,
-  getCantidadMateriasPorInstitucion,
+  getCantidadMateriasPorEstudiante
 };
