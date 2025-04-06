@@ -31,17 +31,34 @@ const getEstadisticasAdmin = async (id_institucion) => {
       const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [id_institucion]);
   
       // **Obtenemos el promedio de notas por grado**
+      // Esta consulta ahora incluye solo las calificaciones activas
       const promedioNotasPorGradoQuery = `
         SELECT c.nombre AS curso, ROUND(AVG(cal.nota), 2) AS promedio
         FROM Calificacion cal
         JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
         JOIN Curso c ON e.id_curso = c.id_curso
         WHERE c.id_institucion = $1
+        AND cal.activo = TRUE
         GROUP BY c.id_curso
       `;
       const promedioNotasPorGrado = await consultarDB(promedioNotasPorGradoQuery, [id_institucion]);
   
-      // Agregamos las estadísticas de estudiantes y promedio de notas
+      // **Promediar las calificaciones por materia en cada curso**
+      // Para cada curso, sumamos las calificaciones activas de cada materia y promediamos
+      const promedioNotasPorMateriaQuery = `
+        SELECT c.nombre AS curso, m.nombre AS materia, ROUND(AVG(cal.nota), 2) AS promedio_materia
+        FROM Calificacion cal
+        JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+        JOIN Curso c ON e.id_curso = c.id_curso
+        JOIN Actividades a ON cal.id_actividad = a.id_actividad
+        JOIN Materia m ON a.id_materia = m.id_materia
+        WHERE c.id_institucion = $1
+        AND cal.activo = TRUE
+        GROUP BY c.id_curso, m.id_materia
+      `;
+      const promedioNotasPorMateria = await consultarDB(promedioNotasPorMateriaQuery, [id_institucion]);
+  
+      // Agregamos las estadísticas de estudiantes, promedio de notas y promedio por materia
       const estadisticas = {
         ...result[0], // Estadísticas generales
         estudiantes_por_grado: estudiantesPorGrado.reduce((acc, item) => {
@@ -51,6 +68,10 @@ const getEstadisticasAdmin = async (id_institucion) => {
         promedio_notas_por_grado: promedioNotasPorGrado.reduce((acc, item) => {
           acc[item.curso] = item.promedio;
           return acc;
+        }, {}),
+        promedio_notas_por_materia: promedioNotasPorMateria.reduce((acc, item) => {
+          acc[`${item.curso}_${item.materia}`] = item.promedio_materia;
+          return acc;
         }, {})
       };
   
@@ -58,7 +79,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
     } catch (error) {
       throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
     }
-  };
+};
 
 // === ESTADÍSTICAS PARA DOCENTE (POR DOCUMENTO) ===
 const getEstadisticasProfesor = async (documento_profe) => {
