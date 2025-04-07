@@ -9,7 +9,8 @@ const {
   activateInstitucion,
 } = require('../controllers/institucion.controller');
 const { upload } = require('../services/uploadService');
-const verifyToken = require('../middleware/auth.middleware')
+const verifyToken = require('../middleware/auth.middleware');
+const adminMiddleware = require('../middleware/admin.middleware');
 
 /**
  * @swagger
@@ -136,7 +137,7 @@ router.get('/:id_institucion', verifyToken, getInstitucionById);
  *       200:
  *         description: Institución actualizada correctamente
  */
-router.put('/:id_institucion', verifyToken, upload.single('logo'), updateInstitucion);
+router.put('/:id_institucion', verifyToken, adminMiddleware, upload.single('logo'), updateInstitucion);
 
 /**
  * @swagger
