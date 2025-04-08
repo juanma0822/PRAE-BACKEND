@@ -11,6 +11,7 @@ const initializeSocket = (server) => {
       allowedHeaders: ["Content-Type"],
       credentials: true,
     },
+    pingTimeout: 20000,
   });
 
   io.on("connection", (socket) => {

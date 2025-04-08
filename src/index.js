@@ -5,6 +5,7 @@ const http = require("http");
 const cors = require('cors');
 const pool = require('./db');
 const testRoute = require('./Routes/testRoute');
+const mainRoutes = require('./Routes/main.routes');
 const usuarioRoutes = require('./Routes/usuario.routes');
 const cursosRoutes = require('./Routes/curso.routes');
 const { initializeSocket } = require("./sockets/sockets");
@@ -21,10 +22,16 @@ const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
 const historialGradoRoutes = require('./Routes/historialGrado.routes');
 const uploadRoutes = require('./Routes/upload.routes');
 const estadisticasRoutes = require('./Routes/estadisticas.routes');
+const path = require('path');
+
+
+app.use(express.static(path.join(__dirname, '../public')));
+
 
 //--------------MIDDLEWARE
 app.use(cors());
 app.use(express.json());
+app.use('/', mainRoutes);
 const server = http.createServer(app);
 
 initializeSocket(server);
@@ -81,11 +88,6 @@ app.use("/api-docs", swaggerRoutes);
 
 // Usar el puerto asignado por Vercel o el puerto 5000 en desarrollo
 const PORT = process.env.PORT || 5000;
-
-// Agrega esto antes de iniciar el servidor
-app.get('/', (req, res) => {
-    res.send('<h1>Bienvenido al API REST de PRAE</h1><p>Este es el index</p>');
-});
 
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
