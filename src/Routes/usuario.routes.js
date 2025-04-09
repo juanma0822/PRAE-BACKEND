@@ -43,8 +43,6 @@ const {
  *                 type: string
  *               correo:
  *                 type: string
- *               contraseña:
- *                 type: string
  *               id_institucion:
  *                 type: integer
  *     responses:
