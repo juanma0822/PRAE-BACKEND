@@ -3,6 +3,7 @@ const {
   emitirEstadisticasInstitucion,
   emitirEstadisticasEstudiante
 } = require('../sockets/emitStats');
+const { emitirCambioInstitucion } = require('../sockets/emitChanges')
 
 // Crear una materia
 const addMateria = async (req, res) => {
@@ -15,6 +16,9 @@ const addMateria = async (req, res) => {
 
     const nuevaMateria = await materiaService.addMateria(nombre, id_institucion);
     await emitirEstadisticasInstitucion(id_institucion);
+
+    // Emitir evento de cambio
+    emitirCambioInstitucion(id_institucion);
 
     res.status(201).json(nuevaMateria);
   } catch (error) {
@@ -69,6 +73,10 @@ const deleteMateria = async (req, res) => {
     const id_institucion = resultado.materia.id_institucion;
 
     await emitirEstadisticasInstitucion(id_institucion);
+
+    // Emitir evento de cambio
+    emitirCambioInstitucion(id_institucion);
+
     res.status(200).json(resultado);
   } catch (error) {
     console.error("Error al desactivar la materia:", error);
@@ -84,6 +92,9 @@ const activateMateria = async (req, res) => {
     const id_institucion = materiaActivada.id_institucion;
 
     await emitirEstadisticasInstitucion(id_institucion);
+    // Emitir evento de cambio
+    emitirCambioInstitucion(id_institucion);
+    
     res.status(200).json(materiaActivada);
   } catch (error) {
     console.error("Error al activar la materia:", error);

@@ -37,7 +37,7 @@ const initializeSocket = (server) => {
 
         if (estadisticas) {
           // Emitir todas las estadísticas bajo el mismo evento
-          socket.emit("cantidadMateriasInstitucion", {
+          socket.emit("emitStats", {
             tipo,
             identificador,
             estadisticas
