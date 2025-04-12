@@ -2,83 +2,106 @@ const { consultarDB } = require('../db');
 
 // === ESTADÍSTICAS PARA ADMIN (POR INSTITUCIÓN) ===
 const getEstadisticasAdmin = async (id_institucion) => {
-    try {
-      const query = `
-        SELECT
-          (SELECT COUNT(*) FROM Usuario WHERE rol = 'docente' AND id_institucion = $1 AND activo = TRUE) AS docentes_activos,
-          (SELECT COUNT(*) FROM Usuario WHERE rol = 'docente' AND id_institucion = $1 AND activo = FALSE) AS docentes_inactivos,
-          (SELECT COUNT(*) FROM Usuario WHERE rol = 'estudiante' AND id_institucion = $1 AND activo = TRUE) AS estudiantes_activos,
-          (SELECT COUNT(*) FROM Usuario WHERE rol = 'estudiante' AND id_institucion = $1 AND activo = FALSE) AS estudiantes_inactivos,
-          (SELECT COUNT(*) FROM Materia WHERE id_institucion = $1 AND activo = TRUE) AS materias_activas,
-          (SELECT COUNT(*) FROM Materia WHERE id_institucion = $1 AND activo = FALSE) AS materias_inactivas,
-          (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = TRUE) AS cursos_activos,
-          (SELECT COUNT(*) FROM Curso WHERE id_institucion = $1 AND activo = FALSE) AS cursos_inactivos,
-          (SELECT COUNT(*) FROM Asignar a JOIN Curso c ON a.id_curso = c.id_curso WHERE c.id_institucion = $1) AS docentes_asignados,
-          (SELECT COUNT(*) FROM Actividades a JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_actividades,
-          (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones
-      `;
-      // Primero obtenemos las estadísticas generales
-      const result = await consultarDB(query, [id_institucion]);
-  
-      // **Obtenemos la cantidad de estudiantes por grado**
-      const estudiantesPorGradoQuery = `
-        SELECT c.nombre AS curso, COUNT(e.documento_identidad) AS estudiantes
-        FROM Estudiante e
-        JOIN Curso c ON e.id_curso = c.id_curso
-        WHERE c.id_institucion = $1
-        GROUP BY c.id_curso
-      `;
-      const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [id_institucion]);
-  
-      // **Obtenemos el promedio de notas por grado**
-      // Esta consulta ahora incluye solo las calificaciones activas
-      const promedioNotasPorGradoQuery = `
-        SELECT c.nombre AS curso, ROUND(AVG(cal.nota), 2) AS promedio
-        FROM Calificacion cal
-        JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
-        JOIN Curso c ON e.id_curso = c.id_curso
-        WHERE c.id_institucion = $1
-        AND cal.activo = TRUE
-        GROUP BY c.id_curso
-      `;
-      const promedioNotasPorGrado = await consultarDB(promedioNotasPorGradoQuery, [id_institucion]);
-  
-      // **Promediar las calificaciones por materia en cada curso**
-      // Para cada curso, sumamos las calificaciones activas de cada materia y promediamos
-      const promedioNotasPorMateriaQuery = `
-        SELECT c.nombre AS curso, m.nombre AS materia, ROUND(AVG(cal.nota), 2) AS promedio_materia
-        FROM Calificacion cal
-        JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
-        JOIN Curso c ON e.id_curso = c.id_curso
-        JOIN Actividades a ON cal.id_actividad = a.id_actividad
-        JOIN Materia m ON a.id_materia = m.id_materia
-        WHERE c.id_institucion = $1
-        AND cal.activo = TRUE
-        GROUP BY c.id_curso, m.id_materia
-      `;
-      const promedioNotasPorMateria = await consultarDB(promedioNotasPorMateriaQuery, [id_institucion]);
-  
-      // Agregamos las estadísticas de estudiantes, promedio de notas y promedio por materia
-      const estadisticas = {
-        ...result[0], // Estadísticas generales
-        estudiantes_por_grado: estudiantesPorGrado.reduce((acc, item) => {
-          acc[item.curso] = item.estudiantes;
-          return acc;
-        }, {}),
-        promedio_notas_por_grado: promedioNotasPorGrado.reduce((acc, item) => {
-          acc[item.curso] = item.promedio;
-          return acc;
-        }, {}),
-        promedio_notas_por_materia: promedioNotasPorMateria.reduce((acc, item) => {
-          acc[`${item.curso}_${item.materia}`] = item.promedio_materia;
-          return acc;
-        }, {})
-      };
-  
-      return estadisticas;
-    } catch (error) {
-      throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
-    }
+  try {
+    // Estadísticas generales optimizadas
+    const query = `
+      SELECT
+        COUNT(*) FILTER (WHERE rol = 'docente' AND activo = TRUE) AS docentes_activos,
+        COUNT(*) FILTER (WHERE rol = 'docente' AND activo = FALSE) AS docentes_inactivos,
+        COUNT(*) FILTER (WHERE rol = 'estudiante' AND activo = TRUE) AS estudiantes_activos,
+        COUNT(*) FILTER (WHERE rol = 'estudiante' AND activo = FALSE) AS estudiantes_inactivos
+      FROM Usuario
+      WHERE id_institucion = $1;
+    `;
+
+    const query2 = `
+      SELECT
+        COUNT(*) FILTER (WHERE activo = TRUE) AS materias_activas,
+        COUNT(*) FILTER (WHERE activo = FALSE) AS materias_inactivas
+      FROM Materia
+      WHERE id_institucion = $1;
+    `;
+
+    const query3 = `
+      SELECT
+        COUNT(*) FILTER (WHERE activo = TRUE) AS cursos_activos,
+        COUNT(*) FILTER (WHERE activo = FALSE) AS cursos_inactivos
+      FROM Curso
+      WHERE id_institucion = $1;
+    `;
+
+    const query4 = `
+      SELECT
+        (SELECT COUNT(*) FROM Asignar a JOIN Curso c ON a.id_curso = c.id_curso WHERE c.id_institucion = $1) AS docentes_asignados,
+        (SELECT COUNT(*) FROM Actividades a JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_actividades,
+        (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones
+    `;
+
+    const [usuarios] = await consultarDB(query, [id_institucion]);
+    const [materias] = await consultarDB(query2, [id_institucion]);
+    const [cursos] = await consultarDB(query3, [id_institucion]);
+    const [otros] = await consultarDB(query4, [id_institucion]);
+
+    // Estudiantes por grado
+    const estudiantesPorGradoQuery = `
+      SELECT c.nombre AS curso, COUNT(e.documento_identidad) AS estudiantes
+      FROM Estudiante e
+      JOIN Curso c ON e.id_curso = c.id_curso
+      WHERE c.id_institucion = $1
+      GROUP BY c.id_curso;
+    `;
+
+    const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [id_institucion]);
+
+    // Promedio de notas por grado
+    const promedioNotasPorGradoQuery = `
+      SELECT c.nombre AS curso, ROUND(AVG(cal.nota), 2) AS promedio
+      FROM Calificacion cal
+      JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+      JOIN Curso c ON e.id_curso = c.id_curso
+      WHERE c.id_institucion = $1
+      AND cal.activo = TRUE
+      GROUP BY c.id_curso;
+    `;
+
+    const promedioNotasPorGrado = await consultarDB(promedioNotasPorGradoQuery, [id_institucion]);
+
+    // Promedio de notas por materia
+    const promedioNotasPorMateriaQuery = `
+      SELECT c.nombre AS curso, m.nombre AS materia, ROUND(AVG(cal.nota), 2) AS promedio_materia
+      FROM Calificacion cal
+      JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+      JOIN Curso c ON e.id_curso = c.id_curso
+      JOIN Actividades a ON cal.id_actividad = a.id_actividad
+      JOIN Materia m ON a.id_materia = m.id_materia
+      WHERE c.id_institucion = $1
+      AND cal.activo = TRUE
+      GROUP BY c.id_curso, m.id_materia;
+    `;
+
+    const promedioNotasPorMateria = await consultarDB(promedioNotasPorMateriaQuery, [id_institucion]);
+
+    return {
+      usuarios,
+      materias,
+      cursos,
+      otros,
+      estudiantes_por_grado: estudiantesPorGrado.reduce((acc, item) => {
+        acc[item.curso] = item.estudiantes;
+        return acc;
+      }, {}),
+      promedio_notas_por_grado: promedioNotasPorGrado.reduce((acc, item) => {
+        acc[item.curso] = item.promedio;
+        return acc;
+      }, {}),
+      promedio_notas_por_materia: promedioNotasPorMateria.reduce((acc, item) => {
+        acc[`${item.curso}_${item.materia}`] = item.promedio_materia;
+        return acc;
+      }, {}),
+    };
+  } catch (error) {
+    throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
+  }
 };
 
 // === ESTADÍSTICAS PARA DOCENTE (POR DOCUMENTO) ===
