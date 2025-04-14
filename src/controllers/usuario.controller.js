@@ -37,7 +37,7 @@ const createAdmin = async (req, res) => {
 
     // Usar el logo predeterminado de PRAE si no se proporciona uno
     if (!logo) {
-      logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FlogoPRAE.png?alt=media&token=4c1c3239-5950-47e6-94cb-4c53d39822ad";
+      logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
     }
 
     // Construir el contenido principal del correo
@@ -96,6 +96,8 @@ const createProfesor = async (req, res) => {
       id_institucion,
       area_ensenanza,
     } = req.body;
+
+    // Crear el profesor en la base de datos
     const newProfesor = await usuarioService.addProfesor(
       documento_identidad,
       nombre,
@@ -108,6 +110,53 @@ const createProfesor = async (req, res) => {
 
     // Emitir estadísticas actualizadas para la institución
     await emitirEstadisticasInstitucion(id_institucion);
+
+    // Obtener los datos de la institución
+    const institucion = await institucionService.getInstitucionById(id_institucion);
+    let { logo, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
+
+    // Usar el logo predeterminado de PRAE si no se proporciona uno
+    if (!logo) {
+      logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
+    }
+
+    // Construir el contenido principal del correo
+    const mainContent = `
+      <div style="text-align: center; padding: 20px;">
+        <img src="${logo}" alt="Logo de la Institución" style="max-width: 200px; margin-bottom: 20px;" />
+        <h1 style="color: #333;">¡Bienvenido a PRAE, ${nombre}!</h1>
+        <p>Has sido registrado como profesor en la institución <strong>${nombreInstitucion}</strong>.</p>
+        <p>Estas son tus credenciales de acceso:</p>
+        <ul style="list-style: none; padding: 0;">
+          <li><strong>Correo:</strong> ${correo}</li>
+          <li><strong>Contraseña:</strong> ${contraseña}</li>
+        </ul>
+        <p><strong>Nota:</strong> Te recomendamos cambiar esta contraseña después de tu primer inicio de sesión.</p>
+      </div>
+    `;
+
+    // Construir el contenido del footer
+    const footerContent = `
+      <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 14px; color: #666;">
+        <p style="font-size: 18px; font-weight: bold;"><strong>${nombreInstitucion}</strong></p>
+        <p>Teléfono: ${telefono || 'No disponible'}</p>
+        <p>Dirección: ${direccion || 'No disponible'}</p>
+        <p>
+          <a href="${instagram || '#'}" style="color: #157AFE; text-decoration: none;">Instagram</a> |
+          <a href="${facebook || '#'}" style="color: #157AFE; text-decoration: none;">Facebook</a>
+        </p>
+      </div>
+    `;
+
+    // Generar el correo completo usando la plantilla genérica
+    const emailContent = emailService.generateEmailTemplate(mainContent, footerContent);
+
+    // Enviar el correo al profesor
+    await emailService.sendEmail(
+      correo,
+      "Credenciales de acceso a PRAE - DOCENTE",
+      emailContent
+    );
 
     res.status(201).json(newProfesor);
   } catch (error) {
@@ -145,6 +194,11 @@ const createEstudiante = async (req, res) => {
     // Obtener el logo de la institución
     const institucion = await institucionService.getInstitucionById(id_institucion);
     const { logo, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
+
+     // Usar el logo predeterminado de PRAE si no se proporciona uno
+     if (!logo) {
+      logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
+    }
 
     // Obtener el nombre del curso
     const curso = await cursoService.getCursoById(id_curso);
