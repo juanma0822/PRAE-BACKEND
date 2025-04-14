@@ -73,9 +73,11 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
     
     const result = await consultarDB(query, [id_materia, id_curso, id_docente, id_institucion]);
 
-    // Agrupar las actividades por estudiante, incluyendo el curso
+    // Agrupar los resultados: Aseguramos que siempre haya un listado de estudiantes
     const groupedResult = result.reduce((acc, row) => {
         const { documento_identidad, nombre, apellido, nota, id_calificacion, actividad, peso, id_actividad, id_curso } = row;
+        
+        // Si el estudiante no está en el objeto, lo agregamos
         if (!acc[documento_identidad]) {
             acc[documento_identidad] = {
                 documento_identidad,
@@ -85,13 +87,21 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
                 actividades: []
             };
         }
-        acc[documento_identidad].actividades.push({ id_actividad, actividad, peso, nota, id_calificacion });
+
+        // Solo añadimos actividades si existen, si no, las dejamos vacías
+        if (actividad) {
+            acc[documento_identidad].actividades.push({ id_actividad, actividad, peso, nota, id_calificacion });
+        } else {
+            acc[documento_identidad].actividades.push({ id_actividad: null, actividad: "Sin actividad asignada", peso: 0, nota, id_calificacion: null });
+        }
+
         return acc;
     }, {});
 
     // Convertir el objeto groupedResult a un array, ordenado por apellido
     return Object.values(groupedResult).sort((a, b) => a.apellido.localeCompare(b.apellido));
 };
+
 
 const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) => {
     const query = `
