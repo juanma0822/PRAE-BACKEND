@@ -211,7 +211,8 @@ const desactivarUsuario = async (documento_identidad) => {
     WHERE documento_identidad = $1
     RETURNING id_institucion, documento_identidad, nombre, apellido, correo, rol;
   `;
-  await consultarDB(queryDesactivarUsuario, [documento_identidad]);
+  const result = await consultarDB(queryDesactivarUsuario, [documento_identidad]);
+  return result[0]; // Asegúrate de devolver el primer elemento del resultado
 };
 
 const activarUsuario = async (documento_identidad) => {

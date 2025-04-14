@@ -225,10 +225,17 @@ const updateUsuario = async (req, res) => {
 const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Llamar al servicio para desactivar el usuario
     const usuarioEliminado = await usuarioService.deleteUsuario(id);
 
+    // Verificar si el usuario fue encontrado
+    if (!usuarioEliminado) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
     // Emitir estadísticas actualizadas para la institución
-    const id_institucion = usuarioEliminado.id_institucion; // Asegúrate de que el servicio devuelva el `id_institucion`
+    const id_institucion = usuarioEliminado.id_institucion;
     await emitirEstadisticasInstitucion(id_institucion);
 
     res.status(200).send("Usuario desactivado correctamente");
@@ -294,6 +301,10 @@ const getEstudiantesPorInstitucion = async (req, res) => {
     const estudiantes = await usuarioService.getEstudiantesPorInstitucion(
       id_institucion
     );
+
+    // Emitir estadísticas actualizadas para la institución
+    await emitirEstadisticasInstitucion(id_institucion);
+
     res.status(200).json(estudiantes);
   } catch (error) {
     console.error("Error al obtener estudiantes por institución:", error);
@@ -470,6 +481,9 @@ const getDocentesPorInstitucion = async (req, res) => {
   try {
     const { id_institucion } = req.params;
     const docentes = await usuarioService.getDocentesPorInstitucion(id_institucion);
+
+    // Emitir estadísticas actualizadas para la institución
+    await emitirEstadisticasInstitucion(id_institucion);
     res.status(200).json(docentes);
   } catch (error) {
     console.error(`Error al obtener docentes en la institución "${req.params.id_institucion}":`, error);

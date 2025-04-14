@@ -111,6 +111,7 @@ const getCursosByInstitucion = async (req, res) => {
     try {
         const { id_institucion } = req.params;
         const cursos = await cursoService.getCursosByInstitucion(id_institucion);
+        await emitirEstadisticasInstitucion(id_institucion);
         res.status(200).json(cursos);
     } catch (error) {
         res.status(500).json({ message: error.message });
