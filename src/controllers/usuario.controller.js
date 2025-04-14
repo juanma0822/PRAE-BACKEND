@@ -225,7 +225,7 @@ const updateUsuario = async (req, res) => {
 const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
-    await usuarioService.deleteUsuario(id);
+    const usuarioEliminado = await usuarioService.deleteUsuario(id);
 
     // Emitir estadísticas actualizadas para la institución
     const id_institucion = usuarioEliminado.id_institucion; // Asegúrate de que el servicio devuelva el `id_institucion`
