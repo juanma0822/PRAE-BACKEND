@@ -2,6 +2,7 @@ const usuarioService = require("../services/usuario.service");
 const institucionService = require('../services/institucion.service');
 const cursoService = require('../services/curso.service');
 const emailService = require('../services/emailService');
+const { emitirEstadisticasInstitucion } = require('../sockets/emitStats');
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
@@ -104,6 +105,10 @@ const createProfesor = async (req, res) => {
       id_institucion,
       area_ensenanza
     );
+
+    // Emitir estadísticas actualizadas para la institución
+    await emitirEstadisticasInstitucion(id_institucion);
+
     res.status(201).json(newProfesor);
   } catch (error) {
     console.error(error);
@@ -133,6 +138,9 @@ const createEstudiante = async (req, res) => {
       id_institucion,
       id_curso
     );
+
+    // Emitir estadísticas actualizadas para la institución
+    await emitirEstadisticasInstitucion(id_institucion);
 
     // Obtener el logo de la institución
     const institucion = await institucionService.getInstitucionById(id_institucion);
@@ -218,6 +226,11 @@ const deleteUsuario = async (req, res) => {
   try {
     const { id } = req.params;
     await usuarioService.deleteUsuario(id);
+
+    // Emitir estadísticas actualizadas para la institución
+    const id_institucion = usuarioEliminado.id_institucion; // Asegúrate de que el servicio devuelva el `id_institucion`
+    await emitirEstadisticasInstitucion(id_institucion);
+
     res.status(200).send("Usuario desactivado correctamente");
   } catch (error) {
     console.error(error);
@@ -231,6 +244,11 @@ const activarUsuario = async (req, res) => {
     const usuarioActivado = await usuarioService.activarUsuario(
       documento_identidad
     );
+
+    // Emitir estadísticas actualizadas para la institución
+    const id_institucion = usuarioActivado.id_institucion; // Asegúrate de que el servicio devuelva el `id_institucion`
+    await emitirEstadisticasInstitucion(id_institucion);
+    
     res
       .status(200)
       .json({
