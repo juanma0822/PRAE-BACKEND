@@ -55,30 +55,33 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
             u.nombre, 
             u.apellido, 
             COALESCE(c.nota, 0) AS nota,
-            c.id_calificacion, -- Incluir el ID de la calificación
+            c.id_calificacion, 
             a.nombre AS actividad, 
             a.peso,
-            a.id_actividad
+            a.id_actividad,
+            e.id_curso  -- Asegurarnos de que cada estudiante tenga su id_curso relacionado
         FROM Estudiante e
         LEFT JOIN Usuario u ON e.documento_identidad = u.documento_identidad
-        LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3
+        LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3 AND a.id_curso = $2  -- Filtro para id_curso
         LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad
         JOIN Materia m ON a.id_materia = m.id_materia
         WHERE e.id_curso = $2 
           AND m.id_institucion = $4
-          AND u.activo = TRUE -- Solo estudiantes activos
+          AND u.activo = TRUE 
         ORDER BY u.nombre ASC;
     `;
+    
     const result = await consultarDB(query, [id_materia, id_curso, id_docente, id_institucion]);
 
-    // Agrupar las actividades por estudiante
+    // Agrupar las actividades por estudiante, incluyendo el curso
     const groupedResult = result.reduce((acc, row) => {
-        const { documento_identidad, nombre, apellido, nota, id_calificacion, actividad, peso, id_actividad } = row;
+        const { documento_identidad, nombre, apellido, nota, id_calificacion, actividad, peso, id_actividad, id_curso } = row;
         if (!acc[documento_identidad]) {
             acc[documento_identidad] = {
                 documento_identidad,
                 nombre,
                 apellido,
+                id_curso,  // Añadir id_curso aquí
                 actividades: []
             };
         }
@@ -86,7 +89,7 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
         return acc;
     }, {});
 
-    // Convertir el objeto groupedResult a un array
+    // Convertir el objeto groupedResult a un array, ordenado por apellido
     return Object.values(groupedResult).sort((a, b) => a.apellido.localeCompare(b.apellido));
 };
 
