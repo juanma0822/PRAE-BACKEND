@@ -1,5 +1,10 @@
 const cursoService = require('../services/curso.service');
 
+const {
+    emitirEstadisticasInstitucion,
+} = require('../sockets/emitStats');
+
+
 const getCursos = async (req, res) => {
     try {
         const cursos = await cursoService.getCursos();
@@ -24,6 +29,8 @@ const createCurso = async (req, res) => {
     try {
         const { nombre, id_institucion } = req.body;
         const nuevoCurso = await cursoService.createCurso(nombre, id_institucion);
+        await emitirEstadisticasInstitucion(id_institucion);
+
         res.status(201).json(nuevoCurso);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -47,6 +54,12 @@ const deleteCurso = async (req, res) => {
         const { id } = req.params;
         const eliminado = await cursoService.deleteCurso(id);
         if (eliminado.length === 0) return res.status(404).json({ message: "Curso no encontrado" });
+        
+        const id_institucion = eliminado[0].id_institucion;
+
+        // Emitir el cambio de la institución después de la eliminación
+        await emitirEstadisticasInstitucion(id_institucion);
+
         res.status(200).json({ message: "Curso eliminado correctamente (estado inactivo)" });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -58,6 +71,11 @@ const activateCurso = async (req, res) => {
         const { id } = req.params;
         const activado = await cursoService.activateCurso(id);
         if (!activado) return res.status(404).json({ message: "Curso no encontrado" });
+        
+        const id_institucion = activado.id_institucion;
+        // Emitir el cambio de la institución después de la activación
+        await emitirEstadisticasInstitucion(id_institucion);
+
         res.status(200).json({ message: "Curso activado correctamente" });
     } catch (error) {
         res.status(500).json({ message: error.message });
