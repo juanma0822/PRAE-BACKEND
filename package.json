@@ -1,16 +1,19 @@
 {
   "name": "prae-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API RESTful de PRAE - Plataforma de Registro Académico Estudiantil",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/index.js",
     "start": "node src/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["PRAE", "backend", "nodejs", "express", "api", "educacion"],
+  "author": "Juan Manuel (@juanma0822)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",

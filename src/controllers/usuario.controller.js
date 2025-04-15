@@ -78,7 +78,11 @@ const createAdmin = async (req, res) => {
       emailContent
     );
 
-    res.status(201).json(newAdmin);
+    res.status(201).json({
+      message: 'Administrador creado exitosamente',
+      admin: newAdmin
+    });
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -158,7 +162,10 @@ const createProfesor = async (req, res) => {
       emailContent
     );
 
-    res.status(201).json(newProfesor);
+    res.status(201).json({
+      message: 'Profesor creado exitosamente',
+      profesor: newProfesor
+    });    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -193,12 +200,9 @@ const createEstudiante = async (req, res) => {
 
     // Obtener el logo de la institución
     const institucion = await institucionService.getInstitucionById(id_institucion);
-    const { logo, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
+    const { logo: logoInstitucion, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
 
-     // Usar el logo predeterminado de PRAE si no se proporciona uno
-     if (!logo) {
-      logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
-    }
+    const logo = logoInstitucion || "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
 
     // Obtener el nombre del curso
     const curso = await cursoService.getCursoById(id_curso);
@@ -239,7 +243,10 @@ const createEstudiante = async (req, res) => {
       emailContent
     );
 
-    res.status(201).json(newEstudiante);
+    res.status(201).json({
+      message: 'Estudiante creado exitosamente',
+      estudiante: newEstudiante
+    });    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
