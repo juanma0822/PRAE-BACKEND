@@ -22,6 +22,7 @@ const periodoAcademicoRoutes = require('./Routes/periodoAcademico.routes');
 const historialGradoRoutes = require('./Routes/historialGrado.routes');
 const uploadRoutes = require('./Routes/upload.routes');
 const estadisticasRoutes = require('./Routes/estadisticas.routes');
+const boletinRoutes = require('./Routes/boletin.routes');
 const path = require('path');
 
 
@@ -80,11 +81,15 @@ app.use('/historialGrado', historialGradoRoutes);
 // Estadisticas Routes
 app.use('/estadisticas', estadisticasRoutes);
 
+//Generar boletines
+app.use("/boletines", boletinRoutes);
+
 //TEST API
 app.use('/test', testRoute);
 
 //Swagger Route
 app.use("/api-docs", swaggerRoutes);
+
 
 // Usar el puerto asignado por Vercel o el puerto 5000 en desarrollo
 const PORT = process.env.PORT || 5000;

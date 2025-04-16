@@ -8,7 +8,14 @@
     "dev": "nodemon src/index.js",
     "start": "node src/index.js"
   },
-  "keywords": ["PRAE", "backend", "nodejs", "express", "api", "educacion"],
+  "keywords": [
+    "PRAE",
+    "backend",
+    "nodejs",
+    "express",
+    "api",
+    "educacion"
+  ],
   "author": "Juan Manuel (@juanma0822)",
   "license": "MIT",
   "engines": {
@@ -26,6 +33,7 @@
     "nodemailer": "^6.10.0",
     "pdfkit": "^0.16.0",
     "pg": "^8.13.2",
+    "puppeteer": "^24.6.1",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
