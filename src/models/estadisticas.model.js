@@ -46,8 +46,10 @@ const getEstadisticasAdmin = async (id_institucion) => {
     const estudiantesPorGradoQuery = `
       SELECT c.nombre AS curso, COUNT(e.documento_identidad) AS estudiantes
       FROM Estudiante e
+      JOIN Usuario u ON e.documento_identidad = u.documento_identidad
       JOIN Curso c ON e.id_curso = c.id_curso
-      WHERE c.id_institucion = $1 AND activo = TRUE
+      WHERE c.id_institucion = $1
+        AND u.activo = TRUE
       GROUP BY c.id_curso;
     `;
 
