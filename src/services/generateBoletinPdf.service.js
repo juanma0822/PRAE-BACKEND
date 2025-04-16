@@ -2,26 +2,26 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 const { consultarDB } = require('../db');
+require('dotenv').config();
 
 function lightenColor(hex, percent) {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) + amt;
-    const G = ((num >> 8) & 0x00FF) + amt;
-    const B = (num & 0x0000FF) + amt;
-    return (
-      '#' +
-      (
-        0x1000000 +
-        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
-        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
-        (B < 255 ? (B < 1 ? 0 : B) : 255)
-      )
-        .toString(16)
-        .slice(1)
-    );
-  }
-  
+  const num = parseInt(hex.replace('#', ''), 16);
+  const amt = Math.round(2.55 * percent);
+  const R = (num >> 16) + amt;
+  const G = ((num >> 8) & 0x00FF) + amt;
+  const B = (num & 0x0000FF) + amt;
+  return (
+    '#' +
+    (
+      0x1000000 +
+      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+      (B < 255 ? (B < 1 ? 0 : B) : 255)
+    )
+      .toString(16)
+      .slice(1)
+  );
+}
 
 const generateBoletinPdf = async (documento_identidad) => {
   try {
@@ -109,46 +109,49 @@ const generateBoletinPdf = async (documento_identidad) => {
 
     let tablasHTML = '';
     Object.entries(materiasMap).forEach(([nombreMateria, info]) => {
-    const headerColor = info.color;
-    const softColor = lightenColor(headerColor, 80); // tono más suave
+      const headerColor = info.color;
+      const softColor = lightenColor(headerColor, 80);
 
-    tablasHTML += `
-    <div class="materia-titulo" style="background-color: ${headerColor}; color: white;">
-        ${nombreMateria} - ${info.docente}
-    </div>
-    <table>
-        <thead style="background-color: ${softColor};">
-        <tr>
-            <th>Actividad</th>
-            <th>Peso</th>
-            <th>Nota</th>
-            <th>Valor Final</th>
-        </tr>
-        </thead>
-        <tbody>
-    `;
-    info.actividades.forEach((act) => {
+      tablasHTML += `
+        <div class="materia-titulo" style="background-color: ${headerColor}; color: white;">
+          ${nombreMateria} - ${info.docente}
+        </div>
+        <table>
+          <thead style="background-color: ${softColor};">
+            <tr>
+              <th>Actividad</th>
+              <th>Peso</th>
+              <th>Nota</th>
+              <th>Valor Final</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      info.actividades.forEach((act) => {
         const nota = parseFloat(act.nota) || 0;
         const peso = parseFloat(act.peso) || 0;
         const valorFinal = (nota * peso / 100).toFixed(2);
 
         tablasHTML += `
-        <tr>
+          <tr>
             <td>${act.nombre}</td>
             <td>${peso}%</td>
             <td>${nota.toFixed(2)}</td>
             <td>${valorFinal}</td>
-        </tr>
+          </tr>
         `;
-    });
+      });
 
-    tablasHTML += `</tbody></table>`; // ✅ AHORA SÍ BIEN CERRADO
+      tablasHTML += `</tbody></table>`;
     });
-
 
     html = html.replace('{{TABLAS_MATERIAS}}', tablasHTML);
 
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.connect({
+      browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`,
+    });
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
 

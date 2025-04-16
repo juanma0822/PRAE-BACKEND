@@ -38,6 +38,7 @@
     "socket.io-client": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.2",
+    "ws": "^8.18.1",
     "z-schema": "^6.0.2"
   }
 }
