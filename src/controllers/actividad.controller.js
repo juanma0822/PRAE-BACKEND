@@ -1,9 +1,12 @@
 const actividadService = require('../services/actividad.service');
+const { emitirEstadisticasProfesor } = require('../sockets/emitStats');
 
 const crearActividad = async (req, res) => {
     try {
       const { nombre, peso, id_materia, id_docente, id_curso } = req.body;
       const nuevaActividad = await actividadService.crearActividad(nombre, peso, id_materia, id_docente, id_curso);
+
+      await emitirEstadisticasProfesor(id_docente); // Emitir estadísticas al docente después de crear la actividad
       res.status(201).json(nuevaActividad);
     } catch (error) {
       res.status(500).json({ error: `Error al crear la actividad: ${error.message}` });
@@ -42,14 +45,26 @@ const actualizarActividad = async (req, res) => {
 };
 
 const eliminarActividad = async (req, res) => {
-    try {
-        const { id_actividad } = req.params;
-        const actividadEliminada = await actividadService.eliminarActividad(id_actividad);
-        res.status(200).json({ message: 'Actividad eliminada correctamente', actividad: actividadEliminada });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar la actividad' });
+  try {
+    const { id_actividad } = req.params;
+
+    const actividadEliminada = await actividadService.eliminarActividad(id_actividad);
+
+    res.status(200).json({
+      message: 'Actividad eliminada correctamente',
+      actividad: actividadEliminada
+    });
+
+    if (actividadEliminada?.id_docente) {
+      await emitirEstadisticasProfesor(actividadEliminada.id_docente);
     }
+
+  } catch (error) {
+    console.error("Error al eliminar la actividad:", error);
+    res.status(500).json({ error: 'Error al eliminar la actividad' });
+  }
 };
+
 
 module.exports = {
     crearActividad,

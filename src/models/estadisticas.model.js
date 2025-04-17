@@ -109,16 +109,47 @@ const getEstadisticasAdmin = async (id_institucion) => {
 // === ESTADÍSTICAS PARA DOCENTE (POR DOCUMENTO) ===
 const getEstadisticasProfesor = async (documento_profe) => {
   try {
-    const query = `
+    const queryResumen = `
       SELECT
         (SELECT COUNT(*) FROM Dictar WHERE documento_profe = $1 AND estado = TRUE) AS materias_dictadas,
         (SELECT COUNT(*) FROM Asignar WHERE id_docente = $1 AND estado = TRUE) AS cursos_asignados,
         (SELECT COUNT(*) FROM Actividades WHERE id_docente = $1 AND activo = TRUE) AS actividades_creadas,
         (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad WHERE a.id_docente = $1) AS calificaciones_asignadas,
-        (SELECT COUNT(*) FROM Comentarios WHERE documento_profe = $1) AS comentarios_realizados
+        (SELECT COUNT(*) FROM Comentarios WHERE documento_profe = $1) AS comentarios_realizados,
+        (SELECT COUNT(DISTINCT e.documento_identidad)
+         FROM Asignar asig
+         JOIN Estudiante e ON e.id_curso = asig.id_curso
+         WHERE asig.id_docente = $1 AND asig.estado = TRUE) AS estudiantes_totales,
+        (SELECT ROUND(AVG(c.nota), 2)
+         FROM Calificacion c
+         JOIN Actividades a ON c.id_actividad = a.id_actividad
+         WHERE a.id_docente = $1 AND c.activo = TRUE) AS promedio_general
     `;
-    const result = await consultarDB(query, [documento_profe]);
-    return result[0];
+
+    const queryPromedioPorCursoYMateria = `
+      SELECT cu.nombre AS curso, m.nombre AS materia, ROUND(AVG(c.nota), 2) AS promedio
+      FROM Calificacion c
+      JOIN Actividades a ON c.id_actividad = a.id_actividad
+      JOIN Materia m ON a.id_materia = m.id_materia
+      JOIN Curso cu ON a.id_curso = cu.id_curso
+      WHERE a.id_docente = $1 AND c.activo = TRUE AND a.activo = TRUE
+      GROUP BY cu.nombre, m.nombre
+      ORDER BY cu.nombre, m.nombre;
+    `;
+
+    const [resumen] = await consultarDB(queryResumen, [documento_profe]);
+    const detalle = await consultarDB(queryPromedioPorCursoYMateria, [documento_profe]);
+
+    const promedio_por_curso = {};
+    detalle.forEach(({ curso, materia, promedio }) => {
+      if (!promedio_por_curso[curso]) promedio_por_curso[curso] = {};
+      promedio_por_curso[curso][materia] = Number(promedio);
+    });
+
+    return {
+      ...resumen,
+      promedio_por_curso
+    };
   } catch (error) {
     throw new Error(`Error al obtener estadísticas del docente: ${error.message}`);
   }

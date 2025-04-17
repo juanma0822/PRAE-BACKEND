@@ -53,7 +53,7 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
     const checkActivitiesQuery = `
         SELECT COUNT(*) 
         FROM Actividades a
-        WHERE a.id_materia = $1 AND a.id_curso = $2 AND a.id_docente = $3;
+        WHERE a.id_materia = $1 AND a.id_curso = $2 AND a.id_docente = $3 AND a.activo = TRUE;
     `;
     
     const activityCount = await consultarDB(checkActivitiesQuery, [id_materia, id_curso, id_docente]);
@@ -73,7 +73,7 @@ const selectCalificacionesCurso = async (id_materia, id_curso, id_docente, id_in
                 e.id_curso
             FROM Estudiante e
             LEFT JOIN Usuario u ON e.documento_identidad = u.documento_identidad
-            LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3 AND a.id_curso = $2
+            LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3 AND a.id_curso = $2 AND a.activo = TRUE
             LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad
             JOIN Materia m ON a.id_materia = m.id_materia
             WHERE e.id_curso = $2 
