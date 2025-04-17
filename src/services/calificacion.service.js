@@ -25,7 +25,7 @@ const obtenerPromedioEstudiante = async (id_materia, id_estudiante, id_docente) 
 };
 
 const obtenerPromedioCurso = async (id_materia, id_curso) => {
-    return await calificacionModel.selectPromedioCurso(id_materia, id_curso);
+    return await calificacionModel.selectPromedioCursoMateria(id_materia, id_curso);
 };
 
 const getCalificacionById = async (id_calificacion) => {

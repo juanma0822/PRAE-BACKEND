@@ -156,6 +156,20 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
     return result[0]?.promedio || 0; // Retorna 0 si no hay calificaciones
 };
 
+const selectPromedioCursoMateria = async (id_materia, id_curso) => {
+    const query = `
+      SELECT ROUND(AVG(c.nota), 2) AS promedio
+      FROM Calificacion c
+      JOIN Actividades a ON c.id_actividad = a.id_actividad
+      WHERE a.id_materia = $1
+        AND a.id_curso = $2
+        AND a.activo = TRUE
+        AND c.activo = TRUE;
+    `;
+    const result = await consultarDB(query, [id_materia, id_curso]);
+    return result[0]?.promedio || 0;
+  };
+
 const getCalificacionById = async (id_calificacion) => {
     const query = `
       SELECT * FROM Calificacion
@@ -172,5 +186,6 @@ module.exports = {
     selectCalificacionesEstudiantePorDocenteEInstitucion,
     selectCalificacionesCurso,
     selectPromedioEstudiante,
+    selectPromedioCursoMateria,
     getCalificacionById,
 };
