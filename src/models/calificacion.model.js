@@ -42,7 +42,9 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia, 
         JOIN Materia m ON a.id_materia = m.id_materia
         WHERE a.id_materia = $1 
           AND a.id_docente = $3 
-          AND m.id_institucion = $4;
+          AND m.id_institucion = $4
+          AND a.activo = TRUE
+          AND c.activo = TRUE;
     `;
     const result = await consultarDB(query, [id_materia, id_estudiante, id_docente, id_institucion]);
     return result;
@@ -147,7 +149,7 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
                 ELSE 0
             END AS promedio
         FROM Calificacion c
-        JOIN Actividades a ON c.id_actividad = a.id_actividad
+        JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
         WHERE a.id_materia = $1 
           AND c.id_estudiante = $2
           AND a.id_docente = $3;
