@@ -223,7 +223,7 @@ const selectPromedioCursoMateria = async (id_materia, id_curso) => {
         u.apellido,
         ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio
       FROM Estudiante e
-      JOIN Usuario u ON u.documento_identidad = e.documento_identidad
+      JOIN Usuario u ON u.documento_identidad = e.documento_identidad AND u.activo = TRUE
       JOIN Actividades a ON a.id_materia = $1 AND a.id_curso = $2 AND a.activo = TRUE
       LEFT JOIN Calificacion c 
         ON c.id_actividad = a.id_actividad 
