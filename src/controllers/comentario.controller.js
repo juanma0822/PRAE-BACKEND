@@ -94,12 +94,22 @@ const deleteComentario = async (req, res) => {
     const { id_comentario } = req.params;
     const resultado = await ComentarioService.deleteComentario(id_comentario);
 
-    
-    res.status(200).json(resultado);
+    // Emitir estadísticas si hay un profesor asociado
+    if (resultado?.documento_profe) {
+      await emitirEstadisticasProfesor(resultado.documento_profe);
+    }
+
+    res.status(200).json({
+      message: "Comentario eliminado correctamente",
+      comentario: resultado
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error al eliminar comentario:", error);
+    res.status(500).json({ message: error.message || 'Error al eliminar comentario' });
   }
 };
+
 
 module.exports = {
   createComentario,
