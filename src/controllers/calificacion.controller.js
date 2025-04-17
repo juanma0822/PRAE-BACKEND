@@ -145,14 +145,40 @@ const obtenerPromedioEstudiante = async (req, res) => {
 };
 
 const obtenerPromedioCurso = async (req, res) => {
+    const { id_materia, id_curso } = req.params;
+  
     try {
-        const { id_materia, id_curso } = req.params;
-        const promedio = await calificacionService.obtenerPromedioCurso(id_materia, id_curso);
-        res.status(200).json({ promedio });
+      // Validación básica de parámetros
+      if (!id_materia || !id_curso) {
+        return res.status(400).json({
+          error: 'Parámetros incompletos',
+          detalle: 'Debe enviar id_materia e id_curso en la URL'
+        });
+      }
+  
+      const promedio = await calificacionService.obtenerPromedioCurso(id_materia, id_curso);
+  
+      // Validación de resultado
+      if (promedio === 0) {
+        return res.status(404).json({
+          error: 'Promedio no disponible',
+          detalle: 'No hay calificaciones activas registradas para esta materia en este curso'
+        });
+      }
+  
+      // Éxito
+      res.status(200).json({ promedio });
+  
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener promedio del curso' });
+      console.error(`[ERROR] promedio curso (materia: ${id_materia}, curso: ${id_curso}):`, error.message);
+  
+      res.status(500).json({
+        error: 'Error interno del servidor',
+        detalle: error.message || 'Ocurrió un error inesperado al calcular el promedio'
+      });
     }
-};
+  };
+  
 
 module.exports = {
     asignarCalificacion,
