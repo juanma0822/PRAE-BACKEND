@@ -127,24 +127,53 @@ const getEstadisticasProfesor = async (documento_profe) => {
     `;
 
     const queryPromedioPorCursoYMateria = `
-      SELECT cu.nombre AS curso, m.nombre AS materia, ROUND(AVG(c.nota), 2) AS promedio
-      FROM Calificacion c
-      JOIN Actividades a ON c.id_actividad = a.id_actividad
-      JOIN Materia m ON a.id_materia = m.id_materia
-      JOIN Curso cu ON a.id_curso = cu.id_curso
-      WHERE a.id_docente = $1 AND c.activo = TRUE AND a.activo = TRUE
-      GROUP BY cu.nombre, m.nombre
-      ORDER BY cu.nombre, m.nombre;
+      SELECT 
+        cu.nombre AS curso,
+        m.nombre AS materia,
+        u.nombre AS estudiante_nombre,
+        u.apellido AS estudiante_apellido,
+        ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio
+      FROM Estudiante e
+      JOIN Usuario u ON u.documento_identidad = e.documento_identidad
+      JOIN Actividades a ON a.id_docente = $1 AND a.id_curso = e.id_curso AND a.activo = TRUE
+      JOIN Materia m ON m.id_materia = a.id_materia
+      JOIN Curso cu ON cu.id_curso = a.id_curso
+      LEFT JOIN Calificacion c 
+        ON c.id_actividad = a.id_actividad 
+        AND c.id_estudiante = e.documento_identidad 
+        AND c.activo = TRUE
+      GROUP BY cu.nombre, m.nombre, u.nombre, u.apellido
+      ORDER BY cu.nombre, m.nombre, u.nombre;
     `;
 
     const [resumen] = await consultarDB(queryResumen, [documento_profe]);
     const detalle = await consultarDB(queryPromedioPorCursoYMateria, [documento_profe]);
 
     const promedio_por_curso = {};
-    detalle.forEach(({ curso, materia, promedio }) => {
+    const acumulado_por_materia = {};
+
+    detalle.forEach(({ curso, materia, estudiante_nombre, estudiante_apellido, promedio }) => {
       if (!promedio_por_curso[curso]) promedio_por_curso[curso] = {};
-      promedio_por_curso[curso][materia] = Number(promedio);
+      if (!promedio_por_curso[curso][materia]) promedio_por_curso[curso][materia] = {
+        promedioCurso: 0,
+        estudiantes: {}
+      };
+
+      promedio_por_curso[curso][materia].estudiantes[`${estudiante_nombre} ${estudiante_apellido}`] = Number(promedio);
+
+      if (!acumulado_por_materia[`${curso}_${materia}`]) {
+        acumulado_por_materia[`${curso}_${materia}`] = [];
+      }
+      acumulado_por_materia[`${curso}_${materia}`].push(Number(promedio));
     });
+
+    // Calcular promedio del curso para cada materia
+    for (const key in acumulado_por_materia) {
+      const [curso, materia] = key.split('_');
+      const valores = acumulado_por_materia[key];
+      const promedioGeneral = parseFloat((valores.reduce((acc, v) => acc + v, 0) / valores.length).toFixed(2));
+      promedio_por_curso[curso][materia].promedioCurso = promedioGeneral;
+    }
 
     return {
       ...resumen,
@@ -154,6 +183,7 @@ const getEstadisticasProfesor = async (documento_profe) => {
     throw new Error(`Error al obtener estadísticas del docente: ${error.message}`);
   }
 };
+
 
 // === ESTADÍSTICAS PARA ESTUDIANTE (POR DOCUMENTO) ===
 const getEstadisticasEstudiante = async (documento_estudiante) => {
