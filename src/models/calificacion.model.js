@@ -158,17 +158,40 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
 
 const selectPromedioCursoMateria = async (id_materia, id_curso) => {
     const query = `
-      SELECT ROUND(AVG(c.nota), 2) AS promedio
-      FROM Calificacion c
-      JOIN Actividades a ON c.id_actividad = a.id_actividad
-      WHERE a.id_materia = $1
-        AND a.id_curso = $2
-        AND a.activo = TRUE
-        AND c.activo = TRUE;
+      SELECT 
+        u.nombre,
+        u.apellido,
+        ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio
+      FROM Estudiante e
+      JOIN Usuario u ON u.documento_identidad = e.documento_identidad
+      JOIN Actividades a ON a.id_materia = $1 AND a.id_curso = $2 AND a.activo = TRUE
+      LEFT JOIN Calificacion c 
+        ON c.id_actividad = a.id_actividad 
+        AND c.id_estudiante = e.documento_identidad 
+        AND c.activo = TRUE
+      WHERE e.id_curso = $2
+      GROUP BY u.nombre, u.apellido;
     `;
-    const result = await consultarDB(query, [id_materia, id_curso]);
-    return result[0]?.promedio || 0;
-  };
+  
+    const rows = await consultarDB(query, [id_materia, id_curso]);
+  
+    // Calcular promedio general del curso
+    const promedioCurso = rows.length > 0
+      ? parseFloat((rows.reduce((acc, r) => acc + parseFloat(r.promedio), 0) / rows.length).toFixed(2))
+      : 0;
+  
+    // Construir respuesta como JSON personalizado
+    const resultado = {
+      promedioCurso,
+    };
+  
+    rows.forEach((row) => {
+      const key = `${row.nombre} ${row.apellido}`;
+      resultado[key] = parseFloat(row.promedio);
+    });
+  
+    return resultado;
+};
 
 const getCalificacionById = async (id_calificacion) => {
     const query = `
