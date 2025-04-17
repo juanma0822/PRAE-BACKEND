@@ -156,11 +156,21 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
     return result[0]?.promedio || 0; // Retorna 0 si no hay calificaciones
 };
 
+const getCalificacionById = async (id_calificacion) => {
+    const query = `
+      SELECT * FROM Calificacion
+      WHERE id_calificacion = $1;
+    `;
+    const result = await consultarDB(query, [id_calificacion]);
+    return result[0];
+};
+
 module.exports = {
     insertCalificacion,
     updateCalificacion,
     selectCalificacionesEstudiante,
     selectCalificacionesEstudiantePorDocenteEInstitucion,
     selectCalificacionesCurso,
-    selectPromedioEstudiante
+    selectPromedioEstudiante,
+    getCalificacionById,
 };

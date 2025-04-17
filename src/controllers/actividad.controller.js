@@ -50,15 +50,14 @@ const eliminarActividad = async (req, res) => {
 
     const actividadEliminada = await actividadService.eliminarActividad(id_actividad);
 
-    res.status(200).json({
-      message: 'Actividad eliminada correctamente',
-      actividad: actividadEliminada
-    });
-
     if (actividadEliminada?.id_docente) {
       await emitirEstadisticasProfesor(actividadEliminada.id_docente);
     }
 
+    res.status(200).json({
+      message: 'Actividad eliminada correctamente',
+      actividad: actividadEliminada
+    });
   } catch (error) {
     console.error("Error al eliminar la actividad:", error);
     res.status(500).json({ error: 'Error al eliminar la actividad' });

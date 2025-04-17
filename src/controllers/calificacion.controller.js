@@ -3,6 +3,7 @@ const usuarioService = require("../services/usuario.service");
 const emailService = require('../services/emailService');
 const actividadService = require('../services/actividad.service');
 const { getIo } = require('../sockets/sockets');
+const { emitirEstadisticasProfesor } = require('../sockets/emitStats');
 
 const asignarCalificacion = async (req, res) => {
     try {
@@ -13,7 +14,7 @@ const asignarCalificacion = async (req, res) => {
 
         // Obtener información de la actividad y la materia asociada
         const actividad = await actividadService.getActividadById(id_actividad);
-        const { nombre_actividad: nombreActividad, nombre_materia: nombreMateria } = actividad;
+        const { nombre_actividad: nombreActividad, nombre_materia: nombreMateria, id_docente } = actividad;
 
         // Construir el contenido principal del correo
         const mainContent = `
@@ -42,23 +43,40 @@ const asignarCalificacion = async (req, res) => {
         const io = getIo();
         io.to(id_estudiante).emit('nuevaCalificacion', nuevaCalificacion);
 
+        // 🔥 Emitir estadísticas al docente
+        await emitirEstadisticasProfesor(id_docente);
+
         res.status(201).json(nuevaCalificacion);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error al asignar calificación' });
     }
 };
-
 const actualizarCalificacion = async (req, res) => {
     try {
-        const { id_calificacion } = req.params;
-        const { nota } = req.body;
-        const calificacionActualizada = await calificacionService.actualizarCalificacion(id_calificacion, nota);
-        res.status(200).json(calificacionActualizada);
+      const { id_calificacion } = req.params;
+      const { nota } = req.body;
+  
+      // Actualizar la nota
+      const calificacionActualizada = await calificacionService.actualizarCalificacion(id_calificacion, nota);
+  
+      // Obtener el id_actividad desde la calificación 
+      const { id_actividad } = await calificacionService.getCalificacionById(id_calificacion);
+  
+      // Ahora sí traemos la actividad completa
+      const actividad = await actividadService.getActividadById(id_actividad);
+      const { id_docente } = actividad;
+  
+      // Emitir estadística para el profe 
+      await emitirEstadisticasProfesor(id_docente);
+  
+      res.status(200).json(calificacionActualizada);
     } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar calificación' });
+      console.error("Error al actualizar calificación:", error);
+      res.status(500).json({ error: 'Error al actualizar calificación' });
     }
-};
+  };
+  
 
 const obtenerCalificacionesEstudiante = async (req, res) => {
     try {

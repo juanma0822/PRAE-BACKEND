@@ -28,6 +28,10 @@ const obtenerPromedioCurso = async (id_materia, id_curso) => {
     return await calificacionModel.selectPromedioCurso(id_materia, id_curso);
 };
 
+const getCalificacionById = async (id_calificacion) => {
+    return await calificacionModel.getCalificacionById(id_calificacion);
+};
+
 module.exports = {
     asignarCalificacion,
     actualizarCalificacion,
@@ -35,5 +39,6 @@ module.exports = {
     obtenerCalificacionesEstudiantePorDocenteEInstitucion,
     obtenerCalificacionesCurso,
     obtenerPromedioEstudiante,
-    obtenerPromedioCurso
+    obtenerPromedioCurso,
+    getCalificacionById,
 };

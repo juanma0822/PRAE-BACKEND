@@ -1,4 +1,4 @@
-const { consultarDB } = require('../db');
+const { consultarDB, getClient } = require('../db');
 
 const insertActividad = async (nombre, peso, id_materia, id_docente, id_curso) => {
     try {
@@ -19,7 +19,8 @@ const getActividadById = async (id_actividad) => {
             a.id_actividad, 
             a.nombre AS nombre_actividad, 
             a.id_materia, 
-            m.nombre AS nombre_materia
+            m.nombre AS nombre_materia,
+            a.id_docente
         FROM Actividades a
         INNER JOIN Materia m ON a.id_materia = m.id_materia
         WHERE a.id_actividad = $1;
@@ -65,12 +66,31 @@ const updateActividad = async (id_actividad, nombre, peso, id_docente) => {
 };
 
 const deleteActividad = async (id_actividad) => {
-    const query = `
-        UPDATE Actividades
-        SET activo = FALSE
-        WHERE id_actividad = $1 RETURNING *`;
-    const result = await consultarDB(query, [id_actividad]);
-    return result[0];
+  const client = await getClient();
+  try {
+    await client.query('BEGIN');
+
+    const resultActividad = await client.query(`
+      UPDATE Actividades
+      SET activo = FALSE
+      WHERE id_actividad = $1
+      RETURNING *;
+    `, [id_actividad]);
+
+    await client.query(`
+      UPDATE Calificacion
+      SET activo = FALSE
+      WHERE id_actividad = $1;
+    `, [id_actividad]);
+
+    await client.query('COMMIT');
+    return resultActividad.rows[0];
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw new Error(`Error al eliminar la actividad y calificaciones: ${error.message}`);
+  } finally {
+    client.release();
+  }
 };
 
 module.exports = {
