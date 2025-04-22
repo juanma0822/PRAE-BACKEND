@@ -41,18 +41,24 @@ const generateBoletinPdf = async (documento_identidad) => {
     if (!estudiante) throw new Error('Estudiante no encontrado o inactivo');
 
     const notasQuery = `
-      SELECT m.nombre AS materia, m.color,
-             a.nombre AS actividad, a.peso,
-             c.nota,
-             p.documento_identidad AS doc_profe, up.nombre AS nombre_profe, up.apellido AS apellido_profe
-      FROM Calificacion c
-      JOIN Actividades a ON c.id_actividad = a.id_actividad
-      JOIN Materia m ON a.id_materia = m.id_materia
-      JOIN Profesor p ON a.id_docente = p.documento_identidad
-      JOIN Usuario up ON p.documento_identidad = up.documento_identidad
-      WHERE c.id_estudiante = $1 AND c.activo = TRUE AND a.activo = TRUE
-      ORDER BY m.nombre, a.nombre;
-    `;
+              SELECT 
+                m.nombre AS materia, 
+                m.color,
+                a.nombre AS actividad, 
+                a.peso,
+                c.nota,
+                p.documento_identidad AS doc_profe, 
+                up.nombre AS nombre_profe, 
+                up.apellido AS apellido_profe
+              FROM Calificacion c
+              INNER JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
+              INNER JOIN Materia m ON a.id_materia = m.id_materia
+              INNER JOIN Profesor p ON a.id_docente = p.documento_identidad
+              INNER JOIN Usuario up ON p.documento_identidad = up.documento_identidad
+              WHERE c.id_estudiante = $1 
+                AND c.activo = TRUE
+              ORDER BY m.nombre, a.nombre;
+            `;
     const notas = await consultarDB(notasQuery, [documento_identidad]);
 
     const htmlTemplatePath = path.join(__dirname, '../templates/boletin/boletinTemplate.html');
