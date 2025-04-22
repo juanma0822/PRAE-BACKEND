@@ -36,25 +36,25 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
   id_institucion
 ) => {
   const query = `
-      SELECT 
-        a.id_actividad,
-        a.nombre AS actividad,
-        a.peso,
-        COALESCE(c.nota, 0) AS nota,
-        c.id_calificacion
-      FROM Actividades a
-      LEFT JOIN Calificacion c 
-        ON a.id_actividad = c.id_actividad 
-       AND c.id_estudiante = $2 
-       AND c.activo = TRUE
-      JOIN Materia m 
-        ON a.id_materia = m.id_materia
-      WHERE a.id_materia = $1 
-        AND a.id_docente = $3 
-        AND m.id_institucion = $4
-        AND a.activo = TRUE
-      ORDER BY a.nombre ASC;
-    `;
+    SELECT 
+      a.id_actividad,
+      a.nombre AS actividad,
+      a.peso,
+      c.nota,
+      c.id_calificacion
+    FROM Actividades a
+    JOIN Calificacion c 
+      ON a.id_actividad = c.id_actividad 
+    JOIN Materia m 
+      ON a.id_materia = m.id_materia
+    WHERE a.id_materia = $1 
+      AND a.id_docente = $3 
+      AND m.id_institucion = $4
+      AND a.activo = TRUE
+      AND c.activo = TRUE
+      AND c.id_estudiante = $2
+    ORDER BY a.nombre ASC;
+  `;
   return consultarDB(query, [
     id_materia,
     id_estudiante,
@@ -62,6 +62,7 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
     id_institucion,
   ]);
 };
+
 
 const selectCalificacionesCurso = async (
   id_materia,
