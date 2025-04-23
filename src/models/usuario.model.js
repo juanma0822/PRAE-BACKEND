@@ -55,7 +55,6 @@ const ExistingUser = async (email, password = null) => {
     user.curso = cursoResult[0].curso;
   }
 
-  console.log("Ingreso exitoso");
   return user;
 };
 
