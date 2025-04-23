@@ -106,9 +106,10 @@ const getEstadisticasAdmin = async (id_institucion) => {
   }
 };
 
-// === ESTADÍSTICAS PARA DOCENTE (POR DOCUMENTO) ===
+// === ESTADÍSTICAS PARA PROFESOR (POR I.D) ===
 const getEstadisticasProfesor = async (documento_profe) => {
   try {
+    // Resumen de estadísticas
     const queryResumen = `
       SELECT
         (SELECT COUNT(*) FROM Dictar WHERE documento_profe = $1 AND estado = TRUE) AS materias_dictadas,
@@ -126,53 +127,58 @@ const getEstadisticasProfesor = async (documento_profe) => {
          WHERE a.id_docente = $1 AND c.activo = TRUE) AS promedio_general
     `;
 
+    // Detalle de promedios por curso, materia y estudiante
     const queryDetallePromedios = `
       SELECT 
-        cu.id_curso,
-        cu.nombre AS curso,
-        m.nombre AS materia,
-        u.nombre AS estudiante_nombre,
-        u.apellido AS estudiante_apellido,
-        ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio
-      FROM Estudiante e
-      JOIN Usuario u ON u.documento_identidad = e.documento_identidad AND u.activo = TRUE
-      JOIN Actividades a ON a.id_docente = $1 AND a.id_curso = e.id_curso AND a.activo = TRUE
-      JOIN Materia m ON m.id_materia = a.id_materia
-      JOIN Curso cu ON cu.id_curso = a.id_curso
-      LEFT JOIN Calificacion c 
-        ON c.id_actividad = a.id_actividad 
-        AND c.id_estudiante = e.documento_identidad 
-        AND c.activo = TRUE
-      GROUP BY cu.id_curso, cu.nombre, m.nombre, u.nombre, u.apellido
-      ORDER BY cu.nombre, m.nombre, u.nombre;
+        curso.id_curso,
+        curso.nombre AS curso,
+        materia.nombre AS materia,
+        usuario.nombre AS estudiante_nombre,
+        usuario.apellido AS estudiante_apellido,
+        ROUND(SUM(COALESCE(calificacion.nota, 0) * (actividad.peso / 100.0)), 2) AS promedio
+      FROM Estudiante estudiante
+      JOIN Usuario usuario ON usuario.documento_identidad = estudiante.documento_identidad AND usuario.activo = TRUE
+      JOIN Actividades actividad ON actividad.id_docente = $1 AND actividad.id_curso = estudiante.id_curso AND actividad.activo = TRUE
+      JOIN Materia materia ON materia.id_materia = actividad.id_materia
+      JOIN Curso curso ON curso.id_curso = actividad.id_curso
+      LEFT JOIN Calificacion calificacion 
+        ON calificacion.id_actividad = actividad.id_actividad 
+        AND calificacion.id_estudiante = estudiante.documento_identidad 
+        AND calificacion.activo = TRUE
+      GROUP BY curso.id_curso, curso.nombre, materia.nombre, usuario.nombre, usuario.apellido
+      ORDER BY curso.nombre, materia.nombre, usuario.nombre;
     `;
 
+    // Promedio general por curso para los cursos del profesor
     const queryPromedioCursoGeneral = `
       SELECT
-        cu.nombre AS curso,
+        sub.curso AS curso,
         ROUND(AVG(sub.promedio), 2) AS promedio_general
       FROM (
         SELECT 
-          cu.id_curso,
-          cu.nombre,
+          curso.id_curso,
+          curso.nombre AS curso,
           e.documento_identidad,
-          SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)) AS promedio
+          SUM(COALESCE(cal.nota, 0) * (a.peso / 100.0)) AS promedio
         FROM Estudiante e
         JOIN Actividades a ON a.id_docente = $1 AND a.id_curso = e.id_curso AND a.activo = TRUE
-        JOIN Curso cu ON cu.id_curso = a.id_curso
-        LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad AND c.activo = TRUE
-        GROUP BY cu.id_curso, cu.nombre, e.documento_identidad
+        JOIN Curso curso ON curso.id_curso = e.id_curso
+        LEFT JOIN Calificacion cal ON cal.id_actividad = a.id_actividad AND cal.id_estudiante = e.documento_identidad AND cal.activo = TRUE
+        GROUP BY curso.id_curso, curso.nombre, e.documento_identidad
       ) AS sub
-      GROUP BY sub.nombre;
+      GROUP BY sub.curso;
     `;
 
+    // Ejecutar las consultas
     const [resumen] = await consultarDB(queryResumen, [documento_profe]);
     const detalle = await consultarDB(queryDetallePromedios, [documento_profe]);
     const promediosGenerales = await consultarDB(queryPromedioCursoGeneral, [documento_profe]);
 
+    // Inicializar objetos para resultados
     const promedio_por_curso = {};
     const acumulado_por_materia = {};
 
+    // Agrupar los resultados de calificaciones por curso y materia
     detalle.forEach(({ curso, materia, estudiante_nombre, estudiante_apellido, promedio }) => {
       if (!promedio_por_curso[curso]) promedio_por_curso[curso] = {};
       if (!promedio_por_curso[curso][materia]) promedio_por_curso[curso][materia] = {
@@ -193,14 +199,23 @@ const getEstadisticasProfesor = async (documento_profe) => {
       const valores = acumulado_por_materia[key];
       const promedioMateria = parseFloat((valores.reduce((acc, v) => acc + v, 0) / valores.length).toFixed(2));
       promedio_por_curso[curso][materia].promedioMateria = promedioMateria;
+
+      // Acumular los promedios de las materias para calcular el promedio del curso
+      if (!promedio_por_curso[curso].materias) promedio_por_curso[curso].materias = [];
+      promedio_por_curso[curso].materias.push(promedioMateria);
     }
 
-    // Agregar promedio general por curso
-    promediosGenerales.forEach(({ curso, promedio_general }) => {
-      if (!promedio_por_curso[curso]) promedio_por_curso[curso] = {};
-      promedio_por_curso[curso].promedioCurso = Number(promedio_general);
-    });
+    // Calcular promedio general por curso
+    for (const curso in promedio_por_curso) {
+      const materias = promedio_por_curso[curso].materias || [];
+      const promedioCurso = materias.length > 0
+        ? parseFloat((materias.reduce((acc, v) => acc + v, 0) / materias.length).toFixed(2))
+        : 0;
+      promedio_por_curso[curso].promedioCurso = promedioCurso;
+      delete promedio_por_curso[curso].materias; // Eliminar el campo temporal
+    }
 
+    // Retornar los resultados
     return {
       ...resumen,
       promedio_por_curso
