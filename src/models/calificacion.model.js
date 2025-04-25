@@ -215,10 +215,12 @@ const selectPromedioEstudiante = async (
 ) => {
   const query = `
         SELECT 
+          ROUND(
             CASE 
-                WHEN SUM(a.peso) > 0 THEN SUM(c.nota * (a.peso / 100.0)) / SUM(a.peso / 100.0)
-                ELSE 0
-            END AS promedio
+              WHEN SUM(a.peso) > 0 THEN SUM(c.nota * (a.peso / 100.0)) / SUM(a.peso / 100.0)
+              ELSE 0
+            END, 2
+          ) AS promedio
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
         WHERE a.id_materia = $1 
