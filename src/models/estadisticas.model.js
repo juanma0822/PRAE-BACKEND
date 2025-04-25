@@ -139,8 +139,8 @@ const getEstadisticasProfesor = async (documento_profe) => {
       FROM Estudiante estudiante
       JOIN Usuario usuario ON usuario.documento_identidad = estudiante.documento_identidad AND usuario.activo = TRUE
       JOIN Actividades actividad ON actividad.id_docente = $1 AND actividad.id_curso = estudiante.id_curso AND actividad.activo = TRUE
-      JOIN Materia materia ON materia.id_materia = actividad.id_materia
-      JOIN Curso curso ON curso.id_curso = actividad.id_curso
+      JOIN Materia materia ON materia.id_materia = actividad.id_materia AND materia.activo = TRUE
+      JOIN Curso curso ON curso.id_curso = actividad.id_curso AND curso.activo = TRUE
       LEFT JOIN Calificacion calificacion 
         ON calificacion.id_actividad = actividad.id_actividad 
         AND calificacion.id_estudiante = estudiante.documento_identidad 
@@ -162,7 +162,7 @@ const getEstadisticasProfesor = async (documento_profe) => {
           SUM(COALESCE(cal.nota, 0) * (a.peso / 100.0)) AS promedio
         FROM Estudiante e
         JOIN Actividades a ON a.id_docente = $1 AND a.id_curso = e.id_curso AND a.activo = TRUE
-        JOIN Curso curso ON curso.id_curso = e.id_curso
+        JOIN Curso curso ON curso.id_curso = e.id_curso AND curso.activo = TRUE
         LEFT JOIN Calificacion cal ON cal.id_actividad = a.id_actividad AND cal.id_estudiante = e.documento_identidad AND cal.activo = TRUE
         GROUP BY curso.id_curso, curso.nombre, e.documento_identidad
       ) AS sub
