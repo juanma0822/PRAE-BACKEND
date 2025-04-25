@@ -93,6 +93,7 @@ const obtenerMateriasPorGrado = async (id_curso, id_institucion) => {
   const query = `
     SELECT 
       c.nombre AS curso,
+      c.id_curso,
       m.id_materia, 
       m.nombre AS materia,
       m.color, 
