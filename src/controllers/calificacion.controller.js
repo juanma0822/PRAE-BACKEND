@@ -101,27 +101,30 @@ const obtenerCalificacionesEstudiante = async (req, res) => {
   }
 };
 
-const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (
-  req,
-  res
-) => {
+const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (req, res) => {
   try {
-    const { id_materia, id_estudiante, id_docente, id_institucion } =
-      req.params;
-    const calificaciones =
-      await calificacionService.obtenerCalificacionesEstudiantePorDocenteEInstitucion(
-        id_materia,
-        id_estudiante,
-        id_docente,
-        id_institucion
-      );
-    getIo().to(id_estudiante).emit("actualizarCalificaciones", calificaciones);
-    res.status(200).json(calificaciones);
+      const { id_materia, id_estudiante, id_docente, id_institucion } = req.params;
+
+      // Llamar al servicio para obtener las calificaciones y el promedio general
+      const { promedio_general, actividades } =
+          await calificacionService.obtenerCalificacionesEstudiantePorDocenteEInstitucion(
+              id_materia,
+              id_estudiante,
+              id_docente,
+              id_institucion
+          );
+
+      // Emitir las calificaciones actualizadas al estudiante
+      getIo().to(id_estudiante).emit("actualizarCalificaciones", { promedio_general, actividades });
+
+      // Retornar la respuesta al cliente
+      res.status(200).json({ promedio_general, actividades });
   } catch (error) {
-    res.status(500).json({
-      error: "Error al obtener calificaciones",
-      detalle: error.message,
-    });
+      console.error("Error al obtener calificaciones:", error);
+      res.status(500).json({
+          error: "Error al obtener calificaciones",
+          detalle: error.message,
+      });
   }
 };
 

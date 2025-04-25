@@ -13,7 +13,26 @@ const obtenerCalificacionesEstudiante = async (id_materia, id_estudiante) => {
 };
 
 const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia, id_estudiante, id_docente, id_institucion) => {
-    return await calificacionModel.selectCalificacionesEstudiantePorDocenteEInstitucion(id_materia, id_estudiante, id_docente, id_institucion);
+    // Obtener las calificaciones de las actividades
+    const actividades = await calificacionModel.selectCalificacionesEstudiantePorDocenteEInstitucion(
+        id_materia,
+        id_estudiante,
+        id_docente,
+        id_institucion
+    );
+
+    // Obtener el promedio general del estudiante
+    const promedio_general = await calificacionModel.selectPromedioEstudiante(
+        id_materia,
+        id_estudiante,
+        id_docente
+    );
+
+    // Retornar las actividades junto con el promedio general
+    return {
+        promedio_general,
+        actividades,
+    };
 };
 
 const obtenerCalificacionesCurso = async (id_materia, id_curso, id_docente, id_institucion) => {
