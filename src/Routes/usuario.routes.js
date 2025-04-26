@@ -20,6 +20,7 @@ const {
     getProfesorById,
     getEstudianteById,
     getDocentesPorInstitucion,
+    updatePassword,
 } = require("../controllers/usuario.controller");
 
 /**
@@ -488,5 +489,32 @@ router.get('/estudiante/:id', verifyToken, getEstudianteById);
  *         description: Lista de docentes obtenida correctamente
  */
 router.get('/docentes/institucion/:id_institucion', verifyToken, getDocentesPorInstitucion);
+
+/**
+ * @swagger
+ * /usuarios/updatePassword:
+ *   put:
+ *     summary: Actualiza la contraseña de un usuario
+ *     tags: [Usuarios - PUT]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               correo:
+ *                 type: string
+ *               nuevaContraseña:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Contraseña actualizada correctamente
+ *       400:
+ *         description: Error en la solicitud (parámetro faltante o inválido)
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.put('/updatePassword', verifyToken, updatePassword);
 
 module.exports = router;

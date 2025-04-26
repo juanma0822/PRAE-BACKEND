@@ -552,6 +552,33 @@ const getDocentesPorInstitucion = async (req, res) => {
   }
 };
 
+const updatePassword = async (req, res) => {
+  try {
+    const { correo, nuevaContraseña } = req.body;
+
+    // Validar que los campos requeridos estén presentes
+    if (!correo || !nuevaContraseña) {
+      return res.status(400).json({
+        error: "Correo y nueva contraseña son requeridos",
+        detalle: "Por favor, proporciona ambos campos para actualizar la contraseña",
+      });
+    }
+
+    // Actualizar la contraseña del usuario
+    const usuarioActualizado = await usuarioService.updatePassword(correo, nuevaContraseña);
+
+    res.status(200).json({
+      message: "Contraseña actualizada exitosamente",
+      usuario: usuarioActualizado,
+    });
+  } catch (error) {
+    console.error("Error al actualizar la contraseña:", error.message);
+    res.status(500).json({
+      error: "Error al actualizar la contraseña",
+      detalle: error.message,
+    });
+  }
+};
 
 module.exports = {
   createAdmin,
@@ -572,4 +599,5 @@ module.exports = {
   getEstudianteById,
   getProfesorById,
   getDocentesPorInstitucion,
+  updatePassword,
 };

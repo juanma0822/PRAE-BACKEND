@@ -232,6 +232,16 @@ const getDocentesPorInstitucion = async (id_institucion) => {
   return await usuarioModel.getDocentesPorInstitucion(id_institucion);
 };
 
+//Servicio para actualizar contraseña
+const updatePassword = async (correo, nuevaContraseña) => {
+  try {
+    const hashedPassword = await bcrypt.hash(nuevaContraseña, saltRounds);
+    return await usuarioModel.updatePassword(correo, hashedPassword);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   addUsuario,
   addProfesor,
@@ -250,4 +260,5 @@ module.exports = {
   getProfesorById,
   getEstudianteById,
   getDocentesPorInstitucion,
+  updatePassword,
 };
