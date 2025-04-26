@@ -11,7 +11,8 @@ const generateToken = (data) => {
         rol: data.rol,
         nombre: data.nombre,
         apellido: data.apellido,
-        institucion: data.institucion
+        institucion: data.institucion,
+        tipo: 'recover',
     };
 
     if (data.rol === 'estudiante') {
@@ -85,7 +86,14 @@ const sendRecoveryEmail = async (email) => {
 // Función para verificar el token de recuperación
 const verifyToken = (token) => {
     try {
-        return jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Validar que el token sea del tipo 'recover'
+        if (decoded.tipo !== 'recover') {
+            throw new Error('El token no es válido para recuperación de contraseña');
+        }
+
+        return decoded;
     } catch (error) {
         throw new Error('Token inválido o expirado');
     }
