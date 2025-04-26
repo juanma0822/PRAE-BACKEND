@@ -78,7 +78,7 @@ const sendRecoveryEmail = async (email) => {
 
         return { message: 'Correo de recuperación enviado' };
     } catch (error) {
-        throw new Error('Error al enviar el correo: ' + error.message);
+        throw new Error(error.message);
     }
 };
 
