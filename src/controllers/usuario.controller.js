@@ -5,6 +5,7 @@ const emailService = require('../services/emailService');
 const { emitirEstadisticasInstitucion } = require('../sockets/emitStats');
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const { console } = require("inspector");
 
 
 const createAdmin = async (req, res) => {
@@ -554,32 +555,39 @@ const getDocentesPorInstitucion = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
-    const { nuevaContraseña } = req.body;
+      const { nuevaContraseña } = req.body;
 
-    // Validar que el campo requerido esté presente
-    if (!nuevaContraseña) {
-      return res.status(400).json({
-        error: "Nueva contraseña requerida",
-        detalle: "Por favor, proporciona la nueva contraseña para actualizarla",
+      // Validar que el campo requerido esté presente
+      if (!nuevaContraseña) {
+          return res.status(400).json({
+              error: "Nueva contraseña requerida",
+              detalle: "Por favor, proporciona la nueva contraseña para actualizarla",
+          });
+      }
+
+      // Obtener el correo del token
+      const correo = req.user.email;
+
+      // Actualizar la contraseña del usuario
+      const usuarioActualizado = await usuarioService.updatePassword(correo, nuevaContraseña);
+
+      if (!usuarioActualizado) {
+          return res.status(404).json({
+              error: "Usuario no encontrado",
+              detalle: "No se encontró un usuario con el correo proporcionado",
+          });
+      }
+
+      res.status(200).json({
+          message: "Contraseña actualizada exitosamente",
+          usuario: usuarioActualizado,
       });
-    }
-
-    // Obtener el correo del token
-    const correo = req.user.email;
-
-    // Actualizar la contraseña del usuario
-    const usuarioActualizado = await usuarioService.updatePassword(correo, nuevaContraseña);
-
-    res.status(200).json({
-      message: "Contraseña actualizada exitosamente",
-      usuario: usuarioActualizado,
-    });
   } catch (error) {
-    console.error("Error al actualizar la contraseña:", error.message);
-    res.status(500).json({
-      error: "Error al actualizar la contraseña",
-      detalle: error.message,
-    });
+      console.error("Error al actualizar la contraseña:", error.message);
+      res.status(500).json({
+          error: "Error al actualizar la contraseña",
+          detalle: error.message,
+      });
   }
 };
 

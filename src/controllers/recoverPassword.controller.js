@@ -25,7 +25,7 @@ const recoverPassword = async (req, res) => {
 };
 
 // Controlador para validar el token de recuperación
-const validateResetToken = async (req, res) => {
+const validateToken = async (req, res) => {
     try {
         const { token } = req.params;
 
@@ -47,7 +47,7 @@ const validateResetToken = async (req, res) => {
             rol: decoded.rol,
         });
     } catch (error) {
-        console.error("Error en validateResetToken:", error.message);
+        console.error("Error en validateToken:", error.message);
         res.status(400).json({
             error: "Token inválido o expirado",
             detalle: error.message,
@@ -55,4 +55,24 @@ const validateResetToken = async (req, res) => {
     }
 };
 
-module.exports = { recoverPassword, validateResetToken };
+const validateResetToken = async (req, res) => {
+    try {
+        // Los datos del token ya están en req.user gracias al middleware
+        const { email, id, rol } = req.user;
+
+        res.status(200).json({
+            message: "Token válido",
+            email,
+            id,
+            rol,
+        });
+    } catch (error) {
+        console.error("Error al validar el token de recuperación:", error.message);
+        res.status(500).json({
+            error: "Error al validar el token",
+            detalle: error.message,
+        });
+    }
+};
+
+module.exports = { recoverPassword, validateToken,  validateResetToken };

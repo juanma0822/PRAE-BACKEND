@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { getUser } = require('../controllers/register.controller');
-const { recoverPassword, validateResetToken, VerifyLogin } = require("../controllers/rutas.controller");
+const { recoverPassword, validateResetToken, VerifyLogin, validateToken } = require("../controllers/rutas.controller");
+const verifyRecoveryToken = require('../middleware/recover.middleware');
 
 /**
  * @swagger
@@ -114,6 +115,38 @@ router.post('/recoverPassword', recoverPassword);
  *       200:
  *         description: Token válido.
  */
-router.get('/validate/:token', validateResetToken);
+router.get('/validate/:token', validateToken);
+
+/**
+ * @swagger
+ * /auth/validateResetToken:
+ *   get:
+ *     summary: Valida el token de recuperación de contraseña
+ *     tags: [Auth - GET]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token válido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 id:
+ *                   type: string
+ *                 rol:
+ *                   type: string
+ *       401:
+ *         description: Token inválido o expirado.
+ *       403:
+ *         description: Token no válido para recuperación.
+ */
+router.get('/validateResetToken', verifyRecoveryToken, validateResetToken);
+
 
 module.exports = router;

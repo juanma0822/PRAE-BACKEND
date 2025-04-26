@@ -38,6 +38,8 @@ const sendRecoveryEmail = async (email) => {
 
         const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`; // Ajusta el URL para el frontend
 
+        console.log(token);
+
         // Obtener los datos de la institución del usuario
         const institucion = await institucionService.getInstitucionById(isCorrect.id_institucion);
         let { logo, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
@@ -87,11 +89,6 @@ const sendRecoveryEmail = async (email) => {
 const verifyToken = (token) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-        // Validar que el token sea del tipo 'recover'
-        if (decoded.tipo !== 'recover') {
-            throw new Error('El token no es válido para recuperación de contraseña');
-        }
 
         return decoded;
     } catch (error) {

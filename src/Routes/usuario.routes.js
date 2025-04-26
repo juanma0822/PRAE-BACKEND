@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const verifyToken = require("../middleware/auth.middleware");
+const verifyRecoveryToken = require('../middleware/recover.middleware');
 const { 
     createAdmin, 
     createProfesor, 
@@ -51,6 +52,32 @@ const {
  *         description: Administrador creado exitosamente
  */
 router.post('/admin', createAdmin);
+
+/**
+/**
+ * @swagger
+ * /usuarios/updatePassword:
+ *   put:
+ *     summary: Actualiza la contraseña de un usuario
+ *     tags: [Usuarios - PUT]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nuevaContraseña:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Contraseña actualizada correctamente
+ *       400:
+ *         description: Error en la solicitud (parámetro faltante o inválido)
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.put('/updatePassword', verifyRecoveryToken, updatePassword);
 
 /**
  * @swagger
@@ -490,30 +517,6 @@ router.get('/estudiante/:id', verifyToken, getEstudianteById);
  */
 router.get('/docentes/institucion/:id_institucion', verifyToken, getDocentesPorInstitucion);
 
-/**
-/**
- * @swagger
- * /usuarios/updatePassword:
- *   put:
- *     summary: Actualiza la contraseña de un usuario
- *     tags: [Usuarios - PUT]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               nuevaContraseña:
- *                 type: string
- *     responses:
- *       200:
- *         description: Contraseña actualizada correctamente
- *       400:
- *         description: Error en la solicitud (parámetro faltante o inválido)
- *       500:
- *         description: Error interno del servidor
- */
-router.put('/updatePassword', verifyToken, updatePassword);
+
 
 module.exports = router;

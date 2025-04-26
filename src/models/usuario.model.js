@@ -624,15 +624,15 @@ const getDocentesPorInstitucion = async (institucion) => {
 
 const updatePassword = async (correo, nuevaContraseña) => {
   const query = `
-    UPDATE Usuario
-    SET contraseña = $1
-    WHERE correo = $2
-    RETURNING documento_identidad, nombre, apellido, correo, rol;
+      UPDATE Usuario
+      SET contraseña = $1
+      WHERE correo = $2
+      RETURNING documento_identidad, nombre, apellido, correo, rol;
   `;
   const result = await consultarDB(query, [nuevaContraseña, correo]);
 
   if (result.length === 0) {
-    throw new Error("No se encontró un usuario con el correo proporcionado");
+      throw new Error("No se encontró un usuario con el correo proporcionado");
   }
 
   return result[0];
