@@ -26,10 +26,17 @@ const ComentarioService = {
     return await ComentarioModel.getComentariosPorProfesorYEstudiante(documento_profe, documento_estudiante);
   },
 
+  // Actualizar un comentario
+  async updateComentario(id_comentario, comentario) {
+    return await ComentarioModel.updateComentario(id_comentario, comentario);
+  },
+
   // Eliminar un comentario
   async deleteComentario(id_comentario) {
     return await ComentarioModel.deleteComentario(id_comentario);
   },
 };
+
+
 
 module.exports = ComentarioService;

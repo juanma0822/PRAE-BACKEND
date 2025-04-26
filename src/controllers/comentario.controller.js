@@ -88,6 +88,21 @@ const getComentariosPorProfesorYEstudiante = async (req, res) => {
   }
 };
 
+// Actualizar un comentario 
+const updateComentario = async (req, res) => {
+  try {
+    const { id } = req.params; // Cambiamos a id
+    const { comentario } = req.body;
+
+    const comentarioActualizado = await ComentarioService.updateComentario(id, comentario);
+
+    res.status(200).json(comentarioActualizado);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Eliminar un comentario
 const deleteComentario = async (req, res) => {
   try {
@@ -118,4 +133,5 @@ module.exports = {
   getComentariosPorEstudiante,
   deleteComentario,
   getComentariosPorProfesorYEstudiante,
+  updateComentario,
 };
