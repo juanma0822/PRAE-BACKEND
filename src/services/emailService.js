@@ -1,7 +1,7 @@
 const transporter = require('../config/nodemailer');
 
 // Función para generar la plantilla genérica del correo
-const generateEmailTemplate = (mainContent, footerContent) => {
+const generateEmailTemplate = (mainContent, footerContent, includeButton = true) => {
   return `
     <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333;">
       <!-- Barra azul superior -->
@@ -11,13 +11,19 @@ const generateEmailTemplate = (mainContent, footerContent) => {
       ${mainContent}
 
       <!-- Botón para ingresar a la aplicación -->
-      <div style="text-align: center; margin: 20px 0;">
-        <a href="${process.env.CLIENT_URL}" 
-           style="display: inline-block; padding: 10px 20px; background-color: #157AFE; color: #fff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
-          Ingresa aquí
-        </a>
-      </div>
-      
+      ${
+        includeButton
+          ? `
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${process.env.CLIENT_URL}" 
+               style="display: inline-block; padding: 10px 20px; background-color: #157AFE; color: #fff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+              Ingresa aquí
+            </a>
+          </div>
+          `
+          : ''
+      }
+
       <!-- Footer específico -->
       ${footerContent}
 

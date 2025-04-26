@@ -71,7 +71,7 @@ const sendRecoveryEmail = async (email) => {
         `;
 
         // Generar plantilla completa de correo
-        const emailContent = generateEmailTemplate(mainContent, footerContent);
+        const emailContent = generateEmailTemplate(mainContent, footerContent, false);
 
         // Enviar el correo usando el servicio de envío de correos
         await sendEmail(email, 'Recuperación de Contraseña', emailContent);
