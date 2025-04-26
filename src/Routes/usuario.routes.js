@@ -491,6 +491,7 @@ router.get('/estudiante/:id', verifyToken, getEstudianteById);
 router.get('/docentes/institucion/:id_institucion', verifyToken, getDocentesPorInstitucion);
 
 /**
+/**
  * @swagger
  * /usuarios/updatePassword:
  *   put:
@@ -503,8 +504,6 @@ router.get('/docentes/institucion/:id_institucion', verifyToken, getDocentesPorI
  *           schema:
  *             type: object
  *             properties:
- *               correo:
- *                 type: string
  *               nuevaContraseña:
  *                 type: string
  *     responses:

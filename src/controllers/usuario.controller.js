@@ -554,15 +554,18 @@ const getDocentesPorInstitucion = async (req, res) => {
 
 const updatePassword = async (req, res) => {
   try {
-    const { correo, nuevaContraseña } = req.body;
+    const { nuevaContraseña } = req.body;
 
-    // Validar que los campos requeridos estén presentes
-    if (!correo || !nuevaContraseña) {
+    // Validar que el campo requerido esté presente
+    if (!nuevaContraseña) {
       return res.status(400).json({
-        error: "Correo y nueva contraseña son requeridos",
-        detalle: "Por favor, proporciona ambos campos para actualizar la contraseña",
+        error: "Nueva contraseña requerida",
+        detalle: "Por favor, proporciona la nueva contraseña para actualizarla",
       });
     }
+
+    // Obtener el correo del token
+    const correo = req.user.email;
 
     // Actualizar la contraseña del usuario
     const usuarioActualizado = await usuarioService.updatePassword(correo, nuevaContraseña);
