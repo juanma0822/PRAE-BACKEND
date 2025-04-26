@@ -7,6 +7,7 @@ const {
   getComentariosPorProfesor,
   getComentariosPorEstudiante,
   getComentariosPorProfesorYEstudiante,
+  updateComentario,
 } = require('../controllers/comentario.controller');
 
 /**
@@ -127,5 +128,33 @@ router.get('/estudiante/:documento_estudiante', getComentariosPorEstudiante);
  *         description: Lista de comentarios obtenida correctamente
  */
 router.get('/profesor/:documento_profe/estudiante/:documento_estudiante', getComentariosPorProfesorYEstudiante);
+
+/**
+ * @swagger
+ * /comentarios/{id}:
+ *   put:
+ *     summary: Actualizar un comentario existente
+ *     tags: [Comentarios - PUT]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del comentario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               comentario:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Comentario actualizado exitosamente
+ */
+router.put('/:id', updateComentario);
 
 module.exports = router;

@@ -52,7 +52,20 @@ const ComentarioModel = {
     const result = await consultarDB(query, [documento_profe, documento_estudiante]);
     return result;
   },
-
+  
+  // Actualizar un comentario
+  async updateComentario(id_comentario, comentario) {
+    const query = `
+      UPDATE Comentarios
+      SET comentario = $1, fecha = NOW()
+      WHERE id_comentario = $2
+      RETURNING *;
+    `;
+    const values = [comentario, id_comentario];
+    const result = await consultarDB(query, values);
+    return result[0];
+  },
+  
   // Eliminar un comentario
   async deleteComentario(id_comentario) {
     const query = 'DELETE FROM Comentarios WHERE id_comentario = $1 RETURNING *';
