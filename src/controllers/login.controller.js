@@ -6,21 +6,28 @@ const jwt = require("jsonwebtoken");
 const VerifyLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // Validar que los campos requeridos estén presentes
         if (!email || !password) {
-            return res.status(400).json({ error: "Email y contraseña son requeridos" });
+            return res.status(400).json({
+                error: "Email y contraseña son requeridos",
+                detalle: "Por favor, proporciona ambos campos para iniciar sesión",
+            });
         }
 
+        // Llamar al servicio para verificar el email y la contraseña
         const user = await verifyEmail({ email, password });
 
+        // Crear el payload para el token
         const payload = {
             email: user.correo,
             id: user.documento_identidad,
             rol: user.rol,
-            nombre: user.nombre, // Asegúrate de que este es el nombre del usuario
+            nombre: user.nombre,
             apellido: user.apellido,
             institucion: {
                 id_institucion: user.id_institucion,
-                nombre: user.nombre_institucion, 
+                nombre: user.nombre_institucion,
                 telefono: user.telefono_institucion,
                 instagram: user.instagram_institucion,
                 facebook: user.facebook_institucion,
@@ -33,25 +40,56 @@ const VerifyLogin = async (req, res) => {
                 color_pildora3: user.color_pildora3_institucion,
                 estado: user.estado_institucion,
                 direccion: user.direccion_institucion,
-            }
+            },
         };
 
+        // Agregar información adicional si el usuario es estudiante
         if (user.rol === 'estudiante') {
             payload.id_curso = user.id_curso;
             payload.curso = user.curso;
         }
 
-        console.log("Payload:", payload); // Agrega un console.log para verificar el payload
-
+        // Generar el token JWT
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
-        res.status(200).json({ message: "Login exitoso", token });
 
-    } catch (e) {
-        console.error(e);
-        res.status(400).json({ error: e.message || "Error en la autenticación" });
+        // Responder con éxito
+        res.status(200).json({ message: "Login exitoso", token });
+    } catch (error) {
+        console.error("Error en VerifyLogin:", error.message);
+
+        // Manejar errores específicos
+        if (error.message === "Email y contraseña son requeridos" || 
+            error.message === "Formato inválido de email o contraseña" || 
+            error.message === "Email no es válido") {
+            return res.status(400).json({
+                error: "Error en los datos proporcionados",
+                detalle: error.message,
+            });
+        }
+
+        if (error.message === "El email no está registrado" || 
+            error.message === "Contraseña incorrecta") {
+            return res.status(401).json({
+                error: "Credenciales inválidas",
+                detalle: error.message,
+            });
+        }
+
+        if (error.message === "Usuario desactivado, comunícate con tu institución para ingresar") {
+            return res.status(403).json({
+                error: "Usuario desactivado",
+                detalle: error.message,
+            });
+        }
+
+        // Manejar errores generales
+        res.status(500).json({
+            error: "Error en el servidor",
+            detalle: error.message,
+        });
     }
 };
 
 module.exports = {
-    VerifyLogin
+    VerifyLogin,
 };

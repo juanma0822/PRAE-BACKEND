@@ -1,4 +1,4 @@
-const{recoverPassword, validateResetToken } =require ("./recoverPssword.controller.js")
+const{recoverPassword, validateResetToken } =require ("./recoverPassword.controller.js")
 const {VerifyLogin} =require ("./login.controller.js")
 const { sendMessage,getChatHistory}=require("./chatbot.js")
 const {generatePdf}=require("./generatePdf.controller.js")
