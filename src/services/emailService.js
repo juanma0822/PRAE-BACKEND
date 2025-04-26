@@ -10,6 +10,14 @@ const generateEmailTemplate = (mainContent, footerContent) => {
       <!-- Contenido principal -->
       ${mainContent}
 
+      <!-- Botón para ingresar a la aplicación -->
+      <div style="text-align: center; margin: 20px 0;">
+        <a href="${process.env.CLIENT_URL}" 
+           style="display: inline-block; padding: 10px 20px; background-color: #157AFE; color: #fff; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+          Ingresa aquí
+        </a>
+      </div>
+      
       <!-- Footer específico -->
       ${footerContent}
 
