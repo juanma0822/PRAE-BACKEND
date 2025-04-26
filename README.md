@@ -125,9 +125,9 @@ Para generar un token, se debe iniciar sesión con un usuario válido.
 ## ✨ Próximos Pasos
 
 ✅ **Base del proyecto configurada**  
-🔜 Implementación de modelos y rutas CRUD para usuarios, cursos y materias  
-🔜 Creación de autenticación JWT  
-🔜 Middleware para validación de roles  
+✅ Implementación de modelos y rutas CRUD para usuarios, cursos y materias  
+✅ Creación de autenticación JWT  
+✅ Middleware para validación de roles  
 
 ¡Contribuciones y sugerencias son bienvenidas! 🎉  
 Si tienes dudas o sugerencias, abre un **issue** en el repositorio.  
