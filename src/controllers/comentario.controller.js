@@ -106,8 +106,8 @@ const updateComentario = async (req, res) => {
 // Eliminar un comentario
 const deleteComentario = async (req, res) => {
   try {
-    const { id_comentario } = req.params;
-    const resultado = await ComentarioService.deleteComentario(id_comentario);
+    const { id } = req.params;
+    const resultado = await ComentarioService.deleteComentario(id);
 
     // Emitir estadísticas si hay un profesor asociado
     if (resultado?.documento_profe) {
