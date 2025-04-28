@@ -20,7 +20,7 @@ const generateToken = (data) => {
         payload.curso = data.curso;
     }
 
-    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '10m' });
 };
 
 // Función para enviar correo de recuperación de contraseña
@@ -56,6 +56,7 @@ const sendRecoveryEmail = async (email) => {
                 <h1 style="color: #333;">¡Hola, ${isCorrect.nombre}!</h1>
                 <p>Has solicitado un cambio de contraseña. Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
                 <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #157AFE; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 20px;">Restablecer mi contraseña</a>
+                <p style="margin-top: 20px; color: #666;">Este enlace tiene una vigencia de <strong>10 minutos</strong>. Si no realizas el cambio en este tiempo, deberás solicitar un nuevo enlace.</p>
                 <p style="margin-top: 20px;">Si no solicitaste este cambio, por favor ignora este correo.</p>
             </div>
         `;
