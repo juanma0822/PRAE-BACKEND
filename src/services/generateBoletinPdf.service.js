@@ -41,49 +41,34 @@ const generateBoletinPdf = async (documento_identidad) => {
     if (!estudiante) throw new Error('Estudiante no encontrado o inactivo');
 
     const notasQuery = `
-              SELECT 
-                m.nombre AS materia, 
-                m.color,
-                a.nombre AS actividad, 
-                a.peso,
-                c.nota,
-                p.documento_identidad AS doc_profe, 
-                up.nombre AS nombre_profe, 
-                up.apellido AS apellido_profe
-              FROM Calificacion c
-              INNER JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
-              INNER JOIN Materia m ON a.id_materia = m.id_materia
-              INNER JOIN Profesor p ON a.id_docente = p.documento_identidad
-              INNER JOIN Usuario up ON p.documento_identidad = up.documento_identidad
-              WHERE c.id_estudiante = $1 
-                AND c.activo = TRUE
-              ORDER BY m.nombre, a.nombre;
-            `;
+      SELECT 
+        m.nombre AS materia, 
+        m.color,
+        a.nombre AS actividad, 
+        a.peso,
+        c.nota,
+        p.documento_identidad AS doc_profe, 
+        up.nombre AS nombre_profe, 
+        up.apellido AS apellido_profe
+      FROM Calificacion c
+      INNER JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
+      INNER JOIN Materia m ON a.id_materia = m.id_materia
+      INNER JOIN Profesor p ON a.id_docente = p.documento_identidad
+      INNER JOIN Usuario up ON p.documento_identidad = up.documento_identidad
+      WHERE c.id_estudiante = $1 
+        AND c.activo = TRUE
+      ORDER BY m.nombre, a.nombre;
+    `;
     const notas = await consultarDB(notasQuery, [documento_identidad]);
 
     const htmlTemplatePath = path.join(__dirname, '../templates/boletin/boletinTemplate.html');
     let html = fs.readFileSync(htmlTemplatePath, 'utf8');
 
-    // Encabezado personalizado
-    const encabezadoHTML = `
-      <div class="encabezado">
-        <img src="${estudiante.logo}" alt="Logo Institución" style="max-height: 100px; margin-bottom: 10px;" />
-        <h1 class="tituloJM" style="background-color: ${estudiante.color_principal}; color: white; font-size: 24px; font-weight: bold; border-radius: 8px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-          Boletín Académico - ${estudiante.institucion}
-        </h1>
-      </div>
-    `;
-    html = html.replace('{{ENCABEZADO}}', encabezadoHTML);
-
-    html = html.replace('{{NOMBRE}}', `${estudiante.nombre} ${estudiante.apellido}`);
-    html = html.replace('{{DOCUMENTO}}', estudiante.documento_identidad);
-    html = html.replace('{{CURSO}}', estudiante.curso);
-    html = html.replace('{{CORREO}}', estudiante.correo);
-    html = html.replace('{{COLOR}}', estudiante.color_principal);
-    html = html.replace('{{COLOR_SECUNDARIO}}', estudiante.color_secundario);
-    html = html.replace('{{FONDO}}', estudiante.fondo);
-
+    // Calcular promedios
     const materiasMap = {};
+    let sumaPromediosMaterias = 0;
+    let cantidadMaterias = 0;
+
     for (const n of notas) {
       let colorBase = n.color?.toLowerCase();
       let hexColor = '#ccc';
@@ -103,15 +88,55 @@ const generateBoletinPdf = async (documento_identidad) => {
           color: hexColor,
           docente: `${n.nombre_profe} ${n.apellido_profe}`,
           actividades: [],
+          sumaNotas: 0,
+          sumaPesos: 0,
         };
+        cantidadMaterias++;
       }
+
+      const nota = parseFloat(n.nota) || 0;
+      const peso = parseFloat(n.peso) || 0;
+      const valorFinal = (nota * peso) / 100;
 
       materiasMap[n.materia].actividades.push({
         nombre: n.actividad,
-        peso: n.peso,
-        nota: n.nota,
+        peso,
+        nota,
+        valorFinal,
       });
+
+      materiasMap[n.materia].sumaNotas += valorFinal;
+      materiasMap[n.materia].sumaPesos += peso;
     }
+
+    // Calcular el promedio de cada materia y el promedio general del estudiante
+    Object.values(materiasMap).forEach((materia) => {
+      const promedioMateria = materia.sumaNotas;
+      sumaPromediosMaterias += promedioMateria;
+    });
+
+    const promedioEstudiante = (sumaPromediosMaterias / cantidadMaterias).toFixed(2);
+
+    // Encabezado personalizado
+    const encabezadoHTML = `
+      <div class="encabezado">
+        <img src="${estudiante.logo}" alt="Logo Institución" style="max-height: 100px; margin-bottom: 10px;" />
+        <h1 class="tituloJM" style="background-color: ${estudiante.color_principal}; color: white; font-size: 24px; font-weight: bold; border-radius: 8px; padding: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          Boletín Académico - ${estudiante.institucion}
+        </h1>
+      </div>
+    `;
+    html = html.replace('{{ENCABEZADO}}', encabezadoHTML);
+    
+    // Reemplazar datos en el HTML
+    html = html.replace('{{NOMBRE}}', `${estudiante.nombre} ${estudiante.apellido}`);
+    html = html.replace('{{DOCUMENTO}}', estudiante.documento_identidad);
+    html = html.replace('{{CURSO}}', estudiante.curso);
+    html = html.replace('{{CORREO}}', estudiante.correo);
+    html = html.replace('{{COLOR}}', estudiante.color_principal);
+    html = html.replace('{{COLOR_SECUNDARIO}}', estudiante.color_secundario);
+    html = html.replace('{{FONDO}}', estudiante.fondo);
+    html = html.replace('{{PROMEDIO_ESTUDIANTE}}', promedioEstudiante);
 
     let tablasHTML = '';
     Object.entries(materiasMap).forEach(([nombreMateria, info]) => {
@@ -135,21 +160,24 @@ const generateBoletinPdf = async (documento_identidad) => {
       `;
 
       info.actividades.forEach((act) => {
-        const nota = parseFloat(act.nota) || 0;
-        const peso = parseFloat(act.peso) || 0;
-        const valorFinal = (nota * peso / 100).toFixed(2);
-
         tablasHTML += `
           <tr>
             <td>${act.nombre}</td>
-            <td>${peso}%</td>
-            <td>${nota.toFixed(2)}</td>
-            <td>${valorFinal}</td>
+            <td>${act.peso}%</td>
+            <td>${act.nota.toFixed(2)}</td>
+            <td>${act.valorFinal.toFixed(2)}</td>
           </tr>
         `;
       });
 
-      tablasHTML += `</tbody></table>`;
+      tablasHTML += `
+          <tr>
+            <td colspan="3" style="text-align: right; font-weight: bold;">Promedio de la materia:</td>
+            <td style="font-weight: bold;">${info.sumaNotas.toFixed(2)}</td>
+          </tr>
+        </tbody>
+        </table>
+      `;
     });
 
     html = html.replace('{{TABLAS_MATERIAS}}', tablasHTML);
