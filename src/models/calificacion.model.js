@@ -210,27 +210,27 @@ const selectCalificacionesCurso = async (
 
 const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) => {
   const query = `
-        SELECT 
-          ROUND(
-            CASE 
-              WHEN COUNT(a.id_actividad) > 0 THEN SUM(c.nota * (a.peso / 100.0)) / COUNT(a.id_actividad)
-              ELSE 0
-            END, 2
-          ) AS promedio
-        FROM Calificacion c
-        JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
-        WHERE a.id_materia = $1 
-          AND c.id_estudiante = $2
-          AND a.id_docente = $3
-          AND c.activo = TRUE;
-    `;
-  const result = await consultarDB(query, [
-    id_materia,
-    id_estudiante,
-    id_docente,
-  ]);
-  return result[0]?.promedio || 0; // Retorna 0 si no hay calificaciones
+    SELECT 
+      ROUND(
+        CASE 
+          WHEN COUNT(a.id_actividad) > 0 THEN SUM(c.nota * (a.peso / 100.0)) 
+          ELSE 0
+        END, 2
+      ) AS promedio
+    FROM Calificacion c
+    JOIN Actividades a 
+      ON c.id_actividad = a.id_actividad 
+      AND a.activo = TRUE
+    WHERE a.id_materia = $1 
+      AND c.id_estudiante = $2
+      AND a.id_docente = $3
+      AND c.activo = TRUE
+  `;
+  
+  const result = await consultarDB(query, [id_materia, id_estudiante, id_docente]);
+  return result[0]?.promedio || 0; // Retorna 0 si no hay calificaciones activas
 };
+
 
 const selectPromedioCursoMateria = async (id_materia, id_curso) => {
   const query = `
