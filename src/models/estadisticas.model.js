@@ -231,23 +231,67 @@ const getEstadisticasProfesor = async (documento_profe) => {
 const getEstadisticasEstudiante = async (documento_estudiante) => {
   try {
     const query = `
-      SELECT
-        (SELECT COUNT(*) FROM Asignar a
-         JOIN Estudiante e ON a.id_curso = e.id_curso
-         WHERE e.documento_identidad = $1 AND a.estado = TRUE) AS materias_inscritas,
-        (SELECT COUNT(*) FROM Actividades a
-         JOIN Estudiante e ON a.id_curso = e.id_curso
-         WHERE e.documento_identidad = $1 AND a.activo = TRUE) AS actividades_asignadas,
-        (SELECT COUNT(*) FROM Calificacion WHERE id_estudiante = $1 AND activo = TRUE) AS calificaciones_recibidas,
-        (SELECT COALESCE(ROUND(AVG(nota), 2), 0.0) FROM Calificacion WHERE id_estudiante = $1 AND activo = TRUE) AS promedio_general,
-        (SELECT COUNT(*) FROM Comentarios WHERE documento_estudiante = $1) AS comentarios_recibidos
+      WITH materias_promedio AS (
+        SELECT 
+          m.id_materia,
+          m.nombre AS nombre_materia,
+          ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio_materia
+        FROM Estudiante e
+        JOIN Curso cu ON cu.id_curso = e.id_curso
+        JOIN Asignar asg ON asg.id_curso = cu.id_curso AND asg.estado = TRUE
+        JOIN Materia m ON m.id_materia = asg.id_materia
+        LEFT JOIN Actividades a ON a.id_materia = m.id_materia AND a.activo = TRUE
+        LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad AND c.activo = TRUE
+        WHERE e.documento_identidad = $1
+        GROUP BY m.id_materia, m.nombre
+      ),
+      promedio_general AS (
+        SELECT ROUND(AVG(promedio_materia), 2) AS promedio FROM materias_promedio
+      ),
+      cantidad_profesores AS (
+        SELECT COUNT(DISTINCT a.id_docente) AS total_profesores
+        FROM Asignar a
+        JOIN Estudiante e ON e.id_curso = a.id_curso
+        WHERE e.documento_identidad = $1 AND a.estado = TRUE
+      ),
+      notas_clasificadas AS (
+        SELECT
+          SUM(CASE WHEN c.nota >= 4.5 THEN 1 ELSE 0 END) AS notas_altas,
+          SUM(CASE WHEN c.nota >= 3.0 AND c.nota < 4.5 THEN 1 ELSE 0 END) AS notas_medias,
+          SUM(CASE WHEN c.nota < 3.0 THEN 1 ELSE 0 END) AS notas_bajas
+        FROM Calificacion c
+        WHERE c.id_estudiante = $1 AND c.activo = TRUE
+      ),
+      resumen_base AS (
+        SELECT
+          (SELECT COUNT(*) FROM Asignar a JOIN Estudiante e ON a.id_curso = e.id_curso WHERE e.documento_identidad = $1 AND a.estado = TRUE) AS materias_inscritas,
+          (SELECT COUNT(*) FROM Actividades a JOIN Estudiante e ON a.id_curso = e.id_curso WHERE e.documento_identidad = $1 AND a.activo = TRUE) AS actividades_asignadas,
+          (SELECT COUNT(*) FROM Calificacion WHERE id_estudiante = $1 AND activo = TRUE) AS calificaciones_recibidas,
+          (SELECT COUNT(*) FROM Comentarios WHERE documento_estudiante = $1) AS comentarios_recibidos
+      )
+
+      SELECT 
+        rb.materias_inscritas,
+        rb.actividades_asignadas,
+        rb.calificaciones_recibidas,
+        rb.comentarios_recibidos,
+        pg.promedio,
+        cp.total_profesores,
+        nc.notas_altas,
+        nc.notas_medias,
+        nc.notas_bajas,
+        json_agg(json_build_object(mp.nombre_materia, mp.promedio_materia)) AS promedios_por_materia
+      FROM resumen_base rb, promedio_general pg, cantidad_profesores cp, notas_clasificadas nc, materias_promedio mp
+      GROUP BY rb.materias_inscritas, rb.actividades_asignadas, rb.calificaciones_recibidas, rb.comentarios_recibidos, pg.promedio, cp.total_profesores, nc.notas_altas, nc.notas_medias, nc.notas_bajas;
     `;
+
     const result = await consultarDB(query, [documento_estudiante]);
     return result[0];
   } catch (error) {
     throw new Error(`Error al obtener estadísticas del estudiante: ${error.message}`);
   }
 };
+
 
 module.exports = {
   getEstadisticasAdmin,

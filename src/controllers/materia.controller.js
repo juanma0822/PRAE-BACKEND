@@ -65,7 +65,7 @@ const getMateriasConDocentes = async (req, res) => {
   }
 };
 
-// Desactivar una materia
+// Desactivar una materia                     ------------> VOLVER ACA
 const deleteMateria = async (req, res) => {
   try {
     const { id_materia } = req.params;
@@ -73,6 +73,7 @@ const deleteMateria = async (req, res) => {
     const id_institucion = resultado.materia.id_institucion;
 
     await emitirEstadisticasInstitucion(id_institucion);
+    await emitirEstadisticasEstudiante(id_estudiante);
 
     // Emitir evento de cambio
     emitirCambioInstitucion(id_institucion);

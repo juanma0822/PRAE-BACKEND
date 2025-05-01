@@ -41,23 +41,7 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
       a.nombre AS actividad,
       a.peso,
       c.nota,
-      c.id_calificacion,
-      (
-        SELECT 
-          ROUND(
-            CASE 
-              WHEN SUM(a2.peso) > 0 THEN SUM(c2.nota * (a2.peso / 100.0)) / SUM(a2.peso / 100.0)
-              ELSE 0
-            END, 2
-          )
-        FROM Actividades a2
-        JOIN Calificacion c2 ON a2.id_actividad = c2.id_actividad
-        WHERE a2.id_materia = $1 
-          AND c2.id_estudiante = $2
-          AND a2.id_docente = $3
-          AND a2.activo = TRUE
-          AND c2.activo = TRUE
-      ) AS promedio_total
+      c.id_calificacion
     FROM Actividades a
     JOIN Calificacion c 
       ON a.id_actividad = c.id_actividad 

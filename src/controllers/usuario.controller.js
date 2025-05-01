@@ -2,7 +2,7 @@ const usuarioService = require("../services/usuario.service");
 const institucionService = require('../services/institucion.service');
 const cursoService = require('../services/curso.service');
 const emailService = require('../services/emailService');
-const { emitirEstadisticasInstitucion } = require('../sockets/emitStats');
+const { emitirEstadisticasInstitucion, emitirEstadisticasEstudiante } = require('../sockets/emitStats');
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { console } = require("inspector");
@@ -532,6 +532,9 @@ const updateEstudiante = async (req, res) => {
         message: "Estudiante actualizado con éxito",
         usuarioActualizado,
       });
+    
+      await emitirEstadisticasEstudiante(documento_identidad); // Emitir estadísticas al estudiante después de actualizar
+      await emitirEstadisticasInstitucion(id_institucion); // Emitir estadísticas a la institución después de actualizar
   } catch (error) {
     console.error("Error al actualizar el estudiante:", error);
     res.status(500).json({ error: "Error interno del servidor: " + error.message });

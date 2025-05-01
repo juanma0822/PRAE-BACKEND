@@ -26,7 +26,7 @@ const getEstadisticasProfesor = async (req, res) => {
 const getEstadisticasEstudiante = async (req, res) => {
     try {
         const { documento_estudiante } = req.params;
-        const estadisticas = await estadisticasService.getEstadisticasProfesor(documento_estudiante);
+        const estadisticas = await estadisticasService.getEstadisticasEstudiante(documento_estudiante);
         res.status(200).json(estadisticas);
     } catch (error) {
         res.status(500).json({ error: error.message });

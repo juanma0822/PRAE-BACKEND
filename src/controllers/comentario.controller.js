@@ -1,7 +1,7 @@
 const ComentarioService = require('../services/comentario.service');
 const usuarioService = require('../services/usuario.service'); 
 const emailService = require('../services/emailService'); 
-const { emitirEstadisticasProfesor } = require('../sockets/emitStats');
+const { emitirEstadisticasProfesor, emitirEstadisticasEstudiante } = require('../sockets/emitStats');
 
 // Crear un nuevo comentario
 const createComentario = async (req, res) => {
@@ -37,6 +37,8 @@ const createComentario = async (req, res) => {
     );
 
     await emitirEstadisticasProfesor(documento_profe); // Emitir estadísticas al profesor después de crear el comentario
+
+    await emitirEstadisticasEstudiante(documento_estudiante); // Emitir estadísticas al estudiante después de crear el comentario
 
     res.status(201).json(nuevoComentario);
   } catch (error) {
@@ -113,6 +115,7 @@ const deleteComentario = async (req, res) => {
     if (resultado?.documento_profe) {
       await emitirEstadisticasProfesor(resultado.documento_profe);
     }
+    await emitirEstadisticasEstudiante(resultado.documento_estudiante); // Emitir estadísticas al estudiante después de eliminar el comentario
 
     res.status(200).json({
       message: "Comentario eliminado correctamente",

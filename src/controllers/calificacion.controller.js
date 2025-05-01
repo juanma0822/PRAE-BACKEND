@@ -3,7 +3,7 @@ const usuarioService = require("../services/usuario.service");
 const emailService = require("../services/emailService");
 const actividadService = require("../services/actividad.service");
 const { getIo } = require("../sockets/sockets");
-const { emitirEstadisticasProfesor } = require("../sockets/emitStats");
+const { emitirEstadisticasProfesor, emitirEstadisticasEstudiante } = require("../sockets/emitStats");
 
 const asignarCalificacion = async (req, res) => {
   try {
@@ -42,6 +42,8 @@ const asignarCalificacion = async (req, res) => {
     );
     getIo().to(id_estudiante).emit("nuevaCalificacion", nuevaCalificacion);
     await emitirEstadisticasProfesor(id_docente);
+    await emitirEstadisticasProfesor(id_estudiante);
+
 
     res.status(201).json(nuevaCalificacion);
   } catch (error) {
@@ -64,15 +66,22 @@ const actualizarCalificacion = async (req, res) => {
       });
     }
 
-    const calificacionActualizada =
-      await calificacionService.actualizarCalificacion(id_calificacion, nota);
+    const calificacionActualizada = await calificacionService.actualizarCalificacion(id_calificacion, nota);
+
+    // Obtener el id_estudiante del resultado
+    const { id_estudiante } = calificacionActualizada;
+
     const { id_actividad } = await calificacionService.getCalificacionById(
       id_calificacion
     );
     const actividad = await actividadService.getActividadById(id_actividad);
     const { id_docente } = actividad;
 
+    // Emitir estadísticas al profesor
     await emitirEstadisticasProfesor(id_docente);
+
+    // Emitir estadísticas al estudiante
+    await emitirEstadisticasEstudiante(id_estudiante);
     res.status(200).json(calificacionActualizada);
   } catch (error) {
     console.error("Error al actualizar calificación:", error);
