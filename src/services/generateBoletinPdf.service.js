@@ -61,9 +61,6 @@ const generateBoletinPdf = async (documento_identidad) => {
     `;
     const notas = await consultarDB(notasQuery, [documento_identidad]);
 
-    const htmlTemplatePath = path.join(__dirname, '../templates/boletin/boletinTemplate.html');
-    let html = fs.readFileSync(htmlTemplatePath, 'utf8');
-
     // Calcular promedios
     const materiasMap = {};
     let sumaPromediosMaterias = 0;
@@ -116,6 +113,27 @@ const generateBoletinPdf = async (documento_identidad) => {
     });
 
     const promedioEstudiante = (sumaPromediosMaterias / cantidadMaterias).toFixed(2);
+    
+    // Calcular el puesto académico del estudiante
+    const puestoQuery = `
+      SELECT e.documento_identidad, 
+             ROUND(SUM(c.nota * (a.peso / 100.0)) / COUNT(DISTINCT a.id_materia), 2) AS promedio
+      FROM Estudiante e
+      JOIN Calificacion c ON e.documento_identidad = c.id_estudiante AND c.activo = TRUE
+      JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
+      WHERE e.id_curso = $1
+      GROUP BY e.documento_identidad
+      ORDER BY promedio DESC, e.documento_identidad ASC;
+    `;
+    const estudiantesCurso = await consultarDB(puestoQuery, [estudiante.id_curso]);
+
+    let puesto = 1;
+    for (let i = 0; i < estudiantesCurso.length; i++) {
+      if (estudiantesCurso[i].documento_identidad === documento_identidad) {
+        puesto = i + 1;
+        break;
+      }
+    }
 
     // Encabezado personalizado
     const encabezadoHTML = `
@@ -126,9 +144,12 @@ const generateBoletinPdf = async (documento_identidad) => {
         </h1>
       </div>
     `;
-    html = html.replace('{{ENCABEZADO}}', encabezadoHTML);
-    
+
+    const htmlTemplatePath = path.join(__dirname, '../templates/boletin/boletinTemplate.html');
+    let html = fs.readFileSync(htmlTemplatePath, 'utf8');
+
     // Reemplazar datos en el HTML
+    html = html.replace('{{ENCABEZADO}}', encabezadoHTML);
     html = html.replace('{{NOMBRE}}', `${estudiante.nombre} ${estudiante.apellido}`);
     html = html.replace('{{DOCUMENTO}}', estudiante.documento_identidad);
     html = html.replace('{{CURSO}}', estudiante.curso);
@@ -137,6 +158,7 @@ const generateBoletinPdf = async (documento_identidad) => {
     html = html.replace('{{COLOR_SECUNDARIO}}', estudiante.color_secundario);
     html = html.replace('{{FONDO}}', estudiante.fondo);
     html = html.replace('{{PROMEDIO_ESTUDIANTE}}', promedioEstudiante);
+    html = html.replace('{{PUESTO}}', puesto);
 
     let tablasHTML = '';
     Object.entries(materiasMap).forEach(([nombreMateria, info]) => {
