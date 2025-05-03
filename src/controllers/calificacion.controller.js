@@ -42,7 +42,7 @@ const asignarCalificacion = async (req, res) => {
     );
     getIo().to(id_estudiante).emit("nuevaCalificacion", nuevaCalificacion);
     await emitirEstadisticasProfesor(id_docente);
-    await emitirEstadisticasProfesor(id_estudiante);
+    await emitirEstadisticasEstudiante(id_estudiante);
 
 
     res.status(201).json(nuevaCalificacion);

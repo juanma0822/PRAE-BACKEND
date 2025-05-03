@@ -1,4 +1,6 @@
 const asignarService = require("../services/asignar.service");
+const cursoService = require("../services/curso.service"); // Importar el servicio de cursos
+const { emitirEstadisticasEstudiante } = require("../sockets/emitStats"); // Importar la función para emitir estadísticas
 
 const asignarMateria = async (req, res) => {
   try {
@@ -8,9 +10,20 @@ const asignarMateria = async (req, res) => {
       return res.status(400).json({ message: "Todos los campos son requeridos: id_curso, id_materia, id_docente" });
     }
 
+    // Asignar la materia al curso
     const nuevaAsignacion = await asignarService.asignarMateria(id_curso, id_materia, id_docente);
+
+    // Obtener los estudiantes del curso
+    const estudiantes = await cursoService.obtenerEstudiantesPorCurso(id_curso);
+
+    // Emitir estadísticas a cada estudiante
+    for (const estudiante of estudiantes) {
+      await emitirEstadisticasEstudiante(estudiante.documento_identidad);
+    }
+
     res.status(201).json({ message: "Materia asignada con éxito", asignacion: nuevaAsignacion });
   } catch (error) {
+    console.error("Error al asignar materia:", error);
     res.status(400).json({ error: error.message });
   }
 };

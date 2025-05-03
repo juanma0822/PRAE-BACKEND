@@ -235,6 +235,9 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
         SELECT 
           m.id_materia,
           m.nombre AS nombre_materia,
+          a.id_docente,
+          u.nombre AS nombre_docente,
+          u.apellido AS apellido_docente,
           ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio_materia
         FROM Estudiante e
         JOIN Curso cu ON cu.id_curso = e.id_curso
@@ -242,8 +245,9 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
         JOIN Materia m ON m.id_materia = asg.id_materia
         LEFT JOIN Actividades a ON a.id_materia = m.id_materia AND a.activo = TRUE
         LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad AND c.activo = TRUE
+        LEFT JOIN Usuario u ON a.id_docente = u.documento_identidad
         WHERE e.documento_identidad = $1
-        GROUP BY m.id_materia, m.nombre
+        GROUP BY m.id_materia, m.nombre, a.id_docente, u.nombre, u.apellido
       ),
       promedio_general AS (
         SELECT ROUND(AVG(promedio_materia), 2) AS promedio FROM materias_promedio
@@ -268,6 +272,17 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
           (SELECT COUNT(*) FROM Actividades a JOIN Estudiante e ON a.id_curso = e.id_curso WHERE e.documento_identidad = $1 AND a.activo = TRUE) AS actividades_asignadas,
           (SELECT COUNT(*) FROM Calificacion WHERE id_estudiante = $1 AND activo = TRUE) AS calificaciones_recibidas,
           (SELECT COUNT(*) FROM Comentarios WHERE documento_estudiante = $1) AS comentarios_recibidos
+      ),
+      puesto_estudiante AS (
+        SELECT 
+          e.documento_identidad,
+          ROUND(AVG(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio
+        FROM Estudiante e
+        LEFT JOIN Calificacion c ON e.documento_identidad = c.id_estudiante AND c.activo = TRUE
+        LEFT JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
+        WHERE e.id_curso = (SELECT id_curso FROM Estudiante WHERE documento_identidad = $1)
+        GROUP BY e.documento_identidad
+        ORDER BY promedio DESC, e.documento_identidad ASC
       )
 
       SELECT 
@@ -280,7 +295,12 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
         nc.notas_altas,
         nc.notas_medias,
         nc.notas_bajas,
-        json_agg(json_build_object(mp.nombre_materia, mp.promedio_materia)) AS promedios_por_materia
+        json_agg(json_build_object(
+          'materia', mp.nombre_materia,
+          'docente', CONCAT(mp.nombre_docente, ' ', mp.apellido_docente),
+          'promedio', mp.promedio_materia
+        )) AS promedios_por_materia,
+        (SELECT RANK() OVER (ORDER BY promedio DESC) FROM puesto_estudiante WHERE documento_identidad = $1) AS puesto
       FROM resumen_base rb, promedio_general pg, cantidad_profesores cp, notas_clasificadas nc, materias_promedio mp
       GROUP BY rb.materias_inscritas, rb.actividades_asignadas, rb.calificaciones_recibidas, rb.comentarios_recibidos, pg.promedio, cp.total_profesores, nc.notas_altas, nc.notas_medias, nc.notas_bajas;
     `;
