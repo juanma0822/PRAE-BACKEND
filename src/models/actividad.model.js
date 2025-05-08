@@ -1,17 +1,19 @@
 const { consultarDB, getClient } = require('../db');
 
-const insertActividad = async (nombre, peso, id_materia, id_docente, id_curso) => {
-    try {
-      const query = `
-        INSERT INTO Actividades (nombre, peso, id_materia, id_docente, id_curso) 
-        VALUES ($1, $2, $3, $4, $5) RETURNING *`;
-      const values = [nombre, peso, id_materia, id_docente, id_curso];
-      const result = await consultarDB(query, values);
-      return result[0];
-    } catch (error) {
-      throw new Error(`Error al insertar actividad: ${error.message}`);
-    }
-  };
+const insertActividad = async (nombre, peso, id_materia, id_docente, id_curso, id_periodo) => {
+  try {
+    const query = `
+      INSERT INTO Actividades (nombre, peso, id_materia, id_docente, id_curso, id_periodo) 
+      VALUES ($1, $2, $3, $4, $5, $6) 
+      RETURNING *;
+    `;
+    const values = [nombre, peso, id_materia, id_docente, id_curso, id_periodo];
+    const result = await consultarDB(query, values);
+    return result[0];
+  } catch (error) {
+    throw new Error(`Error al insertar actividad: ${error.message}`);
+  }
+};
 
 const getActividadById = async (id_actividad) => {
     const query = `

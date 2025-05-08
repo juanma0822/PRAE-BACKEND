@@ -1,8 +1,23 @@
 const actividadModel = require('../models/actividad.model');
+const periodoAcademicoService = require('../services/periodoAcademico.service');
 
-const crearActividad = async (nombre, peso, id_materia, id_docente, id_curso) => {
-    return await actividadModel.insertActividad(nombre, peso, id_materia, id_docente, id_curso);
-};
+const crearActividad = async (nombre, peso, id_materia, id_docente, id_curso, id_institucion) => {
+    try {
+      // Obtener el periodo activo de la institución
+      const periodoActivo = await periodoAcademicoService.getPeriodoActivoByInstitucion(id_institucion);
+  
+      if (!periodoActivo) {
+        throw new Error('No hay un periodo activo para la institución');
+      }
+  
+      const id_periodo = periodoActivo.id_periodo;
+  
+      // Crear la actividad con el id_periodo obtenido
+      return await actividadModel.insertActividad(nombre, peso, id_materia, id_docente, id_curso, id_periodo);
+    } catch (error) {
+      throw new Error(`Error al crear la actividad: ${error.message}`);
+    }
+  };
 
 const getActividadById = async (id_actividad) => {
     return await actividadModel.getActividadById(id_actividad);

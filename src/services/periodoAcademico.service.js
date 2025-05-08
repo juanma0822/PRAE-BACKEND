@@ -3,8 +3,15 @@ const periodoAcademicoModel = require('../models/periodoAcademico.model');
 // Crear un nuevo periodo académico
 const createPeriodoAcademico = async (nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
   try {
-    const periodoAcademico = await periodoAcademicoModel.insertPeriodoAcademico(nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion);
-    return periodoAcademico;
+    const nuevoPeriodo = await periodoAcademicoModel.createPeriodoAcademico(
+      nombre,
+      anio,
+      fecha_inicio,
+      fecha_fin,
+      peso,
+      id_institucion
+    );
+    return nuevoPeriodo;
   } catch (error) {
     throw new Error(`Error al crear el periodo académico: ${error.message}`);
   }
@@ -73,6 +80,28 @@ const deletePeriodoAcademico = async (id_periodo) => {
   }
 };
 
+// Obtener el periodo activo de una institución
+const getPeriodoActivoByInstitucion = async (id_institucion) => {
+  try {
+    const periodoActivo = await periodoAcademicoModel.getPeriodoActivoByInstitucion(id_institucion);
+    if (!periodoActivo) throw new Error('No hay un periodo activo para esta institución');
+    return periodoActivo;
+  } catch (error) {
+    throw new Error(`Error al obtener el periodo activo: ${error.message}`);
+  }
+};
+
+// Activar un periodo y desactivar los demás de la institución
+const activatePeriodoAcademico = async (id_periodo, id_institucion) => {
+  try {
+    const periodoActivado = await periodoAcademicoModel.activatePeriodoAcademico(id_periodo, id_institucion);
+    if (!periodoActivado) throw new Error('No se pudo activar el periodo académico');
+    return periodoActivado;
+  } catch (error) {
+    throw new Error(`Error al activar el periodo académico: ${error.message}`);
+  }
+};
+
 module.exports = {
   createPeriodoAcademico,
   getAllPeriodosAcademicos,
@@ -81,4 +110,6 @@ module.exports = {
   getPeriodosAcademicosByAnioEInstitucion,
   updatePeriodoAcademico,
   deletePeriodoAcademico,
+  getPeriodoActivoByInstitucion,
+  activatePeriodoAcademico,
 };

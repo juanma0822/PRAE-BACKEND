@@ -3,8 +3,16 @@ const periodoAcademicoService = require('../services/periodoAcademico.service');
 // Crear un nuevo periodo académico
 const createPeriodoAcademico = async (req, res) => {
   try {
-    const { nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion } = req.body;
-    const nuevoPeriodoAcademico = await periodoAcademicoService.createPeriodoAcademico(nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion);
+    const { id_institucion } = req.user; // Obtener id_institucion del token
+    const { nombre, anio, fecha_inicio, fecha_fin, peso } = req.body; // Datos del cuerpo de la solicitud
+    const nuevoPeriodoAcademico = await periodoAcademicoService.createPeriodoAcademico(
+      nombre,
+      anio,
+      fecha_inicio,
+      fecha_fin,
+      peso,
+      id_institucion
+    );
     res.status(201).json(nuevoPeriodoAcademico);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -77,6 +85,29 @@ const deletePeriodoAcademico = async (req, res) => {
   }
 };
 
+// Obtener el periodo activo de una institución
+const getPeriodoActivoByInstitucion = async (req, res) => {
+  try {
+    const { id_institucion } = req.user; // Obtener id_institucion del token
+    const periodoActivo = await periodoAcademicoService.getPeriodoActivoByInstitucion(id_institucion);
+    res.status(200).json(periodoActivo);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Activar un periodo y desactivar los demás de la institución
+const activatePeriodoAcademico = async (req, res) => {
+  try {
+    const { id } = req.params; // ID del periodo a activar
+    const { id_institucion } = req.user; // Obtener id_institucion del token
+    const periodoActivado = await periodoAcademicoService.activatePeriodoAcademico(id, id_institucion);
+    res.status(200).json(periodoActivado);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createPeriodoAcademico,
   getAllPeriodosAcademicos,
@@ -85,4 +116,6 @@ module.exports = {
   getPeriodosAcademicosByAnioEInstitucion,
   updatePeriodoAcademico,
   deletePeriodoAcademico,
+  getPeriodoActivoByInstitucion,
+  activatePeriodoAcademico,
 };

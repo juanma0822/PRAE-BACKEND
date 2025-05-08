@@ -2,16 +2,28 @@ const actividadService = require('../services/actividad.service');
 const { emitirEstadisticasProfesor } = require('../sockets/emitStats');
 
 const crearActividad = async (req, res) => {
-    try {
-      const { nombre, peso, id_materia, id_docente, id_curso } = req.body;
-      const nuevaActividad = await actividadService.crearActividad(nombre, peso, id_materia, id_docente, id_curso);
+  try {
+    const { id_institucion } = req.user; // Obtener id_institucion del token
+    const { nombre, peso, id_materia, id_docente, id_curso } = req.body;
 
-      await emitirEstadisticasProfesor(id_docente); // Emitir estadísticas al docente después de crear la actividad
-      res.status(201).json(nuevaActividad);
-    } catch (error) {
-      res.status(500).json({ error: `Error al crear la actividad: ${error.message}` });
-    }
-  };
+    // Crear la actividad
+    const nuevaActividad = await actividadService.crearActividad(
+      nombre,
+      peso,
+      id_materia,
+      id_docente,
+      id_curso,
+      id_institucion // Pasar el id_institucion para obtener el periodo activo
+    );
+
+    // Emitir estadísticas al docente
+    await emitirEstadisticasProfesor(id_docente);
+
+    res.status(201).json(nuevaActividad);
+  } catch (error) {
+    res.status(500).json({ error: `Error al crear la actividad: ${error.message}` });
+  }
+};
 
 const obtenerActividadesPorMateria = async (req, res) => {
     try {

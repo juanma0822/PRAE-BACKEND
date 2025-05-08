@@ -9,12 +9,13 @@ const {
   obtenerPromedioEstudiante,
   obtenerPromedioCurso,
 } = require("../controllers/calificacion.controller");
+const verifyToken = require("../middleware/auth.middleware");
 
 // Asignar una calificación a un estudiante en una actividad
-router.post("/asignar", asignarCalificacion);
+router.post("/asignar", verifyToken, asignarCalificacion);
 
 // Actualizar una calificación
-router.put("/actualizar/:id_calificacion", actualizarCalificacion);
+router.put("/actualizar/:id_calificacion", verifyToken, actualizarCalificacion);
 
 // Obtener todas las calificaciones de un estudiante en una materia
 router.get(
@@ -59,6 +60,7 @@ router.get(
  */
 router.get(
   "/materia/:id_materia/estudiante/:id_estudiante/docente/:id_docente/institucion/:id_institucion",
+  verifyToken,
   obtenerCalificacionesEstudiantePorDocenteEInstitucion
 );
 
@@ -99,6 +101,7 @@ router.get(
  */
 router.get(
   '/materia/:id_materia/curso/:id_curso/docente/:id_docente/institucion/:id_institucion',
+  verifyToken,
   obtenerCalificacionesCurso
 );
 

@@ -1,7 +1,7 @@
 const { consultarDB } = require('../db');
 
-// Insertar un nuevo periodo académico
-const insertPeriodoAcademico = async (nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
+// Crear un nuevo periodo académico
+const createPeriodoAcademico = async (nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
   const query = `
     INSERT INTO PeriodoAcademico (nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion, estado)
     VALUES ($1, $2, $3, $4, $5, $6, TRUE)
@@ -77,12 +77,43 @@ const deletePeriodoAcademico = async (id_periodo) => {
   return result[0];
 };
 
+// Obtener el periodo activo de una institución
+const getPeriodoActivoByInstitucion = async (id_institucion) => {
+  const query = `
+    SELECT * FROM PeriodoAcademico
+    WHERE id_institucion = $1 AND estado = TRUE
+    LIMIT 1;
+  `;
+  const result = await consultarDB(query, [id_institucion]);
+  return result[0];
+};
+
+// Activar un periodo y desactivar los demás de la institución
+const activatePeriodoAcademico = async (id_periodo, id_institucion) => {
+  const queryDesactivar = `
+    UPDATE PeriodoAcademico
+    SET estado = FALSE
+    WHERE id_institucion = $1;
+  `;
+  const queryActivar = `
+    UPDATE PeriodoAcademico
+    SET estado = TRUE
+    WHERE id_periodo = $1
+    RETURNING *;
+  `;
+  await consultarDB(queryDesactivar, [id_institucion]); // Desactivar todos los periodos
+  const result = await consultarDB(queryActivar, [id_periodo]); // Activar el periodo seleccionado
+  return result[0];
+};
+
 module.exports = {
-  insertPeriodoAcademico,
+  createPeriodoAcademico,
   getAllPeriodosAcademicos,
   getPeriodoAcademicoById,
   getPeriodosAcademicosByInstitucion,
   getPeriodosAcademicosByAnioEInstitucion,
   updatePeriodoAcademico,
   deletePeriodoAcademico,
+  getPeriodoActivoByInstitucion,
+  activatePeriodoAcademico,
 };

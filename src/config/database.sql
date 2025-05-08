@@ -119,6 +119,7 @@ CREATE TABLE Actividades (
     id_materia INT NOT NULL,
     id_docente VARCHAR(20) NOT NULL,
     id_curso INT NULL,  -- Nueva columna para asociar la actividad a un curso
+    id_periodo INT, --Periodos academicos
     CONSTRAINT fk_actividad_materia FOREIGN KEY (id_materia)
         REFERENCES Materia(id_materia)
         ON DELETE CASCADE,
@@ -127,7 +128,10 @@ CREATE TABLE Actividades (
         ON DELETE CASCADE,
     CONSTRAINT fk_actividad_curso FOREIGN KEY (id_curso)
         REFERENCES Curso(id_curso)
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+    CONSTRAINT fk_actividad_periodo FOREIGN KEY (id_periodo)
+        REFERENCES PeriodoAcademico(id_periodo)
+        ON DELETE CASCADE;
 );
 
 

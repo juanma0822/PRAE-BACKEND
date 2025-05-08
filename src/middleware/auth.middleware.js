@@ -15,7 +15,8 @@ const authMiddleware = (req, res, next) => {
         req.user = {
             email: decoded.email,
             id: decoded.id,
-            rol: decoded.rol
+            rol: decoded.rol,
+            id_institucion: decoded.institucion?.id_institucion // Agregar id_institucion desde el token
         };
         next(); // Pasar al siguiente middleware/controlador
     } catch (error) {

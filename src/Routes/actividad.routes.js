@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const actividadController = require('../controllers/actividad.controller');
+const verifyToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -34,7 +35,7 @@ const actividadController = require('../controllers/actividad.controller');
  *       201:
  *         description: Actividad creada exitosamente
  */
-router.post('/crear', actividadController.crearActividad);
+router.post('/crear', verifyToken, actividadController.crearActividad);
 
 /**
  * @swagger

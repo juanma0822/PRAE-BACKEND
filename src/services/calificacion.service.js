@@ -1,4 +1,5 @@
 const calificacionModel = require('../models/calificacion.model');
+const periodoAcademicoService = require('../services/periodoAcademico.service'); // Importar el servicio de periodos académicos
 
 const asignarCalificacion = async (id_actividad, id_estudiante, nota) => {
     return await calificacionModel.insertCalificacion(id_actividad, id_estudiante, nota);
@@ -36,8 +37,22 @@ const obtenerCalificacionesEstudiantePorDocenteEInstitucion = async (id_materia,
 };
 
 const obtenerCalificacionesCurso = async (id_materia, id_curso, id_docente, id_institucion) => {
-    return await calificacionModel.selectCalificacionesCurso(id_materia, id_curso, id_docente, id_institucion);
-};
+    try {
+      // Obtener el periodo activo de la institución
+      const periodoActivo = await periodoAcademicoService.getPeriodoActivoByInstitucion(id_institucion);
+  
+      if (!periodoActivo) {
+        throw new Error('No hay un periodo activo para la institución');
+      }
+  
+      const id_periodo = periodoActivo.id_periodo;
+  
+      // Llamar al modelo con el id_periodo incluido
+      return await calificacionModel.selectCalificacionesCurso(id_materia, id_curso, id_docente, id_institucion, id_periodo);
+    } catch (error) {
+      throw new Error(`Error al obtener calificaciones del curso: ${error.message}`);
+    }
+  };
 
 const obtenerPromedioEstudiante = async (id_materia, id_estudiante, id_docente) => {
     return await calificacionModel.selectPromedioEstudiante(id_materia, id_estudiante, id_docente);

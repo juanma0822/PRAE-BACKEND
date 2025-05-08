@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const verifyToken = require("../middleware/auth.middleware");
 const {
   createPeriodoAcademico,
   getAllPeriodosAcademicos,
@@ -8,7 +9,113 @@ const {
   getPeriodosAcademicosByAnioEInstitucion,
   updatePeriodoAcademico,
   deletePeriodoAcademico,
+  getPeriodoActivoByInstitucion,
+  activatePeriodoAcademico,
 } = require('../controllers/periodoAcademico.controller');
+
+
+/**
+ * @swagger
+ * /periodos/activo:
+ *   get:
+ *     summary: Obtener el periodo activo de una institución
+ *     tags: [Periodos Académicos - GET]
+ *     responses:
+ *       200:
+ *         description: Periodo activo obtenido correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_periodo:
+ *                   type: integer
+ *                   description: ID del periodo activo
+ *                 nombre:
+ *                   type: string
+ *                   description: Nombre del periodo activo
+ *                 anio:
+ *                   type: integer
+ *                   description: Año del periodo activo
+ *                 fecha_inicio:
+ *                   type: string
+ *                   format: date
+ *                   description: Fecha de inicio del periodo activo
+ *                 fecha_fin:
+ *                   type: string
+ *                   format: date
+ *                   description: Fecha de fin del periodo activo
+ *                 peso:
+ *                   type: number
+ *                   description: Peso del periodo activo
+ *                 id_institucion:
+ *                   type: integer
+ *                   description: ID de la institución asociada
+ *                 estado:
+ *                   type: boolean
+ *                   description: Estado del periodo (activo o inactivo)
+ *       401:
+ *         description: Acceso denegado, token no proporcionado
+ *       403:
+ *         description: Token inválido o expirado
+ */
+router.get('/activo', verifyToken, getPeriodoActivoByInstitucion);
+
+/**
+ * @swagger
+ * /periodos/{id}/estado:
+ *   patch:
+ *     summary: Activar un periodo académico y desactivar los demás de la institución
+ *     tags: [Periodos Académicos - PATCH]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID del periodo académico a activar
+ *     responses:
+ *       200:
+ *         description: Periodo académico activado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id_periodo:
+ *                   type: integer
+ *                   description: ID del periodo activado
+ *                 nombre:
+ *                   type: string
+ *                   description: Nombre del periodo activado
+ *                 anio:
+ *                   type: integer
+ *                   description: Año del periodo activado
+ *                 fecha_inicio:
+ *                   type: string
+ *                   format: date
+ *                   description: Fecha de inicio del periodo activado
+ *                 fecha_fin:
+ *                   type: string
+ *                   format: date
+ *                   description: Fecha de fin del periodo activado
+ *                 peso:
+ *                   type: number
+ *                   description: Peso del periodo activado
+ *                 id_institucion:
+ *                   type: integer
+ *                   description: ID de la institución asociada
+ *                 estado:
+ *                   type: boolean
+ *                   description: Estado del periodo (activo o inactivo)
+ *       401:
+ *         description: Acceso denegado, token no proporcionado
+ *       403:
+ *         description: Token inválido o expirado
+ *       404:
+ *         description: Periodo académico no encontrado
+ */
+router.patch('/:id/estado', verifyToken, activatePeriodoAcademico);
 
 /**
  * @swagger
@@ -41,7 +148,7 @@ const {
  *       201:
  *         description: Periodo académico creado exitosamente
  */
-router.post('/', createPeriodoAcademico);
+router.post('/', verifyToken, createPeriodoAcademico);
 
 /**
  * @swagger
