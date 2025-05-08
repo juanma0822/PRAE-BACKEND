@@ -23,6 +23,7 @@ const historialGradoRoutes = require('./Routes/historialGrado.routes');
 const uploadRoutes = require('./Routes/upload.routes');
 const estadisticasRoutes = require('./Routes/estadisticas.routes');
 const boletinRoutes = require('./Routes/boletin.routes');
+const cronJob = require('./jobs/periodoJob');
 const path = require('path');
 
 
