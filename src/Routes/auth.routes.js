@@ -19,13 +19,16 @@ const verifyRecoveryToken = require('../middleware/recover.middleware');
  *             properties:
  *               email:
  *                 type: string
- *                 description: Correo electrónico del usuario
+ *                 description: Correo electrónico del usuario (no requerido en modo demo)
  *               password:
  *                 type: string
- *                 description: Contraseña del usuario
+ *                 description: Contraseña del usuario (no requerida en modo demo)
  *               demo:
  *                 type: boolean
  *                 description: Indica si es un login en modo demo
+ *               rol:
+ *                 type: string
+ *                 description: Rol del usuario en modo demo (admin, profesor, estudiante)
  *     responses:
  *       200:
  *         description: Login exitoso, devuelve un token.
@@ -36,10 +39,12 @@ const verifyRecoveryToken = require('../middleware/recover.middleware');
  *               properties:
  *                 message:
  *                   type: string
+ *                   description: Mensaje de éxito
  *                 token:
  *                   type: string
+ *                   description: Token JWT generado
  *       400:
- *         description: Error en la petición (faltan datos).
+ *         description: Error en la petición (faltan datos o rol inválido).
  *         content:
  *           application/json:
  *             schema:
@@ -47,6 +52,10 @@ const verifyRecoveryToken = require('../middleware/recover.middleware');
  *               properties:
  *                 error:
  *                   type: string
+ *                   description: Descripción del error
+ *                 detalle:
+ *                   type: string
+ *                   description: Detalle del error
  *       401:
  *         description: Credenciales incorrectas.
  *         content:
@@ -56,6 +65,7 @@ const verifyRecoveryToken = require('../middleware/recover.middleware');
  *               properties:
  *                 error:
  *                   type: string
+ *                   description: Descripción del error
  */
 router.post('/Login', VerifyLogin);
 
