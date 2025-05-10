@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
   const isDark = hour >= 18 || hour < 6;
 
   const backgroundColor = isDark ? '#121212' : '#ffffff';
-  const textColor = isDark ? '#f0f0f0' : '#333333';
+  const textColor = '#333333';
   const accentColor = '#157AFE';
   const highlightColor = '#f1faff';
 

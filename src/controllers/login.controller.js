@@ -28,7 +28,7 @@ const VerifyLogin = async (req, res) => {
 
             const demoUsers = {
                 admin: { email: "juan.demo@prae.com", password: "demo" },
-                profesor: { email: "carlos.demo@prae.com", password: "demo" },
+                docente: { email: "carlos.demo@prae.com", password: "demo" },
                 estudiante: { email: "ana.demo@prae.com", password: "demo" },
             };
 
