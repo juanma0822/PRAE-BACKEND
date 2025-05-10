@@ -1,31 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { getUser } = require('../controllers/register.controller');
 const { recoverPassword, validateResetToken, VerifyLogin, validateToken } = require("../controllers/rutas.controller");
 const verifyRecoveryToken = require('../middleware/recover.middleware');
 
-/**
- * @swagger
- * /auth/addRegister:
- *   post:
- *     summary: Registra un nuevo usuario
- *     tags: [Auth - POST]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *     responses:
- *       200:
- *         description: Usuario registrado correctamente.
- */
-router.post('/addRegister', getUser);
 
 /**
  * @swagger
