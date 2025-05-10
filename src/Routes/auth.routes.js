@@ -19,8 +19,13 @@ const verifyRecoveryToken = require('../middleware/recover.middleware');
  *             properties:
  *               email:
  *                 type: string
+ *                 description: Correo electrónico del usuario
  *               password:
  *                 type: string
+ *                 description: Contraseña del usuario
+ *               demo:
+ *                 type: boolean
+ *                 description: Indica si es un login en modo demo
  *     responses:
  *       200:
  *         description: Login exitoso, devuelve un token.

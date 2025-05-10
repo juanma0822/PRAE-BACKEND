@@ -16,7 +16,8 @@ const authMiddleware = (req, res, next) => {
             email: decoded.email,
             id: decoded.id,
             rol: decoded.rol,
-            id_institucion: decoded.institucion?.id_institucion // Agregar id_institucion desde el token
+            id_institucion: decoded.institucion?.id_institucion, // Agregar id_institucion desde el token
+            demo: decoded.demo || false, // Agregar el estado demo desde el token
         };
 
         // Verificar si el rol es uno de los permitidos
@@ -25,6 +26,12 @@ const authMiddleware = (req, res, next) => {
         if (!allowedRoles.includes(req.user.rol) && req.method !== 'GET') {
             return res.status(403).json({ error: 'Acceso denegado, rol no autorizado' });
         }
+
+        // Bloquear rutas que no sean GET si el usuario está en modo demo
+        if (req.user.demo && req.method !== 'GET') {
+            return res.status(403).json({ error: 'Acceso restringido en modo demo' });
+        }
+        
         next(); // Pasar al siguiente middleware/controlador
     } catch (error) {
         return res.status(401).json({ error: 'Token inválido o expirado' });

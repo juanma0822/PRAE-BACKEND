@@ -5,18 +5,46 @@ const jwt = require("jsonwebtoken");
 
 const VerifyLogin = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, demo, rol } = req.body; // Agregar el parámetro demo y rol
 
         // Validar que los campos requeridos estén presentes
-        if (!email || !password) {
+        if (!demo && (!email || !password)) {
             return res.status(400).json({
                 error: "Email y contraseña son requeridos",
                 detalle: "Por favor, proporciona ambos campos para iniciar sesión",
             });
         }
 
-        // Llamar al servicio para verificar el email y la contraseña
-        const user = await verifyEmail({ email, password });
+        let user;
+
+        // Si es modo demo, obtener el usuario ficticio según el rol
+        if (demo) {
+            if (!rol) {
+                return res.status(400).json({
+                    error: "El rol es requerido en modo demo",
+                    detalle: "Por favor, proporciona el rol (admin, profesor, estudiante)",
+                });
+            }
+
+            const demoUsers = {
+                admin: { email: "juan.demo@prae.com", password: "demo" },
+                profesor: { email: "carlos.demo@prae.com", password: "demo" },
+                estudiante: { email: "ana.demo@prae.com", password: "demo" },
+            };
+
+            const demoUser = demoUsers[rol.toLowerCase()];
+            if (!demoUser) {
+                return res.status(400).json({
+                    error: "Rol inválido",
+                    detalle: "El rol debe ser uno de los siguientes: admin, profesor, estudiante",
+                });
+            }
+
+            user = await verifyEmail(demoUser);
+        } else {
+            // Llamar al servicio para verificar el email y la contraseña
+            user = await verifyEmail({ email, password });
+        }
 
         // Crear el payload para el token
         const payload = {
@@ -25,6 +53,7 @@ const VerifyLogin = async (req, res) => {
             rol: user.rol,
             nombre: user.nombre,
             apellido: user.apellido,
+            demo: !!demo, // Indicar si es modo demo
             institucion: {
                 id_institucion: user.id_institucion,
                 nombre: user.nombre_institucion,

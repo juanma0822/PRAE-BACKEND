@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { getUser } = require('../controllers/register.controller');
 const { recoverPassword, validateResetToken, VerifyLogin, sendMessage, getChatHistory, generatePdf,NotesBySubject } = require("../controllers/rutascontroller");
 
 /**
@@ -17,29 +16,6 @@ router.get('/', (req, res) => {
     res.send('API is working!');
 });
 
-/**
- * @swagger
- * /test/addRegister:
- *   post:
- *     summary: Registra un nuevo usuario
- *     tags: [PRUEBAS]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *              
- *               username:
- *                 type: string
- *               email:
- *                 type: string
- *     responses:
- *       200:
- *         description: Usuario registrado correctamente.
- */
-router.post('/addRegister', getUser);
 
 /**
  * @swagger
