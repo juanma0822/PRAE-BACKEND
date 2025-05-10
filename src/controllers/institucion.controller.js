@@ -1,5 +1,6 @@
 const institucionService = require("../services/institucion.service");
 const usuarioService = require("../services/usuario.service");
+const periodoAcademicoService = require('../services/periodoAcademico.service');
 const {
   uploadImageToFirebase,
   deleteImageFromFirebase,
@@ -32,6 +33,7 @@ const createInstitucion = async (req, res) => {
       );
     }
 
+    // Crear la institución
     const nuevaInstitucion = await institucionService.createInstitucion(
       nombre,
       telefono,
@@ -46,7 +48,51 @@ const createInstitucion = async (req, res) => {
       color_pildora2,
       color_pildora3
     );
-    res.status(201).json(nuevaInstitucion);
+
+    // Crear automáticamente 4 periodos académicos para la institución
+    const añoActual = new Date().getFullYear();
+    const periodos = [
+      {
+        nombre: "Primer Periodo",
+        fecha_inicio: `${añoActual}-01-01`,
+        fecha_fin: `${añoActual}-03-31`,
+        peso: 25,
+      },
+      {
+        nombre: "Segundo Periodo",
+        fecha_inicio: `${añoActual}-04-01`,
+        fecha_fin: `${añoActual}-06-30`,
+        peso: 25,
+      },
+      {
+        nombre: "Tercer Periodo",
+        fecha_inicio: `${añoActual}-07-01`,
+        fecha_fin: `${añoActual}-09-30`,
+        peso: 25,
+      },
+      {
+        nombre: "Cuarto Periodo",
+        fecha_inicio: `${añoActual}-10-01`,
+        fecha_fin: `${añoActual}-12-31`,
+        peso: 25,
+      },
+    ];
+
+    for (const periodo of periodos) {
+      await periodoAcademicoService.createPeriodoAcademico(
+        periodo.nombre,
+        añoActual,
+        periodo.fecha_inicio,
+        periodo.fecha_fin,
+        periodo.peso,
+        nuevaInstitucion.id_institucion
+      );
+    }
+
+    res.status(201).json({
+      message: "Institución creada exitosamente con 4 periodos académicos por defecto",
+      institucion: nuevaInstitucion,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

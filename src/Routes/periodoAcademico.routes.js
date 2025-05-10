@@ -123,6 +123,8 @@ router.patch('/:id/estado', verifyToken, activatePeriodoAcademico);
  *   post:
  *     summary: Crear un nuevo periodo académico
  *     tags: [Periodos Académicos - POST]
+ *     security:
+ *       - JWT: [] # Indica que requiere autenticación con token
  *     requestBody:
  *       required: true
  *       content:
@@ -132,21 +134,29 @@ router.patch('/:id/estado', verifyToken, activatePeriodoAcademico);
  *             properties:
  *               nombre:
  *                 type: string
- *               anio:
- *                 type: integer
+ *                 description: Nombre del periodo académico
  *               fecha_inicio:
  *                 type: string
  *                 format: date
+ *                 description: Fecha de inicio del periodo académico
  *               fecha_fin:
  *                 type: string
  *                 format: date
+ *                 description: Fecha de fin del periodo académico
  *               peso:
  *                 type: number
- *               id_institucion:
- *                 type: integer
+ *                 description: Peso del periodo académico
  *     responses:
  *       201:
  *         description: Periodo académico creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PeriodoAcademico'
+ *       401:
+ *         description: Acceso denegado, token no proporcionado
+ *       403:
+ *         description: Token inválido o expirado
  */
 router.post('/', verifyToken, createPeriodoAcademico);
 

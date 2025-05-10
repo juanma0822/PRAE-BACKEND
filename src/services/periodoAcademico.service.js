@@ -1,8 +1,35 @@
 const periodoAcademicoModel = require('../models/periodoAcademico.model');
 
-// Crear un nuevo periodo académico
+// Crear un nuevo periodo académico con validaciones
 const createPeriodoAcademico = async (nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
   try {
+    const añoActual = new Date().getFullYear();
+
+    // Validar que el año no sea pasado
+    if (anio < añoActual) {
+      throw new Error('El año del periodo académico no puede ser menor al año actual');
+    }
+
+    // Validar que las fechas no se superpongan con otros periodos
+    const periodosExistentes = await periodoAcademicoModel.getPeriodosAcademicosByInstitucion(id_institucion);
+    for (const periodo of periodosExistentes) {
+      const inicioExistente = new Date(periodo.fecha_inicio);
+      const finExistente = new Date(periodo.fecha_fin);
+      const nuevoInicio = new Date(fecha_inicio);
+      const nuevoFin = new Date(fecha_fin);
+
+      if (
+        (nuevoInicio >= inicioExistente && nuevoInicio <= finExistente) || // Nuevo inicio dentro de un periodo existente
+        (nuevoFin >= inicioExistente && nuevoFin <= finExistente) || // Nuevo fin dentro de un periodo existente
+        (nuevoInicio <= inicioExistente && nuevoFin >= finExistente) // Nuevo periodo abarca un periodo existente
+      ) {
+        throw new Error(
+          `El nuevo periodo académico se superpone con el periodo existente: ${periodo.nombre} (${periodo.fecha_inicio} - ${periodo.fecha_fin})`
+        );
+      }
+    }
+
+    // Crear el nuevo periodo académico
     const nuevoPeriodo = await periodoAcademicoModel.createPeriodoAcademico(
       nombre,
       anio,
@@ -11,6 +38,7 @@ const createPeriodoAcademico = async (nombre, anio, fecha_inicio, fecha_fin, pes
       peso,
       id_institucion
     );
+
     return nuevoPeriodo;
   } catch (error) {
     throw new Error(`Error al crear el periodo académico: ${error.message}`);

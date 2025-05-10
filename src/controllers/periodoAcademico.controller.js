@@ -4,7 +4,10 @@ const periodoAcademicoService = require('../services/periodoAcademico.service');
 const createPeriodoAcademico = async (req, res) => {
   try {
     const { id_institucion } = req.user; // Obtener id_institucion del token
-    const { nombre, anio, fecha_inicio, fecha_fin, peso } = req.body; // Datos del cuerpo de la solicitud
+    const { nombre, fecha_inicio, fecha_fin, peso } = req.body; // Datos del cuerpo de la solicitud
+
+    const anio = new Date().getFullYear(); // Obtener el año actual
+
     const nuevoPeriodoAcademico = await periodoAcademicoService.createPeriodoAcademico(
       nombre,
       anio,
@@ -13,6 +16,7 @@ const createPeriodoAcademico = async (req, res) => {
       peso,
       id_institucion
     );
+
     res.status(201).json(nuevoPeriodoAcademico);
   } catch (error) {
     res.status(500).json({ message: error.message });
