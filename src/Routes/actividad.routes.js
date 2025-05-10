@@ -54,7 +54,7 @@ router.post('/crear', verifyToken, actividadController.crearActividad);
  *       200:
  *         description: Lista de actividades obtenida correctamente
  */
-router.get('/materia/:id_materia', actividadController.obtenerActividadesPorMateria);
+router.get('/materia/:id_materia', verifyToken, actividadController.obtenerActividadesPorMateria);
 
 /**
  * @swagger
@@ -91,7 +91,7 @@ router.get('/materia/:id_materia', actividadController.obtenerActividadesPorMate
  *       200:
  *         description: Lista de actividades obtenida correctamente
  */
-router.get('/institucion/:id_institucion/docente/:id_docente/materia/:id_materia/curso/:id_curso', actividadController.obtenerActividadesPorMateriaDocenteInstitucion);
+router.get('/institucion/:id_institucion/docente/:id_docente/materia/:id_materia/curso/:id_curso', verifyToken, actividadController.obtenerActividadesPorMateriaDocenteInstitucion);
 
 /**
  * @swagger
@@ -126,7 +126,7 @@ router.get('/institucion/:id_institucion/docente/:id_docente/materia/:id_materia
  *       200:
  *         description: Actividad actualizada correctamente
  */
-router.put('/actualizar/:id_actividad', actividadController.actualizarActividad);
+router.put('/actualizar/:id_actividad', verifyToken, actividadController.actualizarActividad);
 
 /**
  * @swagger
@@ -145,6 +145,6 @@ router.put('/actualizar/:id_actividad', actividadController.actualizarActividad)
  *       200:
  *         description: Actividad eliminada correctamente
  */
-router.delete('/eliminar/:id_actividad', actividadController.eliminarActividad);
+router.delete('/eliminar/:id_actividad', verifyToken, actividadController.eliminarActividad);
 
 module.exports = router;

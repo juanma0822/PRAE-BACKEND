@@ -62,7 +62,7 @@ router.get('/', getAllDictar);
  *       200:
  *         description: Lista de materias obtenida correctamente
  */
-router.get('/profesor/:documento_profe/materias', getMateriasPorProfesor);
+router.get('/profesor/:documento_profe/materias', verifyToken, getMateriasPorProfesor);
 
 /**
  * @swagger
@@ -104,7 +104,7 @@ router.get('/materia/:id_materia/profesores', verifyToken, getProfesoresPorMater
  *       200:
  *         description: Relación Dictar eliminada correctamente
  */
-router.delete('/', deleteDictar);
+router.delete('/', verifyToken, deleteDictar);
 
 /**
  * @swagger

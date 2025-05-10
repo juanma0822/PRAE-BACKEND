@@ -10,6 +10,7 @@ const {
   deleteHistorialGrado,
 } = require('../controllers/historialGrado.controller');
 
+
 /**
  * @swagger
  * /historialGrado:

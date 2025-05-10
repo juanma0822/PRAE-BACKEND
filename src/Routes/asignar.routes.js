@@ -101,7 +101,7 @@ router.get('/curso/:id_curso', verifyToken, obtenerMateriasPorCurso);
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/eliminarAsignacion/:id_asignacion', eliminarAsignacion);
+router.delete('/eliminarAsignacion/:id_asignacion', verifyToken, eliminarAsignacion);
 
 /**
  * @swagger
@@ -124,7 +124,7 @@ router.delete('/eliminarAsignacion/:id_asignacion', eliminarAsignacion);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/institucion/:id_institucion', obtenerAsignacionesPorInstitucion);
+router.get('/institucion/:id_institucion', verifyToken, obtenerAsignacionesPorInstitucion);
 
 /**
  * @swagger

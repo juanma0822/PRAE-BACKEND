@@ -9,6 +9,7 @@ const {
   getComentariosPorProfesorYEstudiante,
   updateComentario,
 } = require('../controllers/comentario.controller');
+const verifyToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -33,7 +34,7 @@ const {
  *       201:
  *         description: Comentario creado exitosamente
  */
-router.post('/', createComentario);
+router.post('/', verifyToken, createComentario);
 
 /**
  * @swagger
@@ -45,7 +46,7 @@ router.post('/', createComentario);
  *       200:
  *         description: Lista de comentarios obtenida correctamente
  */
-router.get('/', getAllComentarios);
+router.get('/', verifyToken, getAllComentarios);
 
 /**
  * @swagger
@@ -64,7 +65,7 @@ router.get('/', getAllComentarios);
  *       200:
  *         description: Comentario eliminado correctamente
  */
-router.delete('/:id', deleteComentario);
+router.delete('/:id', verifyToken, deleteComentario);
 
 /**
  * @swagger
@@ -83,7 +84,7 @@ router.delete('/:id', deleteComentario);
  *       200:
  *         description: Lista de comentarios obtenida correctamente
  */
-router.get('/profesor/:documento_profe', getComentariosPorProfesor);
+router.get('/profesor/:documento_profe', verifyToken,getComentariosPorProfesor);
 
 /**
  * @swagger
@@ -102,7 +103,7 @@ router.get('/profesor/:documento_profe', getComentariosPorProfesor);
  *       200:
  *         description: Lista de comentarios obtenida correctamente
  */
-router.get('/estudiante/:documento_estudiante', getComentariosPorEstudiante);
+router.get('/estudiante/:documento_estudiante', verifyToken, getComentariosPorEstudiante);
 
 /**
  * @swagger
@@ -127,7 +128,7 @@ router.get('/estudiante/:documento_estudiante', getComentariosPorEstudiante);
  *       200:
  *         description: Lista de comentarios obtenida correctamente
  */
-router.get('/profesor/:documento_profe/estudiante/:documento_estudiante', getComentariosPorProfesorYEstudiante);
+router.get('/profesor/:documento_profe/estudiante/:documento_estudiante', verifyToken, getComentariosPorProfesorYEstudiante);
 
 /**
  * @swagger
@@ -155,6 +156,6 @@ router.get('/profesor/:documento_profe/estudiante/:documento_estudiante', getCom
  *       200:
  *         description: Comentario actualizado exitosamente
  */
-router.put('/:id', updateComentario);
+router.put('/:id', verifyToken, updateComentario);
 
 module.exports = router;

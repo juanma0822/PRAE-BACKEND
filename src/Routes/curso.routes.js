@@ -42,7 +42,7 @@ router.get('/', getCursos);
  *       200:
  *         description: Curso obtenido correctamente
  */
-router.get('/:id', getCursoById);
+router.get('/:id', verifyToken, getCursoById);
 
 /**
  * @swagger
@@ -152,7 +152,7 @@ router.put('/:id/activate', verifyToken, activateCurso);
  *       200:
  *         description: ID del curso obtenido correctamente
  */
-router.get('/getId/:nombre', getIdByName);
+router.get('/getId/:nombre', verifyToken, getIdByName);
 
 /**
  * @swagger

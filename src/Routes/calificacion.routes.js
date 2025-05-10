@@ -20,6 +20,7 @@ router.put("/actualizar/:id_calificacion", verifyToken, actualizarCalificacion);
 // Obtener todas las calificaciones de un estudiante en una materia
 router.get(
   "/materia/:id_materia/estudiante/:id_estudiante",
+  verifyToken,
   obtenerCalificacionesEstudiante
 );
 
@@ -108,12 +109,14 @@ router.get(
 // Obtener el promedio de un estudiante en una materia específica impartida por un docente
 router.get(
   "/promedio/materia/:id_materia/estudiante/:id_estudiante/docente/:id_docente",
+  verifyToken,
   obtenerPromedioEstudiante
 );
 
 // Obtener el promedio de todos los estudiantes de un curso en una materia
 router.get(
   "/promedio/materia/:id_materia/curso/:id_curso",
+  verifyToken,
   obtenerPromedioCurso
 );
 

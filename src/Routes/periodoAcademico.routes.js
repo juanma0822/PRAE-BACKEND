@@ -160,7 +160,7 @@ router.post('/', verifyToken, createPeriodoAcademico);
  *       200:
  *         description: Lista de periodos académicos obtenida correctamente
  */
-router.get('/', getAllPeriodosAcademicos);
+router.get('/', verifyToken, getAllPeriodosAcademicos);
 
 /**
  * @swagger
@@ -179,7 +179,7 @@ router.get('/', getAllPeriodosAcademicos);
  *       200:
  *         description: Periodo académico obtenido correctamente
  */
-router.get('/:id_periodo', getPeriodoAcademicoById);
+router.get('/:id_periodo', verifyToken, getPeriodoAcademicoById);
 
 /**
  * @swagger
@@ -198,7 +198,7 @@ router.get('/:id_periodo', getPeriodoAcademicoById);
  *       200:
  *         description: Lista de periodos académicos obtenida correctamente
  */
-router.get('/institucion/:id_institucion', getPeriodosAcademicosByInstitucion);
+router.get('/institucion/:id_institucion', verifyToken, getPeriodosAcademicosByInstitucion);
 
 /**
  * @swagger
@@ -221,7 +221,7 @@ router.get('/institucion/:id_institucion', getPeriodosAcademicosByInstitucion);
  *       200:
  *         description: Lista de periodos académicos obtenida correctamente
  */
-router.get('/year-institucion', getPeriodosAcademicosByAnioEInstitucion);
+router.get('/year-institucion', verifyToken, getPeriodosAcademicosByAnioEInstitucion);
 
 /**
  * @swagger
@@ -261,7 +261,7 @@ router.get('/year-institucion', getPeriodosAcademicosByAnioEInstitucion);
  *       200:
  *         description: Periodo académico actualizado correctamente
  */
-router.put('/:id_periodo', updatePeriodoAcademico);
+router.put('/:id_periodo', verifyToken, updatePeriodoAcademico);
 
 /**
  * @swagger
@@ -280,6 +280,6 @@ router.put('/:id_periodo', updatePeriodoAcademico);
  *       200:
  *         description: Periodo académico desactivado correctamente
  */
-router.delete('/:id_periodo', deletePeriodoAcademico);
+router.delete('/:id_periodo', verifyToken, deletePeriodoAcademico);
 
 module.exports = router;

@@ -5,6 +5,7 @@ const {
   getEstadisticasProfesor,
   getEstadisticasEstudiante,
 } = require('../controllers/estadisticas.controller');
+const verifyToken = require("../middleware/auth.middleware");
 
 /**
  * @swagger
@@ -25,7 +26,7 @@ const {
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/admin/:id_institucion', getEstadisticasAdmin);
+router.get('/admin/:id_institucion', verifyToken, getEstadisticasAdmin);
 
 /**
  * @swagger
@@ -46,7 +47,7 @@ router.get('/admin/:id_institucion', getEstadisticasAdmin);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/profesor/:documento_profe', getEstadisticasProfesor);
+router.get('/profesor/:documento_profe', verifyToken, getEstadisticasProfesor);
 
 /**
  * @swagger
@@ -67,6 +68,6 @@ router.get('/profesor/:documento_profe', getEstadisticasProfesor);
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/estudiante/:documento_estudiante', getEstadisticasEstudiante);
+router.get('/estudiante/:documento_estudiante', verifyToken, getEstadisticasEstudiante);
 
 module.exports = router;
