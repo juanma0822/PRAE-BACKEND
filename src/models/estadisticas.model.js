@@ -57,6 +57,39 @@ const getEstadisticasAdmin = async (id_institucion) => {
       id_institucion,
     ]);
 
+    // Promedio de notas por materia
+    const promedioNotasPorMateriaQuery = `
+      SELECT c.nombre AS curso, m.nombre AS materia, ROUND(AVG(cal.nota), 2) AS promedio_materia
+      FROM Calificacion cal
+      JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+      JOIN Curso c ON e.id_curso = c.id_curso
+      JOIN Actividades a ON cal.id_actividad = a.id_actividad
+      JOIN Materia m ON a.id_materia = m.id_materia
+      WHERE c.id_institucion = $1
+        AND cal.activo = TRUE
+      GROUP BY c.id_curso, m.id_materia, c.nombre, m.nombre;
+    `;
+
+    const promedioNotasPorMateria = await consultarDB(
+      promedioNotasPorMateriaQuery,
+      [id_institucion]
+    );
+
+    // Ajustar el formato de promedio_notas_por_materia
+    const promedioNotasPorMateriaAjustado = promedioNotasPorMateria.reduce(
+      (acc, item) => {
+        const { curso, materia, promedio_materia } = item;
+
+        if (!acc[curso]) {
+          acc[curso] = {};
+        }
+
+        acc[curso][materia] = promedio_materia;
+        return acc;
+      },
+      {}
+    );
+
     // Promedio de notas por grado (filtrando por periodo activo)
     const promedioNotasPorGradoQuery = `
       SELECT c.nombre AS curso, ROUND(AVG(cal.nota), 2) AS promedio
@@ -133,6 +166,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
         acc[item.curso] = item.estudiantes;
         return acc;
       }, {}),
+      promedio_notas_por_materia: promedioNotasPorMateriaAjustado,
       promedio_notas_por_grado: promedioNotasPorGradoAjustado,
       promedio_notas_por_grado_acumulado: promedioNotasPorGradoAcumuladoAjustado,
     };
