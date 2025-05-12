@@ -1,4 +1,4 @@
-const { consultarDB } = require('../db');
+const { consultarDB } = require("../db");
 
 // === ESTADÍSTICAS PARA ADMIN (POR INSTITUCIÓN) ===
 const getEstadisticasAdmin = async (id_institucion) => {
@@ -53,7 +53,9 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso;
     `;
 
-    const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [id_institucion]);
+    const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [
+      id_institucion,
+    ]);
 
     // Promedio de notas por grado
     const promedioNotasPorGradoQuery = `
@@ -66,7 +68,10 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso;
     `;
 
-    const promedioNotasPorGrado = await consultarDB(promedioNotasPorGradoQuery, [id_institucion]);
+    const promedioNotasPorGrado = await consultarDB(
+      promedioNotasPorGradoQuery,
+      [id_institucion]
+    );
 
     // Promedio de notas por materia
     const promedioNotasPorMateriaQuery = `
@@ -81,7 +86,24 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso, m.id_materia;
     `;
 
-    const promedioNotasPorMateria = await consultarDB(promedioNotasPorMateriaQuery, [id_institucion]);
+    const promedioNotasPorMateria = await consultarDB(
+      promedioNotasPorMateriaQuery,
+      [id_institucion]
+    );
+    // Ajustar el formato de promedio_notas_por_materia
+    const promedioNotasPorMateriaAjustado = promedioNotasPorMateria.reduce(
+      (acc, item) => {
+        const { curso, materia, promedio_materia } = item;
+
+        if (!acc[curso]) {
+          acc[curso] = {};
+        }
+
+        acc[curso][materia] = promedio_materia;
+        return acc;
+      },
+      {}
+    );
 
     return {
       usuarios,
@@ -96,13 +118,12 @@ const getEstadisticasAdmin = async (id_institucion) => {
         acc[item.curso] = item.promedio;
         return acc;
       }, {}),
-      promedio_notas_por_materia: promedioNotasPorMateria.reduce((acc, item) => {
-        acc[`${item.curso}_${item.materia}`] = item.promedio_materia;
-        return acc;
-      }, {}),
+      promedio_notas_por_materia: promedioNotasPorMateriaAjustado,
     };
   } catch (error) {
-    throw new Error(`Error al obtener estadísticas del admin: ${error.message}`);
+    throw new Error(
+      `Error al obtener estadísticas del admin: ${error.message}`
+    );
   }
 };
 
@@ -172,45 +193,66 @@ const getEstadisticasProfesor = async (documento_profe) => {
     // Ejecutar las consultas
     const [resumen] = await consultarDB(queryResumen, [documento_profe]);
     const detalle = await consultarDB(queryDetallePromedios, [documento_profe]);
-    const promediosGenerales = await consultarDB(queryPromedioCursoGeneral, [documento_profe]);
+    const promediosGenerales = await consultarDB(queryPromedioCursoGeneral, [
+      documento_profe,
+    ]);
 
     // Inicializar objetos para resultados
     const promedio_por_curso = {};
     const acumulado_por_materia = {};
 
     // Agrupar los resultados de calificaciones por curso y materia
-    detalle.forEach(({ curso, materia, estudiante_nombre, estudiante_apellido, promedio }) => {
-      if (!promedio_por_curso[curso]) promedio_por_curso[curso] = {};
-      if (!promedio_por_curso[curso][materia]) promedio_por_curso[curso][materia] = {
-        promedioMateria: 0,
-        estudiantes: {}
-      };
+    detalle.forEach(
+      ({
+        curso,
+        materia,
+        estudiante_nombre,
+        estudiante_apellido,
+        promedio,
+      }) => {
+        if (!promedio_por_curso[curso]) promedio_por_curso[curso] = {};
+        if (!promedio_por_curso[curso][materia])
+          promedio_por_curso[curso][materia] = {
+            promedioMateria: 0,
+            estudiantes: {},
+          };
 
-      promedio_por_curso[curso][materia].estudiantes[`${estudiante_nombre} ${estudiante_apellido}`] = Number(promedio);
+        promedio_por_curso[curso][materia].estudiantes[
+          `${estudiante_nombre} ${estudiante_apellido}`
+        ] = Number(promedio);
 
-      const key = `${curso}_${materia}`;
-      if (!acumulado_por_materia[key]) acumulado_por_materia[key] = [];
-      acumulado_por_materia[key].push(Number(promedio));
-    });
+        const key = `${curso}_${materia}`;
+        if (!acumulado_por_materia[key]) acumulado_por_materia[key] = [];
+        acumulado_por_materia[key].push(Number(promedio));
+      }
+    );
 
     // Calcular promedio por materia
     for (const key in acumulado_por_materia) {
-      const [curso, materia] = key.split('_');
+      const [curso, materia] = key.split("_");
       const valores = acumulado_por_materia[key];
-      const promedioMateria = parseFloat((valores.reduce((acc, v) => acc + v, 0) / valores.length).toFixed(2));
+      const promedioMateria = parseFloat(
+        (valores.reduce((acc, v) => acc + v, 0) / valores.length).toFixed(2)
+      );
       promedio_por_curso[curso][materia].promedioMateria = promedioMateria;
 
       // Acumular los promedios de las materias para calcular el promedio del curso
-      if (!promedio_por_curso[curso].materias) promedio_por_curso[curso].materias = [];
+      if (!promedio_por_curso[curso].materias)
+        promedio_por_curso[curso].materias = [];
       promedio_por_curso[curso].materias.push(promedioMateria);
     }
 
     // Calcular promedio general por curso
     for (const curso in promedio_por_curso) {
       const materias = promedio_por_curso[curso].materias || [];
-      const promedioCurso = materias.length > 0
-        ? parseFloat((materias.reduce((acc, v) => acc + v, 0) / materias.length).toFixed(2))
-        : 0;
+      const promedioCurso =
+        materias.length > 0
+          ? parseFloat(
+              (
+                materias.reduce((acc, v) => acc + v, 0) / materias.length
+              ).toFixed(2)
+            )
+          : 0;
       promedio_por_curso[curso].promedioCurso = promedioCurso;
       delete promedio_por_curso[curso].materias; // Eliminar el campo temporal
     }
@@ -218,14 +260,14 @@ const getEstadisticasProfesor = async (documento_profe) => {
     // Retornar los resultados
     return {
       ...resumen,
-      promedio_por_curso
+      promedio_por_curso,
     };
   } catch (error) {
-    throw new Error(`Error al obtener estadísticas del docente: ${error.message}`);
+    throw new Error(
+      `Error al obtener estadísticas del docente: ${error.message}`
+    );
   }
 };
-
-
 
 // === ESTADÍSTICAS PARA ESTUDIANTE (POR DOCUMENTO) ===
 const getEstadisticasEstudiante = async (documento_estudiante) => {
@@ -308,13 +350,14 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
     const result = await consultarDB(query, [documento_estudiante]);
     return result[0];
   } catch (error) {
-    throw new Error(`Error al obtener estadísticas del estudiante: ${error.message}`);
+    throw new Error(
+      `Error al obtener estadísticas del estudiante: ${error.message}`
+    );
   }
 };
-
 
 module.exports = {
   getEstadisticasAdmin,
   getEstadisticasProfesor,
-  getEstadisticasEstudiante
+  getEstadisticasEstudiante,
 };
