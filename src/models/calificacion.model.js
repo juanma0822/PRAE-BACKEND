@@ -35,32 +35,60 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
   id_docente,
   id_institucion
 ) => {
-  const query = `
-    SELECT 
-      a.id_actividad,
-      a.nombre AS actividad,
-      a.peso,
-      c.nota,
-      c.id_calificacion
-    FROM Actividades a
-    JOIN Calificacion c 
-      ON a.id_actividad = c.id_actividad 
-    JOIN Materia m 
-      ON a.id_materia = m.id_materia
-    WHERE a.id_materia = $1 
-      AND a.id_docente = $3 
-      AND m.id_institucion = $4
-      AND a.activo = TRUE
-      AND c.activo = TRUE
-      AND c.id_estudiante = $2
-    ORDER BY a.nombre ASC;
+  // Primero obtenemos los periodos de la institución
+  const periodosQuery = `
+    SELECT id_periodo, nombre, estado
+    FROM PeriodoAcademico
+    WHERE id_institucion = $1;
   `;
-  return consultarDB(query, [
-    id_materia,
-    id_estudiante,
-    id_docente,
-    id_institucion,
-  ]);
+
+  const periodos = await consultarDB(periodosQuery, [id_institucion]);
+
+  const resultByPeriod = {};
+
+  // Iteramos sobre los periodos
+  for (const periodo of periodos) {
+    const queryWithActivities = `
+      SELECT 
+        a.id_actividad,
+        a.nombre AS actividad,
+        a.peso,
+        c.nota,
+        c.id_calificacion
+      FROM Actividades a
+      LEFT JOIN Calificacion c 
+        ON a.id_actividad = c.id_actividad 
+        AND c.id_estudiante = $2
+        AND c.activo = TRUE
+      WHERE a.id_materia = $1 
+        AND a.id_docente = $3 
+        AND a.id_periodo = $4
+        AND a.activo = TRUE
+      ORDER BY a.nombre ASC;
+    `;
+
+    const result = await consultarDB(queryWithActivities, [
+      id_materia,
+      id_estudiante,
+      id_docente,
+      periodo.id_periodo,
+    ]);
+
+    // Agrupamos los resultados por periodo
+    resultByPeriod[periodo.id_periodo] = {
+      estado: periodo.estado,
+      nombre: periodo.nombre,
+      actividades: result.map((row) => ({
+        id_actividad: row.id_actividad,
+        actividad: row.actividad,
+        peso: row.peso,
+        nota: row.nota,
+        id_calificacion: row.id_calificacion,
+      })),
+    };
+  }
+
+  return resultByPeriod;
 };
 
 
