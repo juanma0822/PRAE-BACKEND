@@ -108,7 +108,17 @@ const getEstadisticasAdmin = async (id_institucion) => {
       [id_institucion]
     );
 
-     // Promedio de notas por grado acumulado (ponderado por el peso de los periodos)
+    // Ajustar el formato de promedio_notas_por_grado
+    const promedioNotasPorGradoAjustado = promedioNotasPorGrado.reduce(
+      (acc, item) => {
+        const { curso, promedio } = item;
+        acc[curso] = promedio;
+        return acc;
+      },
+      {}
+    );
+
+    // Promedio de notas por grado acumulado (ponderado por el peso de los periodos)
     const promedioNotasPorGradoAcumuladoQuery = `
       SELECT 
         c.nombre AS curso, 
@@ -131,18 +141,8 @@ const getEstadisticasAdmin = async (id_institucion) => {
     );
 
     // Ajustar el formato de promedio_notas_por_grado
-    const promedioNotasPorGradoAjustado = promedioNotasPorGrado.reduce(
-      (acc, item) => {
-        const { curso, promedio } = item;
-        acc[curso] = promedio;
-        return acc;
-      },
-      {}
-    );
-
-    // Ajustar el formato de promedio_notas_por_grado_acumulado
-    const promedioNotasPorGradoAcumuladoAjustado = promedioNotasPorGradoAcumulado.reduce(
-      (acc, item) => {
+    const promedioNotasPorGradoAcumuladoAjustado =
+      promedioNotasPorGradoAcumulado.reduce((acc, item) => {
         const { curso, periodo, peso_periodo, promedio_periodo } = item;
 
         if (!acc[curso]) {
@@ -150,12 +150,68 @@ const getEstadisticasAdmin = async (id_institucion) => {
         }
 
         // Multiplicar el promedio del periodo por el peso del periodo
-        acc[curso][periodo] = (promedio_periodo * (peso_periodo / 100)).toFixed(2);
+        acc[curso][periodo] = (promedio_periodo * (peso_periodo / 100)).toFixed(
+          2
+        );
 
         return acc;
-      },
-      {}
-    );
+      }, {});
+
+    // Consulta para obtener los periodos académicos de la institución
+    const periodosQuery = `
+      SELECT nombre
+      FROM PeriodoAcademico
+      WHERE id_institucion = $1;
+    `;
+
+    const periodos = await consultarDB(periodosQuery, [id_institucion]);
+
+    // Asegurar que todos los periodos estén presentes y calcular el total
+    for (const curso in promedioNotasPorGradoAcumuladoAjustado) {
+      let total = 0;
+
+      periodos.forEach((periodo) => {
+        const { nombre: periodoNombre } = periodo;
+
+        // Si el periodo no tiene un valor, asignar 0
+        if (!promedioNotasPorGradoAcumuladoAjustado[curso][periodoNombre]) {
+          promedioNotasPorGradoAcumuladoAjustado[curso][periodoNombre] = "0.00";
+        }
+
+        // Sumar los valores al total
+        total += parseFloat(
+          promedioNotasPorGradoAcumuladoAjustado[curso][periodoNombre]
+        );
+      });
+
+      // Agregar el total al curso
+      promedioNotasPorGradoAcumuladoAjustado[curso].total = total.toFixed(2);
+    }
+
+    // Asegurar que los cursos sin datos también tengan periodos con 0
+    const cursosConDatos = Object.keys(promedioNotasPorGradoAcumuladoAjustado);
+    const cursosQuery = `
+      SELECT nombre AS curso
+      FROM Curso
+      WHERE id_institucion = $1;
+    `;
+    const cursosSinDatos = await consultarDB(cursosQuery, [id_institucion]);
+
+    cursosSinDatos.forEach((curso) => {
+      if (!cursosConDatos.includes(curso.curso)) {
+        promedioNotasPorGradoAcumuladoAjustado[curso.curso] = {};
+
+        let total = 0;
+
+        periodos.forEach((periodo) => {
+          promedioNotasPorGradoAcumuladoAjustado[curso.curso][periodo.nombre] =
+            "0.00";
+        });
+
+        promedioNotasPorGradoAcumuladoAjustado[curso.curso].total =
+          total.toFixed(2);
+      }
+    });
 
     return {
       usuarios,
@@ -168,7 +224,8 @@ const getEstadisticasAdmin = async (id_institucion) => {
       }, {}),
       promedio_notas_por_materia: promedioNotasPorMateriaAjustado,
       promedio_notas_por_grado: promedioNotasPorGradoAjustado,
-      promedio_notas_por_grado_acumulado: promedioNotasPorGradoAcumuladoAjustado,
+      promedio_notas_por_grado_acumulado:
+        promedioNotasPorGradoAcumuladoAjustado,
     };
   } catch (error) {
     throw new Error(
@@ -176,7 +233,6 @@ const getEstadisticasAdmin = async (id_institucion) => {
     );
   }
 };
-
 
 // === ESTADÍSTICAS PARA PROFESOR (POR I.D) ===
 const getEstadisticasProfesor = async (documento_profe) => {

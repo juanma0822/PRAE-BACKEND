@@ -273,46 +273,48 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
 
 
 const selectPromedioCursoMateria = async (id_materia, id_curso) => {
+  // Consulta para obtener los promedios por periodo
   const query = `
-      SELECT 
-        u.nombre,
-        u.apellido,
-        ROUND(SUM(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio
-      FROM Estudiante e
-      JOIN Usuario u ON u.documento_identidad = e.documento_identidad AND u.activo = TRUE
-      JOIN Actividades a ON a.id_materia = $1 AND a.id_curso = $2 AND a.activo = TRUE
-      LEFT JOIN Calificacion c 
-        ON c.id_actividad = a.id_actividad 
-        AND c.id_estudiante = e.documento_identidad 
-        AND c.activo = TRUE
-      WHERE e.id_curso = $2
-      GROUP BY u.nombre, u.apellido;
-    `;
+    SELECT 
+      p.nombre AS periodo,
+      p.peso AS peso_periodo,
+      ROUND(AVG(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio_base
+    FROM Estudiante e
+    JOIN Actividades a ON a.id_materia = $1 AND a.id_curso = $2 AND a.activo = TRUE
+    LEFT JOIN Calificacion c 
+      ON c.id_actividad = a.id_actividad 
+      AND c.id_estudiante = e.documento_identidad 
+      AND c.activo = TRUE
+    JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
+    WHERE e.id_curso = $2
+    GROUP BY p.id_periodo, p.nombre, p.peso;
+  `;
 
   const rows = await consultarDB(query, [id_materia, id_curso]);
 
-  // Calcular promedio general del curso
-  const promedioCurso =
-    rows.length > 0
-      ? parseFloat(
-          (
-            rows.reduce((acc, r) => acc + parseFloat(r.promedio), 0) /
-            rows.length
-          ).toFixed(2)
-        )
-      : 0;
+  // Calcular el promedio ponderado por periodo y el promedio general
+  let promedioGeneral = 0;
 
-  // Construir respuesta como JSON personalizado
-  const resultado = {
-    promedioCurso,
-  };
+  const promediosPorPeriodo = rows.map((row) => {
+    const { periodo, peso_periodo, promedio_base } = row;
+    const pesoDecimal = peso_periodo / 100; // Convertir el peso a decimal
+    const promedioPonderado = parseFloat((promedio_base * pesoDecimal).toFixed(2));
 
-  rows.forEach((row) => {
-    const key = `${row.nombre} ${row.apellido}`;
-    resultado[key] = parseFloat(row.promedio);
+    // Sumar al promedio general
+    promedioGeneral += promedioPonderado;
+
+    return {
+      periodo,
+      promedioBase: parseFloat(promedio_base),
+      promedioPonderado,
+    };
   });
 
-  return resultado;
+  // Construir la respuesta final
+  return {
+    promediosPorPeriodo,
+    promedioGeneral: parseFloat(promedioGeneral.toFixed(2)),
+  };
 };
 
 const getCalificacionById = async (id_calificacion) => {

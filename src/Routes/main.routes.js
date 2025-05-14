@@ -1,18 +1,18 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const path = require('path');
+const path = require("path");
 
 // Servir archivos estáticos desde la carpeta public
-router.use(express.static(path.join(__dirname, '../public')));
+router.use(express.static(path.join(__dirname, "../public")));
 
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
   const hour = new Date().getHours();
   const isDark = hour >= 18 || hour < 6;
 
-  const backgroundColor = isDark ? '#121212' : '#ffffff';
-  const textColor = '#333333';
-  const accentColor = '#157AFE';
-  const highlightColor = '#f1faff';
+  const backgroundColor = isDark ? "#121212" : "#ffffff";
+  const textColor = "#333333";
+  const accentColor = "#157AFE";
+  const highlightColor = "#f1faff";
 
   res.send(`
     <!DOCTYPE html>
@@ -89,6 +89,40 @@ router.get('/', (req, res) => {
         .navbar a:hover {
           color: #ffd700;
         }
+        
+        .buttons-container {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin-top: 20px; /* Espacio entre la navbar y los botones */
+        }
+
+        .btn {
+          text-align: center;
+          padding: 20px 40px;
+          font-size: 18px;
+          font-weight: bold;
+          color: white;
+          text-decoration: none;
+          border-radius: 10px;
+          transition: all 0.3s ease;
+        }
+
+        .btn-visitar-front {
+          background-color: #157AFE; /* El mismo color de la página */
+        }
+
+        .btn-visitar-doc {
+          background-color: #28a745; /* Color verde para el hover */
+        }
+
+        .btn:hover {
+          opacity: 0.8; /* Cambio de opacidad para efecto de hover */
+        }
+
+        .btn-visitar-doc:hover {
+          background-color: #218838; /* Tono verde más oscuro para el hover */
+        }
 
         .section {
           padding: 40px 20px;
@@ -155,6 +189,7 @@ router.get('/', (req, res) => {
         </div>
       </div>
 
+
       <div id="home" class="section">
         <h2>Home</h2>
         <p>
@@ -169,6 +204,11 @@ router.get('/', (req, res) => {
           Además, incorporamos WebSockets para estadísticas en tiempo real, generación de PDFs con Puppeteer,
           y un sistema de correos personalizados para mantener la comunicación entre las partes involucradas.
         </p>
+      </div>
+
+      <div id="buttons" class="buttons-container">
+        <a href="https://praeweb.netlify.app" class="btn btn-visitar-front" target="_blank">Visitar Front</a>
+        <a href="https://prae-backend.vercel.app/api-docs/" class="btn btn-visitar-doc" target="_blank">Visitar Doc</a>
       </div>
 
       <div id="rutas-info" class="section">
