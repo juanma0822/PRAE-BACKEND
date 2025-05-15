@@ -1,4 +1,8 @@
-# PRAE - Backend 📚
+<p align="center">
+  <img src="public/logoPRAE.png" alt="Logo PRAE" width="400" />
+</p>
+
+# PRAE - Backend 
 
 Backend de la aplicación web **PRAE (Plataforma de Registro Académico Estudiantil)**.  
 Este servicio gestiona usuarios, cursos, materias, actividades y calificaciones, permitiendo la autenticación y administración de datos académicos.
