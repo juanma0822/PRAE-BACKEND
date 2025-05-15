@@ -16,7 +16,7 @@ const {
 
 /**
  * @swagger
- * /periodos/activo:
+ * /periodosAcademicos/activo:
  *   get:
  *     summary: Obtener el periodo activo de una institución
  *     tags: [Periodos Académicos - GET]
@@ -63,7 +63,7 @@ router.get('/activo', verifyToken, getPeriodoActivoByInstitucion);
 
 /**
  * @swagger
- * /periodos/{id}/estado:
+ * /periodosAcademicos/{id}/estado:
  *   patch:
  *     summary: Activar un periodo académico y desactivar los demás de la institución
  *     tags: [Periodos Académicos - PATCH]
@@ -119,7 +119,7 @@ router.patch('/:id/estado', verifyToken, activatePeriodoAcademico);
 
 /**
  * @swagger
- * /periodos:
+ * /periodosAcademicos:
  *   post:
  *     summary: Crear un nuevo periodo académico
  *     tags: [Periodos Académicos - POST]
@@ -162,7 +162,7 @@ router.post('/', verifyToken, createPeriodoAcademico);
 
 /**
  * @swagger
- * /periodos:
+ * /periodosAcademicos:
  *   get:
  *     summary: Obtener todos los periodos académicos activos
  *     tags: [Periodos Académicos - GET]
@@ -193,7 +193,7 @@ router.get('/:id_periodo', verifyToken, getPeriodoAcademicoById);
 
 /**
  * @swagger
- * /periodos/institucion/{id_institucion}:
+ * /periodosAcademicos/institucion/{id_institucion}:
  *   get:
  *     summary: Obtener periodos académicos por institución
  *     tags: [Periodos Académicos - GET]
@@ -212,7 +212,7 @@ router.get('/institucion/:id_institucion', verifyToken, getPeriodosAcademicosByI
 
 /**
  * @swagger
- * /periodos/anio-institucion:
+ * /periodosAcademicos/anio-institucion:
  *   post:
  *     summary: Obtener periodos académicos por año e institución
  *     tags: [Periodos Académicos - get]
@@ -235,7 +235,7 @@ router.get('/year-institucion', verifyToken, getPeriodosAcademicosByAnioEInstitu
 
 /**
  * @swagger
- * /periodos/{id_periodo}:
+ * /periodosAcademicos/{id_periodo}:
  *   put:
  *     summary: Actualizar un periodo académico
  *     tags: [Periodos Académicos - PUT]
@@ -275,7 +275,7 @@ router.put('/:id_periodo', verifyToken, updatePeriodoAcademico);
 
 /**
  * @swagger
- * /periodos/{id_periodo}:
+ * /periodosAcademicos/{id_periodo}:
  *   delete:
  *     summary: Desactivar un periodo académico (cambiar estado a false)
  *     tags: [Periodos Académicos - DELETE]
