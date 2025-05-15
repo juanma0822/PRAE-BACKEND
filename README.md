@@ -171,6 +171,74 @@ Para generar un token, se debe iniciar sesión con un usuario válido.
 
 ---
 
+## 🧪 Pruebas de rendimiento con k6
+
+Para garantizar que el backend maneje carga y responda eficientemente, hemos integrado scripts de pruebas de rendimiento usando [k6](https://k6.io/).
+
+### Carpeta de pruebas
+
+Los scripts de carga se encuentran en la carpeta:
+
+```
+
+/test
+
+````
+
+### Uso de variables sensibles
+
+Para no exponer usuarios ni contraseñas en el código, las credenciales se deben pasar mediante variables de entorno:
+
+- Define en consola las variables antes de ejecutar la prueba:
+
+```bash
+# En Linux / macOS
+TEST_USER_EMAIL=tu_email TEST_USER_PASSWORD=tu_password k6 run test/login-loadtest.js
+
+# En Windows CMD
+set TEST_USER_EMAIL=tu_email
+set TEST_USER_PASSWORD=tu_password
+k6 run test/login-loadtest.js
+````
+
+### Ejemplo básico de script (`login-loadtest.js`)
+
+```js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export let options = {
+  vus: 10,            // Usuarios virtuales concurrentes
+  duration: '30s',    // Duración de la prueba
+};
+
+export default function () {
+  const payload = JSON.stringify({
+    email: __ENV.TEST_USER_EMAIL,
+    password: __ENV.TEST_USER_PASSWORD,
+  });
+
+  const headers = { 'Content-Type': 'application/json' };
+
+  const res = http.post('https://prae-backend.vercel.app/auth/Login', payload, { headers });
+
+  console.log(`Status: ${res.status}, body: ${res.body}`);
+
+  check(res, {
+    '✅ Status 200': (r) => r.status === 200,
+    '⚡ Tiempo < 500ms': (r) => r.timings.duration < 500,
+  });
+
+  sleep(1);
+}
+```
+
+### Ejecución
+
+Asegúrate de tener configuradas las variables de entorno con el usuario válido antes de correr la prueba.
+
+---
+
 ## 🧪 Swagger
 
 Puedes acceder a la documentación Swagger de toda la API en:  
