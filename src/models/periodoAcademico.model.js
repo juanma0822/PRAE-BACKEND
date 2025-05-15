@@ -46,30 +46,18 @@ const getPeriodosAcademicosByInstitucion = async (id_institucion) => {
 const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => {
   const query = `
     SELECT * FROM PeriodoAcademico
-    WHERE anio = $1 AND id_institucion = $2;
+    WHERE anio = $1 AND id_institucion = $2
+    ORDER BY fecha_inicio ASC; -- Ordenar por fecha de inicio en orden ascendente
   `;
   const result = await consultarDB(query, [anio, id_institucion]);
 
-  // Formatear las fechas a 'YYYY-MM-DD'
+  // Formatear las fechas a 'YYYY-MM-DD' y convertir el peso a entero
   return result.map((periodo) => ({
     ...periodo,
     fecha_inicio: new Date(periodo.fecha_inicio).toISOString().split('T')[0],
     fecha_fin: new Date(periodo.fecha_fin).toISOString().split('T')[0],
     peso: parseInt(periodo.peso, 10), // Convertir el peso a entero
   }));
-};
-
-// Actualizar un periodo académico
-const updatePeriodoAcademico = async (id_periodo, nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
-  const query = `
-    UPDATE PeriodoAcademico
-    SET nombre = $1, anio = $2, fecha_inicio = $3, fecha_fin = $4, peso = $5, id_institucion = $6
-    WHERE id_periodo = $7 AND estado = TRUE
-    RETURNING *;
-  `;
-  const values = [nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion, id_periodo];
-  const result = await consultarDB(query, values);
-  return result[0];
 };
 
 // Desactivar un periodo académico (cambiar estado a false)
