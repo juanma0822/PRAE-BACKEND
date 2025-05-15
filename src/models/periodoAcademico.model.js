@@ -62,6 +62,19 @@ const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => 
 
 // Actualizar un periodo académico
 const updatePeriodoAcademico = async (id_periodo, nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
+  // Verificar si el periodo está bloqueado
+  const verificarBloqueadoQuery = `
+    SELECT bloqueado 
+    FROM PeriodoAcademico
+    WHERE id_periodo = $1;
+  `;
+  const verificarBloqueadoResult = await consultarDB(verificarBloqueadoQuery, [id_periodo]);
+
+  if (verificarBloqueadoResult[0]?.bloqueado) {
+    throw new Error("Este periodo académico ya fue bloqueado y no puede ser modificado.");
+  }
+
+  // Permitir la actualización si no está bloqueado
   const query = `
     UPDATE PeriodoAcademico
     SET 
@@ -71,12 +84,24 @@ const updatePeriodoAcademico = async (id_periodo, nombre, anio, fecha_inicio, fe
       fecha_fin = $4, 
       peso = $5, 
       id_institucion = $6,
-      bloqueado = TRUE -- Establecer el campo bloqueado como TRUE
+      bloqueado = TRUE -- Bloquear el periodo después de la actualización
     WHERE id_periodo = $7
     RETURNING *;
   `;
   const values = [nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion, id_periodo];
   const result = await consultarDB(query, values);
+
+  // Verificar y actualizar el estado de los periodos del mismo año
+  const actualizarEstadoQuery = `
+    UPDATE PeriodoAcademico
+    SET estado = CASE
+      WHEN CURRENT_DATE BETWEEN fecha_inicio AND fecha_fin THEN TRUE
+      ELSE FALSE
+    END
+    WHERE anio = $1 AND id_institucion = $2;
+  `;
+  await consultarDB(actualizarEstadoQuery, [anio, id_institucion]);
+
   return result[0];
 };
 
