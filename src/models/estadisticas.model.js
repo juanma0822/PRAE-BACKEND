@@ -193,7 +193,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
     const cursosQuery = `
       SELECT nombre AS curso
       FROM Curso
-      WHERE id_institucion = $1;
+      WHERE id_institucion = $1 AND activo= TRUE;
     `;
     const cursosSinDatos = await consultarDB(cursosQuery, [id_institucion]);
 
