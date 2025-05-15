@@ -53,8 +53,7 @@ const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => 
   // Formatear las fechas a 'YYYY-MM-DD'
   return result.map((periodo) => ({
     ...periodo,
-    fecha_inicio: new Date(periodo.fecha_inicio).toISOString().split('T')[0],
-    fecha_fin: new Date(periodo.fecha_fin).toISOString().split('T')[0],
+    peso: parseInt(periodo.peso, 10), // Convertir el peso a entero
   }));
 };
 
