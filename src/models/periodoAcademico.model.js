@@ -60,6 +60,19 @@ const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => 
   }));
 };
 
+// Actualizar un periodo académico
+const updatePeriodoAcademico = async (id_periodo, nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
+  const query = `
+    UPDATE PeriodoAcademico
+    SET nombre = $1, anio = $2, fecha_inicio = $3, fecha_fin = $4, peso = $5, id_institucion = $6
+    WHERE id_periodo = $7 AND estado = TRUE
+    RETURNING *;
+  `;
+  const values = [nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion, id_periodo];
+  const result = await consultarDB(query, values);
+  return result[0];
+};
+
 // Desactivar un periodo académico (cambiar estado a false)
 const deletePeriodoAcademico = async (id_periodo) => {
   const query = `
