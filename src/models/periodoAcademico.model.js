@@ -49,7 +49,13 @@ const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => 
     WHERE anio = $1 AND id_institucion = $2;
   `;
   const result = await consultarDB(query, [anio, id_institucion]);
-  return result;
+
+  // Formatear las fechas a 'YYYY-MM-DD'
+  return result.map((periodo) => ({
+    ...periodo,
+    fecha_inicio: new Date(periodo.fecha_inicio).toISOString().split('T')[0],
+    fecha_fin: new Date(periodo.fecha_fin).toISOString().split('T')[0],
+  }));
 };
 
 // Actualizar un periodo académico
