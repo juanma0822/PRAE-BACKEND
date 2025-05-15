@@ -53,25 +53,25 @@ const createInstitucion = async (req, res) => {
     const añoActual = new Date().getFullYear();
     const periodos = [
       {
-        nombre: "Primer Periodo",
+        nombre: "PRIMER PERIODO",
         fecha_inicio: `${añoActual}-01-01`,
         fecha_fin: `${añoActual}-03-31`,
         peso: 25,
       },
       {
-        nombre: "Segundo Periodo",
+        nombre: "SEGUNDO PERIODO",
         fecha_inicio: `${añoActual}-04-01`,
         fecha_fin: `${añoActual}-06-30`,
         peso: 25,
       },
       {
-        nombre: "Tercer Periodo",
+        nombre: "TERCER PERIODO",
         fecha_inicio: `${añoActual}-07-01`,
         fecha_fin: `${añoActual}-09-30`,
         peso: 25,
       },
       {
-        nombre: "Cuarto Periodo",
+        nombre: "CUARTO PERIODO",
         fecha_inicio: `${añoActual}-10-01`,
         fecha_fin: `${añoActual}-12-31`,
         peso: 25,
