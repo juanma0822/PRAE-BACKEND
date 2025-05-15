@@ -72,7 +72,7 @@ const updatePeriodoAcademico = async (id_periodo, nombre, anio, fecha_inicio, fe
       peso = $5, 
       id_institucion = $6,
       bloqueado = TRUE -- Establecer el campo bloqueado como TRUE
-    WHERE id_periodo = $7 AND estado = TRUE
+    WHERE id_periodo = $7
     RETURNING *;
   `;
   const values = [nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion, id_periodo];
