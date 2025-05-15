@@ -13,8 +13,9 @@ const pool = new Pool({
     require: true,
     rejectUnauthorized: false, // Necesario para Aiven
   },
+  max: 15, // 🔹 Máximo de conexiones en el pool
   idleTimeoutMillis: 15000, // 🔹 Cierra conexiones inactivas después de 15s
-  connectionTimeoutMillis: 5000, // 🔹 Tiempo de espera para nuevas conexiones
+  connectionTimeoutMillis: 10000, // 🔹 Tiempo de espera para nuevas conexiones
 });
 
 pool.on("connect", () => {
@@ -26,13 +27,21 @@ pool.on("remove", () => {
 });
 
 // 🔹 Función para consultar la DB y liberar la conexión
-async function consultarDB(query, params) {
-  const client = await pool.connect();
+async function consultarDB(query, params, retries = 2) {
   try {
-    const resultado = await client.query(query, params);
-    return resultado.rows;
-  } finally {
-    client.release(); // 🔹 Libera la conexión después de la consulta
+    const client = await pool.connect();
+    try {
+      const res = await client.query(query, params);
+      return res.rows;
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    if (retries > 0 && err.code === 'ETIMEDOUT') {
+      await new Promise(r => setTimeout(r, 100 * (3 - retries)));
+      return consultarDB(query, params, retries - 1);
+    }
+    throw err;
   }
 }
 
