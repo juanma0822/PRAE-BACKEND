@@ -181,6 +181,7 @@ CREATE TABLE PeriodoAcademico (
     peso DECIMAL(5,2) CHECK (peso > 0 AND peso <= 100),
     id_institucion INT NOT NULL,
     estado BOOLEAN DEFAULT TRUE,
+    bloqueado BOOLEAN DEFAULT FALSE,
     CONSTRAINT fk_periodo_institucion FOREIGN KEY (id_institucion)
         REFERENCES Institucion(id_institucion)
         ON DELETE CASCADE

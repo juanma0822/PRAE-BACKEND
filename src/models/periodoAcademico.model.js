@@ -64,7 +64,14 @@ const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => 
 const updatePeriodoAcademico = async (id_periodo, nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion) => {
   const query = `
     UPDATE PeriodoAcademico
-    SET nombre = $1, anio = $2, fecha_inicio = $3, fecha_fin = $4, peso = $5, id_institucion = $6
+    SET 
+      nombre = $1, 
+      anio = $2, 
+      fecha_inicio = $3, 
+      fecha_fin = $4, 
+      peso = $5, 
+      id_institucion = $6,
+      bloqueado = TRUE -- Establecer el campo bloqueado como TRUE
     WHERE id_periodo = $7 AND estado = TRUE
     RETURNING *;
   `;

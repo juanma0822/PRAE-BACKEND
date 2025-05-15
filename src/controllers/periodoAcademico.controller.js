@@ -86,8 +86,9 @@ const getPeriodosAcademicosByAnioEInstitucion = async (req, res) => {
 // Actualizar un periodo académico
 const updatePeriodoAcademico = async (req, res) => {
   try {
+    const { id_institucion } = req.user; // Obtener id_institucion del token
     const { id_periodo } = req.params;
-    const { nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion } = req.body;
+    const { nombre, anio, fecha_inicio, fecha_fin, peso} = req.body;
     const periodoAcademicoActualizado = await periodoAcademicoService.updatePeriodoAcademico(id_periodo, nombre, anio, fecha_inicio, fecha_fin, peso, id_institucion);
     res.status(200).json(periodoAcademicoActualizado);
   } catch (error) {
