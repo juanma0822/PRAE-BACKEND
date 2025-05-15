@@ -4,6 +4,7 @@ const verifyToken = require("../middleware/auth.middleware");
 const {
   createPeriodoAcademico,
   getAllPeriodosAcademicos,
+  getPeriodosAcademicosDelAnioActual,
   getPeriodoAcademicoById,
   getPeriodosAcademicosByInstitucion,
   getPeriodosAcademicosByAnioEInstitucion,
