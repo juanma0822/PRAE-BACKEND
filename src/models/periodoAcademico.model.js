@@ -46,7 +46,7 @@ const getPeriodosAcademicosByInstitucion = async (id_institucion) => {
 const getPeriodosAcademicosByAnioEInstitucion = async (anio, id_institucion) => {
   const query = `
     SELECT * FROM PeriodoAcademico
-    WHERE anio = $1 AND id_institucion = $2 AND estado = TRUE;
+    WHERE anio = $1 AND id_institucion = $2;
   `;
   const result = await consultarDB(query, [anio, id_institucion]);
   return result;

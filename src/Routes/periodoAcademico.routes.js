@@ -13,6 +13,17 @@ const {
   activatePeriodoAcademico,
 } = require('../controllers/periodoAcademico.controller');
 
+/**
+ * @swagger
+ * /periodosAcademicos/actual:
+ *   get:
+ *     summary: Obtener los periodos académicos del año actual
+ *     tags: [Periodos Académicos - GET]
+ *     responses:
+ *       200:
+ *         description: Lista de periodos académicos del año actual obtenida correctamente
+ */
+router.get('/actual', verifyToken, getPeriodosAcademicosDelAnioActual);
 
 /**
  * @swagger

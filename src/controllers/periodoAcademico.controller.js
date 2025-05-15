@@ -23,6 +23,23 @@ const createPeriodoAcademico = async (req, res) => {
   }
 };
 
+// Obtener los periodos académicos del año actual
+const getPeriodosAcademicosDelAnioActual = async (req, res) => {
+  try {
+    const anioActual = new Date().getFullYear(); // Obtener el año actual
+    const { id_institucion } = req.user; // Obtener la institución del token
+
+    const periodosAcademicos = await periodoAcademicoService.getPeriodosAcademicosByAnioEInstitucion(
+      anioActual,
+      id_institucion
+    );
+
+    res.status(200).json(periodosAcademicos);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Obtener todos los periodos académicos activos
 const getAllPeriodosAcademicos = async (req, res) => {
   try {
@@ -114,6 +131,7 @@ const activatePeriodoAcademico = async (req, res) => {
 
 module.exports = {
   createPeriodoAcademico,
+  getPeriodosAcademicosDelAnioActual,
   getAllPeriodosAcademicos,
   getPeriodoAcademicoById,
   getPeriodosAcademicosByInstitucion,
