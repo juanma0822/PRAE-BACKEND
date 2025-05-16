@@ -297,17 +297,16 @@ const getUsuariosByRol = async (rol) => {
 // Obtener un profesor por su ID
 const getProfesorById = async (documento_identidad) => {
   const query = `
-    SELECT u.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
+    SELECT u.*, p.area_ensenanza, d.id_materia, m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
-    LEFT JOIN Materia m ON d.id_materia = m.id_materia
+    LEFT JOIN Materia m ON d.id_materia = m.id_materia AND m.activo = TRUE
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE AND d.estado = TRUE;
+    WHERE u.documento_identidad = $1 AND u.rol = 'docente' AND u.activo = TRUE
   `;
   const result = await consultarDB(query, [documento_identidad]);
 
-  // Verificar si se encontraron resultados
   if (result.length === 0) {
     throw new Error(`No se encontró un docente con el documento de identidad ${documento_identidad}`);
   }
@@ -325,9 +324,9 @@ const getProfesorById = async (documento_identidad) => {
     materias: [],
   };
 
-  // Agregar las materias al objeto del profesor
+  // Agregar las materias activas al objeto del profesor
   result.forEach((row) => {
-    if (row.id_materia) {
+    if (row.id_materia && row.materia) {
       profesor.materias.push({
         id_materia: row.id_materia,
         nombre_materia: row.materia,
