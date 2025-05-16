@@ -52,7 +52,7 @@ const adminMiddleware = require('../middleware/admin.middleware');
  *       201:
  *         description: Institución creada exitosamente
  */
-router.post('/', verifyToken, upload.single('logo'), createInstitucion);
+router.post('/', upload.single('logo'), createInstitucion);
 
 /**
  * @swagger
