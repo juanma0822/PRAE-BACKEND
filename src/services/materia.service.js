@@ -89,9 +89,18 @@ const getCantidadMateriasPorEstudiante = async (id_estudiante) => {
     const cantidadMaterias = await materiaModel.getCantidadMateriasPorEstudiante(id_estudiante);
     return cantidadMaterias;
   } catch (error) {
-    throw new Error(`Error al obtener la cantidad de materias: ${error.message}`);
+    throw new Error(error.message);
   }
 };
+
+const getEstudiantesAfectadosPorMateria = async (id_materia) => {
+  try {
+    const estudiantesAfectados = await materiaModel.getEstudiantesAfectadosPorMateria(id_materia);
+    return estudiantesAfectados;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
 
 
 module.exports = {
@@ -104,4 +113,5 @@ module.exports = {
   deleteMateria,
   activateMateria,
   getCantidadMateriasPorEstudiante,
+  getEstudiantesAfectadosPorMateria,
 };

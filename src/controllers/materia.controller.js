@@ -72,8 +72,14 @@ const deleteMateria = async (req, res) => {
     const resultado = await materiaService.deleteMateria(id_materia);
     const id_institucion = resultado.materia.id_institucion;
 
+    const estudiantesAfectados = await materiaService.getEstudiantesAfectadosPorMateria(id_materia);
+    
+        // Emitir estadísticas para cada estudiante afectado
+    for (const id_estudiante of estudiantesAfectados) {
+      await emitirEstadisticasEstudiante(id_estudiante);
+    }
+    
     await emitirEstadisticasInstitucion(id_institucion);
-    await emitirEstadisticasEstudiante(id_estudiante);
 
     // Emitir evento de cambio
     emitirCambioInstitucion(id_institucion);

@@ -114,6 +114,24 @@ const deleteMateria = async (id_materia) => {
       WHERE id_materia = $1;
     `;
     await consultarDB(updateAsignarQuery, [id_materia]);
+
+    // Desactivar actividades asociadas a la materia
+    const updateActividadesQuery = `
+      UPDATE Actividades
+      SET activo = FALSE
+      WHERE id_materia = $1;
+    `;
+    await consultarDB(updateActividadesQuery, [id_materia]);
+
+    // Desactivar calificaciones asociadas a las actividades de la materia
+    const updateCalificacionesQuery = `
+      UPDATE Calificacion
+      SET activo = FALSE
+      WHERE id_actividad IN (
+        SELECT id_actividad FROM Actividades WHERE id_materia = $1
+      );
+    `;
+    await consultarDB(updateCalificacionesQuery, [id_materia]);
   }
 
   return result[0];
@@ -153,6 +171,18 @@ const getCantidadMateriasPorEstudiante = async (id_estudiante) => {
   return result[0]?.cantidad_materias || 0; // Retorna 0 si no hay materias
 };
 
+// Obtener los estudiantes afectados por materia borrada (los que estaban en cursos con esa materia)
+const getEstudiantesAfectadosPorMateria = async (id_materia) => {
+  const query = `
+    SELECT DISTINCT e.documento_identidad
+    FROM Estudiante e
+    JOIN Asignar a ON e.id_curso = a.id_curso
+    WHERE a.id_materia = $1
+  `;
+  const result = await consultarDB(query, [id_materia]);
+  return result.map(e => e.documento_identidad);
+};
+
 
 
 module.exports = {
@@ -164,5 +194,6 @@ module.exports = {
   updateMateria,
   deleteMateria,
   activateMateria,
-  getCantidadMateriasPorEstudiante
+  getCantidadMateriasPorEstudiante,
+  getEstudiantesAfectadosPorMateria,
 };
