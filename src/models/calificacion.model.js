@@ -35,18 +35,23 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
   id_docente,
   id_institucion
 ) => {
-  // Primero obtenemos los periodos de la institución
+  // Obtener los periodos de la institución
   const periodosQuery = `
     SELECT id_periodo, nombre, estado
     FROM PeriodoAcademico
     WHERE id_institucion = $1;
   `;
-
   const periodos = await consultarDB(periodosQuery, [id_institucion]);
+
+  // Obtener el curso del estudiante
+  const cursoQuery = `
+    SELECT id_curso FROM Estudiante WHERE documento_identidad = $1;
+  `;
+  const cursoResult = await consultarDB(cursoQuery, [id_estudiante]);
+  const id_curso = cursoResult[0]?.id_curso;
 
   const resultByPeriod = {};
 
-  // Iteramos sobre los periodos
   for (const periodo of periodos) {
     const queryWithActivities = `
       SELECT 
@@ -61,8 +66,9 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
         AND c.id_estudiante = $2
         AND c.activo = TRUE
       WHERE a.id_materia = $1 
-        AND a.id_docente = $3 
+        AND a.id_docente = $3
         AND a.id_periodo = $4
+        AND a.id_curso = $5
         AND a.activo = TRUE
       ORDER BY a.nombre ASC;
     `;
@@ -72,9 +78,9 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
       id_estudiante,
       id_docente,
       periodo.id_periodo,
+      id_curso, // Ahora sí lo tienes aquí
     ]);
 
-    // Agrupamos los resultados por periodo
     resultByPeriod[periodo.id_periodo] = {
       estado: periodo.estado,
       nombre: periodo.nombre,

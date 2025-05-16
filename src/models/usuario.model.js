@@ -585,16 +585,23 @@ const updateEstudiante = async (
 // Obtener docentes por institución
 const getDocentesPorInstitucion = async (institucion) => {
   const query = `
-    SELECT u.*, p.area_ensenanza, m.id_materia, m.nombre AS materia
+    SELECT 
+      u.*, 
+      p.area_ensenanza, 
+      d.id_materia, 
+      m.nombre AS materia
     FROM Usuario u
     INNER JOIN Profesor p ON u.documento_identidad = p.documento_identidad
     LEFT JOIN Dictar d ON p.documento_identidad = d.documento_profe
-    LEFT JOIN Materia m ON d.id_materia = m.id_materia
+    LEFT JOIN Materia m ON d.id_materia = m.id_materia AND m.activo = TRUE -- <--- Aquí va el filtro
     LEFT JOIN Institucion i ON u.id_institucion = i.id_institucion
-    WHERE u.id_institucion = $1 AND u.rol = 'docente' AND u.activo = TRUE AND d.estado = TRUE;
+    WHERE u.id_institucion = $1 
+      AND u.rol = 'docente' 
+      AND u.activo = TRUE
   `;
   const result = await consultarDB(query, [institucion]);
 
+  // Agrupar por docente
   const profesores = {};
   result.forEach((row) => {
     if (!profesores[row.documento_identidad]) {
@@ -604,14 +611,14 @@ const getDocentesPorInstitucion = async (institucion) => {
         apellido: row.apellido,
         correo: row.correo,
         rol: row.rol,
-        institucion: row.institucion,
         activo: row.activo,
         color: row.color,
         area_ensenanza: row.area_ensenanza,
         materias: [],
       };
     }
-    if (row.id_materia) {
+    // Solo agrega la materia si existe (ya solo serán activas)
+    if (row.id_materia && row.materia) {
       profesores[row.documento_identidad].materias.push({
         id_materia: row.id_materia,
         nombre_materia: row.materia,
