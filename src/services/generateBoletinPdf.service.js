@@ -27,7 +27,7 @@ const generateBoletinPdf = async (documento_identidad) => {
   try {
     const infoQuery = `
       SELECT u.documento_identidad, u.nombre, u.apellido, u.correo, u.id_institucion,
-             c.nombre AS curso,
+             c.nombre AS curso, c.id_curso,
              i.nombre AS institucion, i.logo, i.color_principal, i.color_secundario, i.fondo,
              i.color_pildora1, i.color_pildora2, i.color_pildora3
       FROM Usuario u
@@ -128,20 +128,33 @@ const generateBoletinPdf = async (documento_identidad) => {
     
     // Calcular el puesto académico del estudiante
     const puestoQuery = `
-      SELECT e.documento_identidad, 
-             ROUND(SUM(c.nota * (a.peso / 100.0)) / COUNT(DISTINCT a.id_materia), 2) AS promedio
-      FROM Estudiante e
-      JOIN Calificacion c ON e.documento_identidad = c.id_estudiante AND c.activo = TRUE
-      JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
-      WHERE e.id_curso = $1
-      GROUP BY e.documento_identidad
-      ORDER BY promedio DESC, e.documento_identidad ASC;
+      WITH promedio_por_materia AS (
+        SELECT 
+          e.documento_identidad,
+          a.id_materia,
+          SUM(c.nota * (a.peso / 100.0)) AS promedio_materia
+        FROM Estudiante e
+        JOIN Calificacion c ON e.documento_identidad = c.id_estudiante AND c.activo = TRUE
+        JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
+        WHERE e.id_curso = $1
+        GROUP BY e.documento_identidad, a.id_materia
+      ),
+      promedios_finales AS (
+        SELECT 
+          documento_identidad,
+          ROUND(AVG(promedio_materia), 2) AS promedio
+        FROM promedio_por_materia
+        GROUP BY documento_identidad
+      )
+      SELECT * 
+      FROM promedios_finales
+      ORDER BY promedio DESC, documento_identidad ASC;
     `;
     const estudiantesCurso = await consultarDB(puestoQuery, [estudiante.id_curso]);
 
     let puesto = 1;
     for (let i = 0; i < estudiantesCurso.length; i++) {
-      if (estudiantesCurso[i].documento_identidad === documento_identidad) {
+      if (String(estudiantesCurso[i].documento_identidad) === String(documento_identidad)) {
         puesto = i + 1;
         break;
       }
