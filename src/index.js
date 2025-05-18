@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const http = require("http");
 const cors = require('cors');
-const pool = require('./db');
 const testRoute = require('./Routes/testRoute');
 const mainRoutes = require('./Routes/main.routes');
 const usuarioRoutes = require('./Routes/usuario.routes');
@@ -35,6 +34,10 @@ app.use(cors());
 app.use(express.json());
 app.use('/', mainRoutes);
 const server = http.createServer(app);
+
+app.get('/health', (req, res) => {
+  res.send('OK');
+});
 
 initializeSocket(server);
 
@@ -95,6 +98,10 @@ app.use("/api-docs", swaggerRoutes);
 // Usar el puerto asignado por Vercel o el puerto 5000 en desarrollo
 const PORT = process.env.PORT || 5000;
 
+console.log("Iniciando backend PRAE...");
+
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
+

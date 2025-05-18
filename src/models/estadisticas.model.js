@@ -102,48 +102,62 @@ const getEstadisticasAdmin = async (id_institucion) => {
     );
 
     // Promedio de notas por grado (filtrando por periodo activo)
-    const promedioNotasPorGradoQuery = `
-      SELECT c.nombre AS curso, ROUND(AVG(cal.nota), 2) AS promedio
-      FROM Calificacion cal
-      JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
-      JOIN Curso c ON e.id_curso = c.id_curso
-      JOIN Actividades a ON cal.id_actividad = a.id_actividad
-      WHERE c.id_institucion = $1
-        AND cal.activo = TRUE
-        AND a.id_periodo = (SELECT id_periodo FROM PeriodoAcademico WHERE id_institucion = $1 AND estado = TRUE LIMIT 1)  -- Filtra por el periodo activo
-      GROUP BY c.id_curso;
-    `;
+    const promedioNotasPorGradoAjustado = {};
 
-    const promedioNotasPorGrado = await safeConsultarDB(
-      promedioNotasPorGradoQuery,
-      [id_institucion]
-    );
+    for (const curso in promedioNotasPorMateriaAjustado) {
+      const materias = promedioNotasPorMateriaAjustado[curso];
+      const promedios = Object.values(materias).map((n) => parseFloat(n));
 
-    // Ajustar el formato de promedio_notas_por_grado
-    const promedioNotasPorGradoAjustado = promedioNotasPorGrado.reduce(
-      (acc, item) => {
-        const { curso, promedio } = item;
-        acc[curso] = promedio;
-        return acc;
-      },
-      {}
-    );
+      if (promedios.length > 0) {
+        const suma = promedios.reduce((acc, val) => acc + val, 0);
+        const promedio = (suma / promedios.length).toFixed(2);
+        promedioNotasPorGradoAjustado[curso] = promedio;
+      } else {
+        promedioNotasPorGradoAjustado[curso] = "0.00";
+      }
+    }
 
     // Promedio de notas por grado acumulado (ponderado por el peso de los periodos)
     const promedioNotasPorGradoAcumuladoQuery = `
-      SELECT 
-        c.nombre AS curso, 
-        p.nombre AS periodo, 
-        p.peso AS peso_periodo,
-        ROUND(AVG(cal.nota), 2) AS promedio_periodo
-      FROM Calificacion cal
-      JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
-      JOIN Curso c ON e.id_curso = c.id_curso
-      JOIN Actividades a ON cal.id_actividad = a.id_actividad
-      JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
-      WHERE c.id_institucion = $1
-      AND cal.activo = TRUE
-      GROUP BY c.id_curso, p.id_periodo, p.nombre, p.peso;
+      WITH promedio_estudiante_materia_periodo AS (
+        SELECT 
+          c.nombre AS curso,
+          p.nombre AS periodo,
+          p.peso AS peso_periodo,
+          m.id_materia,
+          e.documento_identidad,
+          SUM(cal.nota * (a.peso / 100.0)) AS promedio_ponderado_estudiante
+        FROM Calificacion cal
+        JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
+        JOIN Curso c ON e.id_curso = c.id_curso
+        JOIN Actividades a ON cal.id_actividad = a.id_actividad
+        JOIN Materia m ON a.id_materia = m.id_materia
+        JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
+        WHERE cal.activo = TRUE
+          AND a.activo = TRUE
+          AND c.id_institucion = $1
+        GROUP BY c.nombre, p.nombre, p.peso, m.id_materia, e.documento_identidad
+      ),
+      promedio_materia_periodo AS (
+        SELECT 
+          curso,
+          periodo,
+          peso_periodo,
+          id_materia,
+          ROUND(AVG(promedio_ponderado_estudiante), 2) AS promedio_materia
+        FROM promedio_estudiante_materia_periodo
+        GROUP BY curso, periodo, peso_periodo, id_materia
+      ),
+      promedio_curso_periodo AS (
+        SELECT 
+          curso,
+          periodo,
+          peso_periodo,
+          ROUND(AVG(promedio_materia), 2) AS promedio_periodo
+        FROM promedio_materia_periodo
+        GROUP BY curso, periodo, peso_periodo
+      )
+      SELECT * FROM promedio_curso_periodo;
     `;
 
     const promedioNotasPorGradoAcumulado = await safeConsultarDB(
