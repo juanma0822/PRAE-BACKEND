@@ -207,8 +207,8 @@ router.get("/", (req, res) => {
       </div>
 
       <div id="buttons" class="buttons-container">
-        <a href="https://praeweb.netlify.app" class="btn btn-visitar-front" target="_blank">Visitar Front</a>
-        <a href="https://prae-backend.vercel.app/api-docs/" class="btn btn-visitar-doc" target="_blank">Visitar Doc</a>
+        <a href="https://praeapp.vercel.app/" class="btn btn-visitar-front" target="_blank">Visitar Front</a>
+        <a href="https://prae-backend.up.railway.app/api-docs/" class="btn btn-visitar-doc" target="_blank">Visitar Doc</a>
       </div>
 
       <div id="rutas-info" class="section">

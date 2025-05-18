@@ -1,5 +1,15 @@
 const { consultarDB } = require("../db");
 
+// Función segura para consultas a la DB
+const safeConsultarDB = async (query, params) => {
+  try {
+    const result = await consultarDB(query, params);
+    return result || []; // Retorna arreglo vacío si es null o undefined
+  } catch (error) {
+    console.error("Error en consulta a la base de datos:", error);
+    return []; // Retorna arreglo vacío para evitar bloqueo
+  }
+};
 // === ESTADÍSTICAS PARA ADMIN (POR INSTITUCIÓN) ===
 const getEstadisticasAdmin = async (id_institucion) => {
   try {
@@ -37,10 +47,10 @@ const getEstadisticasAdmin = async (id_institucion) => {
         (SELECT COUNT(*) FROM Calificacion c JOIN Actividades a ON c.id_actividad = a.id_actividad JOIN Materia m ON a.id_materia = m.id_materia WHERE m.id_institucion = $1) AS total_calificaciones
     `;
 
-    const [usuarios] = await consultarDB(query, [id_institucion]);
-    const [materias] = await consultarDB(query2, [id_institucion]);
-    const [cursos] = await consultarDB(query3, [id_institucion]);
-    const [otros] = await consultarDB(query4, [id_institucion]);
+    const [usuarios] = await safeConsultarDB(query, [id_institucion]);
+    const [materias] = await safeConsultarDB(query2, [id_institucion]);
+    const [cursos] = await safeConsultarDB(query3, [id_institucion]);
+    const [otros] = await safeConsultarDB(query4, [id_institucion]);
 
     // Estudiantes por grado
     const estudiantesPorGradoQuery = `
@@ -53,9 +63,10 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso;
     `;
 
-    const estudiantesPorGrado = await consultarDB(estudiantesPorGradoQuery, [
-      id_institucion,
-    ]);
+    const estudiantesPorGrado = await safeConsultarDB(
+      estudiantesPorGradoQuery,
+      [id_institucion]
+    );
 
     // Promedio de notas por materia
     const promedioNotasPorMateriaQuery = `
@@ -70,7 +81,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso, m.id_materia, c.nombre, m.nombre;
     `;
 
-    const promedioNotasPorMateria = await consultarDB(
+    const promedioNotasPorMateria = await safeConsultarDB(
       promedioNotasPorMateriaQuery,
       [id_institucion]
     );
@@ -103,7 +114,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso;
     `;
 
-    const promedioNotasPorGrado = await consultarDB(
+    const promedioNotasPorGrado = await safeConsultarDB(
       promedioNotasPorGradoQuery,
       [id_institucion]
     );
@@ -135,7 +146,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
       GROUP BY c.id_curso, p.id_periodo, p.nombre, p.peso;
     `;
 
-    const promedioNotasPorGradoAcumulado = await consultarDB(
+    const promedioNotasPorGradoAcumulado = await safeConsultarDB(
       promedioNotasPorGradoAcumuladoQuery,
       [id_institucion]
     );
@@ -164,7 +175,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
       WHERE id_institucion = $1;
     `;
 
-    const periodos = await consultarDB(periodosQuery, [id_institucion]);
+    const periodos = await safeConsultarDB(periodosQuery, [id_institucion]);
 
     // Asegurar que todos los periodos estén presentes y calcular el total
     for (const curso in promedioNotasPorGradoAcumuladoAjustado) {
@@ -195,7 +206,7 @@ const getEstadisticasAdmin = async (id_institucion) => {
       FROM Curso
       WHERE id_institucion = $1 AND activo= TRUE;
     `;
-    const cursosSinDatos = await consultarDB(cursosQuery, [id_institucion]);
+    const cursosSinDatos = await safeConsultarDB(cursosQuery, [id_institucion]);
 
     cursosSinDatos.forEach((curso) => {
       if (!cursosConDatos.includes(curso.curso)) {
@@ -228,9 +239,17 @@ const getEstadisticasAdmin = async (id_institucion) => {
         promedioNotasPorGradoAcumuladoAjustado,
     };
   } catch (error) {
-    throw new Error(
-      `Error al obtener estadísticas del admin: ${error.message}`
-    );
+    console.error("Error al obtener estadísticas del admin:", error);
+    return {
+      usuarios: null,
+      materias: null,
+      cursos: null,
+      otros: null,
+      estudiantes_por_grado: {},
+      promedio_notas_por_materia: {},
+      promedio_notas_por_grado: {},
+      promedio_notas_por_grado_acumulado: {},
+    };
   }
 };
 

@@ -279,36 +279,38 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
 
 
 const selectPromedioCursoMateria = async (id_materia, id_curso) => {
-  // Consulta para obtener los promedios por periodo
   const query = `
-    SELECT 
-      p.nombre AS periodo,
-      p.peso AS peso_periodo,
-      ROUND(AVG(COALESCE(c.nota, 0) * (a.peso / 100.0)), 2) AS promedio_base
-    FROM Estudiante e
-    JOIN Actividades a ON a.id_materia = $1 AND a.id_curso = $2 AND a.activo = TRUE
-    LEFT JOIN Calificacion c 
-      ON c.id_actividad = a.id_actividad 
-      AND c.id_estudiante = e.documento_identidad 
-      AND c.activo = TRUE
-    JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
-    WHERE e.id_curso = $2
-    GROUP BY p.id_periodo, p.nombre, p.peso;
+    WITH promedio_por_estudiante_periodo AS (
+      SELECT 
+        p.id_periodo,
+        p.nombre AS periodo,
+        p.peso AS peso_periodo,
+        e.documento_identidad,
+        COALESCE(SUM(c.nota * (a.peso / 100.0)), 0) AS promedio_ponderado_estudiante
+      FROM PeriodoAcademico p
+      JOIN Actividades a ON a.id_periodo = p.id_periodo AND a.id_materia = $1 AND a.id_curso = $2 AND a.activo = TRUE
+      JOIN Estudiante e ON e.id_curso = $2
+      JOIN Usuario u ON e.documento_identidad = u.documento_identidad AND u.activo = TRUE
+      LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad AND c.activo = TRUE
+      GROUP BY p.id_periodo, p.nombre, p.peso, e.documento_identidad
+    )
+    SELECT
+      periodo,
+      peso_periodo,
+      ROUND(AVG(promedio_ponderado_estudiante), 2) AS promedio_base
+    FROM promedio_por_estudiante_periodo
+    GROUP BY periodo, peso_periodo
+    ORDER BY periodo;
   `;
 
   const rows = await consultarDB(query, [id_materia, id_curso]);
 
-  // Calcular el promedio ponderado por periodo y el promedio general
   let promedioGeneral = 0;
 
-  const promediosPorPeriodo = rows.map((row) => {
-    const { periodo, peso_periodo, promedio_base } = row;
-    const pesoDecimal = peso_periodo / 100; // Convertir el peso a decimal
+  const promediosPorPeriodo = rows.map(({ periodo, peso_periodo, promedio_base }) => {
+    const pesoDecimal = peso_periodo / 100;
     const promedioPonderado = parseFloat((promedio_base * pesoDecimal).toFixed(2));
-
-    // Sumar al promedio general
     promedioGeneral += promedioPonderado;
-
     return {
       periodo,
       promedioBase: parseFloat(promedio_base),
@@ -316,12 +318,12 @@ const selectPromedioCursoMateria = async (id_materia, id_curso) => {
     };
   });
 
-  // Construir la respuesta final
   return {
     promediosPorPeriodo,
     promedioGeneral: parseFloat(promedioGeneral.toFixed(2)),
   };
 };
+
 
 const getCalificacionById = async (id_calificacion) => {
   const query = `
