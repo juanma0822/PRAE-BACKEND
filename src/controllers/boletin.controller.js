@@ -1,7 +1,7 @@
 const { generateBoletinPdf } = require('../services/generateBoletinPdf.service');
 
 const getBoletinPdfEstudiante = async (req, res) => {
-  const documento_identidad = req.params; 
+  const {documento_identidad} = req.params; 
   try {
     const pdfBuffer = await generateBoletinPdf(documento_identidad);
 

@@ -40,6 +40,17 @@ const generateBoletinPdf = async (documento_identidad) => {
 
     if (!estudiante) throw new Error('Estudiante no encontrado o inactivo');
 
+    // 1. Obtener el periodo vigente (estado = TRUE)
+    const periodoQuery = `
+      SELECT id_periodo, nombre 
+      FROM PeriodoAcademico 
+      WHERE id_institucion = $1 AND estado = TRUE
+      LIMIT 1;
+    `;
+    const [periodoVigente] = await consultarDB(periodoQuery, [estudiante.id_institucion]);
+    if (!periodoVigente) throw new Error('No hay periodo académico vigente');
+
+    // 2. Traer solo las notas del periodo vigente
     const notasQuery = `
       SELECT 
         m.nombre AS materia, 
@@ -52,14 +63,15 @@ const generateBoletinPdf = async (documento_identidad) => {
         up.apellido AS apellido_profe
       FROM Calificacion c
       INNER JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
-      INNER JOIN Materia m ON a.id_materia = m.id_materia
+      INNER JOIN Materia m ON a.id_materia = m.id_materia AND m.activo = TRUE
       INNER JOIN Profesor p ON a.id_docente = p.documento_identidad
       INNER JOIN Usuario up ON p.documento_identidad = up.documento_identidad
       WHERE c.id_estudiante = $1 
         AND c.activo = TRUE
+        AND a.id_periodo = $2
       ORDER BY m.nombre, a.nombre;
     `;
-    const notas = await consultarDB(notasQuery, [documento_identidad]);
+    const notas = await consultarDB(notasQuery, [documento_identidad, periodoVigente.id_periodo]);
 
     // Calcular promedios
     const materiasMap = {};
@@ -160,7 +172,12 @@ const generateBoletinPdf = async (documento_identidad) => {
     html = html.replace('{{PROMEDIO_ESTUDIANTE}}', promedioEstudiante);
     html = html.replace('{{PUESTO}}', puesto);
 
-    let tablasHTML = '';
+     // --- Generar el HTML de las materias ---
+    let tablasHTML = `
+      <div style="text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 20px;">
+        ${periodoVigente.nombre}
+      </div>
+    `;
     Object.entries(materiasMap).forEach(([nombreMateria, info]) => {
       const headerColor = info.color;
       const softColor = lightenColor(headerColor, 80);
