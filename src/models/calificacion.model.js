@@ -37,7 +37,7 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
 ) => {
   // Obtener los periodos de la institución
   const periodosQuery = `
-    SELECT id_periodo, nombre, estado
+    SELECT id_periodo, nombre, peso, estado
     FROM PeriodoAcademico
     WHERE id_institucion = $1;
   `;
@@ -73,24 +73,46 @@ const selectCalificacionesEstudiantePorDocenteEInstitucion = async (
       ORDER BY a.nombre ASC;
     `;
 
-    const result = await consultarDB(queryWithActivities, [
+    const actividades = await consultarDB(queryWithActivities, [
       id_materia,
       id_estudiante,
       id_docente,
       periodo.id_periodo,
-      id_curso, // Ahora sí lo tienes aquí
+      id_curso,
     ]);
 
-    resultByPeriod[periodo.id_periodo] = {
-      estado: periodo.estado,
-      nombre: periodo.nombre,
-      actividades: result.map((row) => ({
+    // Cálculo del promedio del periodo y valor neto
+    let sumaPonderada = 0;
+    let sumaPesos = 0;
+
+    const actividadesProcesadas = actividades.map((row) => {
+      const peso = parseFloat(row.peso) || 0;
+      const nota = parseFloat(row.nota) || 0;
+      const valorFinal = (nota * peso) / 100;
+
+      sumaPonderada += valorFinal;
+      sumaPesos += peso;
+
+      return {
         id_actividad: row.id_actividad,
         actividad: row.actividad,
         peso: row.peso,
         nota: row.nota,
         id_calificacion: row.id_calificacion,
-      })),
+        valorFinal: valorFinal.toFixed(2)
+      };
+    });
+
+    const promedio_periodo = sumaPesos > 0 ? (sumaPonderada).toFixed(2) : "0.00";
+    const valor_neto = (parseFloat(promedio_periodo) * (parseFloat(periodo.peso) / 100)).toFixed(2);
+
+    resultByPeriod[periodo.id_periodo] = {
+      estado: periodo.estado,
+      nombre: periodo.nombre,
+      peso: periodo.peso,
+      promedio_periodo,
+      valor_neto,
+      actividades: actividadesProcesadas,
     };
   }
 
