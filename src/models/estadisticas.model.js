@@ -435,9 +435,11 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
         JOIN Asignar asg ON asg.id_curso = cu.id_curso AND asg.estado = TRUE
         JOIN Materia m ON m.id_materia = asg.id_materia AND m.activo = TRUE
         LEFT JOIN Actividades a ON a.id_materia = m.id_materia AND a.activo = TRUE
+        JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo 
         LEFT JOIN Calificacion c ON c.id_actividad = a.id_actividad AND c.id_estudiante = e.documento_identidad AND c.activo = TRUE
         LEFT JOIN Usuario u ON a.id_docente = u.documento_identidad
         WHERE e.documento_identidad = $1
+          AND p.estado = TRUE
         GROUP BY m.id_materia, m.nombre, a.id_docente, u.nombre, u.apellido
       ),
 
@@ -465,7 +467,7 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
           p.nombre AS periodo,
           ROUND(AVG(c.nota), 2) AS promedio_periodo
         FROM Calificacion c
-        JOIN Actividades a ON c.id_actividad = a.id_actividad
+        JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
         JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
         WHERE c.id_estudiante = $1 AND c.activo = TRUE
         GROUP BY p.id_periodo, p.nombre
@@ -475,7 +477,7 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
         SELECT 
           ROUND(AVG(c.nota), 2) AS promedio_actual
         FROM Calificacion c
-        JOIN Actividades a ON c.id_actividad = a.id_actividad
+        JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
         JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
         WHERE c.id_estudiante = $1 AND c.activo = TRUE AND p.estado = TRUE
       ),
@@ -484,7 +486,10 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
         SELECT
           (SELECT COUNT(*) FROM Asignar a JOIN Estudiante e ON a.id_curso = e.id_curso WHERE e.documento_identidad = $1 AND a.estado = TRUE) AS materias_inscritas,
           (SELECT COUNT(*) FROM Actividades a JOIN Estudiante e ON a.id_curso = e.id_curso WHERE e.documento_identidad = $1 AND a.activo = TRUE) AS actividades_asignadas,
-          (SELECT COUNT(*) FROM Calificacion WHERE id_estudiante = $1 AND activo = TRUE) AS calificaciones_recibidas,
+          (SELECT COUNT(*) FROM Calificacion c
+          JOIN Actividades a ON c.id_actividad = a.id_actividad
+          JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
+          WHERE c.id_estudiante = $1 AND c.activo = TRUE AND a.activo = TRUE AND p.estado = TRUE) AS calificaciones_recibidas,
           (SELECT COUNT(*) FROM Comentarios WHERE documento_estudiante = $1) AS comentarios_recibidos
       ),
 
@@ -495,6 +500,7 @@ const getEstadisticasEstudiante = async (documento_estudiante) => {
           SUM(c.nota * (a.peso / 100.0)) AS promedio_materia
         FROM Calificacion c
         JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
+        JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo AND p.estado = TRUE
         WHERE a.id_curso = (SELECT id_curso FROM Estudiante WHERE documento_identidad = $1)
           AND c.activo = TRUE
         GROUP BY c.id_estudiante, a.id_materia
