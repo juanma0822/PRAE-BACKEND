@@ -255,7 +255,7 @@ const selectCalificacionesCurso = async (
 
 
 const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) => {
-    const query = `
+  const query = `
     SELECT 
       p.nombre AS periodo,
       p.peso AS peso_periodo,
@@ -263,7 +263,7 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
       ROUND(AVG(c.nota) * (p.peso / 100.0), 2) AS valor_neto
     FROM Calificacion c
     JOIN Actividades a ON c.id_actividad = a.id_actividad AND a.activo = TRUE
-    JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo AND p.estado = TRUE
+    JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
     WHERE a.id_materia = $1 
       AND c.id_estudiante = $2
       AND a.id_docente = $3
@@ -274,8 +274,11 @@ const selectPromedioEstudiante = async (id_materia, id_estudiante, id_docente) =
 
   const rows = await consultarDB(query, [id_materia, id_estudiante, id_docente]);
 
-  // Calcular el promedio general (sumar los valores netos)
-  const promedio_general = rows.reduce((acc, row) => acc + parseFloat(row.valor_neto), 0).toFixed(2);
+  // Calcular el promedio general acumulado (ponderado)
+  const promedio_general = rows.reduce(
+    (acc, row) => acc + parseFloat(row.valor_neto || 0),
+    0
+  ).toFixed(2);
 
   return {
     promedio_general,
