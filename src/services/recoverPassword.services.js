@@ -1,4 +1,4 @@
-const { sendEmail, generateEmailTemplate } = require('../services/emailService');
+const { sendEmail, generateRecoverPasswordTemplate } = require('../services/emailService');
 const models = require('../models/usuario.model'); // Asegúrate de que la ruta sea correcta
 const institucionService = require('../services/institucion.service');
 const jwt = require('jsonwebtoken');
@@ -42,40 +42,25 @@ const sendRecoveryEmail = async (email) => {
 
         // Obtener los datos de la institución del usuario
         const institucion = await institucionService.getInstitucionById(isCorrect.id_institucion);
-        let { logo, nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
+        let {nombre: nombreInstitucion, telefono, instagram, facebook, direccion } = institucion;
 
-        // Usar el logo predeterminado de PRAE si no se proporciona uno
-        if (!logo) {
-            logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
-        }
+        // Usar el logo predeterminado de PRAE en BLANCO
+        logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_White.png?alt=media&token=3da2e251-2587-4c03-8496-b4b667ebd587";
+
 
         // Crear contenido principal del correo
-        const mainContent = `
-            <div style="text-align: center; padding: 20px;">
-                <img src="${logo}" alt="Logo de la Institución" style="max-width: 200px; margin-bottom: 20px;" />
-                <h1 style="color: #333;">¡Hola, ${isCorrect.nombre}!</h1>
-                <p>Has solicitado un cambio de contraseña. Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-                <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #157AFE; color: #fff; text-decoration: none; border-radius: 5px; margin-top: 20px;">Restablecer mi contraseña</a>
-                <p style="margin-top: 20px; color: #666;">Este enlace tiene una vigencia de <strong>10 minutos</strong>. Si no realizas el cambio en este tiempo, deberás solicitar un nuevo enlace.</p>
-                <p style="margin-top: 20px;">Si no solicitaste este cambio, por favor ignora este correo.</p>
-            </div>
-        `;
-
-        // Crear contenido del footer
-        const footerContent = `
-            <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 14px; color: #666;">
-                <p style="font-size: 18px; font-weight: bold;"><strong>${nombreInstitucion}</strong></p>
-                <p>Teléfono: ${telefono || 'No disponible'}</p>
-                <p>Dirección: ${direccion || 'No disponible'}</p>
-                <p>
-                    <a href="${instagram || '#'}" style="color: #157AFE; text-decoration: none;">Instagram</a> |
-                    <a href="${facebook || '#'}" style="color: #157AFE; text-decoration: none;">Facebook</a>
-                </p>
-            </div>
-        `;
-
-        // Generar plantilla completa de correo
-        const emailContent = generateEmailTemplate(mainContent, footerContent, false);
+        // Aquí generas el HTML usando el template específico para recuperación
+        const emailContent = generateRecoverPasswordTemplate({
+            nombreUsuario: isCorrect.nombre,
+            correoUsuario: email,
+            resetLink,
+            nombreInstitucion: nombreInstitucion,
+            telefonoInstitucion: telefono,
+            direccionInstitucion: direccion,
+            instagram,
+            facebook,
+            logoUrl: logo,
+        });
 
         // Enviar el correo usando el servicio de envío de correos
         await sendEmail(email, 'Recuperación de Contraseña', emailContent);
