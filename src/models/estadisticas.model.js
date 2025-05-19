@@ -70,14 +70,20 @@ const getEstadisticasAdmin = async (id_institucion) => {
 
     // Promedio de notas por materia
     const promedioNotasPorMateriaQuery = `
-      SELECT c.nombre AS curso, m.nombre AS materia, ROUND(AVG(cal.nota), 2) AS promedio_materia
+      SELECT 
+      c.nombre AS curso, 
+      m.nombre AS materia, 
+      ROUND(AVG(cal.nota), 2) AS promedio_materia
       FROM Calificacion cal
       JOIN Estudiante e ON cal.id_estudiante = e.documento_identidad
       JOIN Curso c ON e.id_curso = c.id_curso
       JOIN Actividades a ON cal.id_actividad = a.id_actividad
       JOIN Materia m ON a.id_materia = m.id_materia
+      JOIN PeriodoAcademico p ON a.id_periodo = p.id_periodo
       WHERE c.id_institucion = $1
         AND cal.activo = TRUE
+        AND a.activo = TRUE
+        AND p.estado = TRUE -- ✅ solo del periodo activo
       GROUP BY c.id_curso, m.id_materia, c.nombre, m.nombre;
     `;
 
