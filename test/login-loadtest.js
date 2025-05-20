@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export let options = {
-  vus: 10,
+  vus: 30,
   duration: '30s',
 };
 
@@ -14,7 +14,7 @@ export default function () {
 
   const headers = { 'Content-Type': 'application/json' };
 
-  const res = http.post('https://prae-backend.vercel.app/auth/Login', payload, { headers });
+  const res = http.post('https://prae-backend.up.railway.app/auth/Login', payload, { headers });
 
   console.log(`Status: ${res.status}, body: ${res.body}`);
 
