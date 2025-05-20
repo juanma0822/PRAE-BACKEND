@@ -52,6 +52,7 @@ const createAdmin = async (req, res) => {
     const emailContent = await getWelcomeTemplate(
       correo,
       contraseña,
+      nombreInstitucion,
       color_principal,
       color_pildora1,
       color_pildora2
@@ -123,13 +124,14 @@ const createProfesor = async (req, res) => {
       contraseña,
       color_principal,
       color_pildora1,
-      color_pildora2
+      color_pildora2,
+      nombreInstitucion
     );
 
     await emailService.sendEmail(
       correo,
       "Bienvenido a PRAE - Credenciales de acceso",
-      emailContentTutorial
+      emailContent
     );
 
     res.status(201).json({
@@ -194,13 +196,14 @@ const createEstudiante = async (req, res) => {
       contraseña,
       color_principal,
       color_pildora1,
-      color_pildora2
+      color_pildora2,
+      nombreInstitucion,
     );
 
     await emailService.sendEmail(
       correo,
       "Bienvenido a PRAE - Credenciales de acceso",
-      emailContentTutorial
+      emailContent
     );
 
     res.status(201).json({
