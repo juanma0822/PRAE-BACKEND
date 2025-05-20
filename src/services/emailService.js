@@ -126,20 +126,19 @@ const generateRecoverPasswordTemplate = ({
           background-color: #101523;
         }
         .template-container {
-          background-color: #1F0C46;
+          background-color: #162447; /* Azul oscuro sobrio */
           color: #FAFAFA;
         }
         a.button {
-          background-color: #AA6FF7;
+          background-color: #157AFE; /* Azul principal */
         }
         .footer {
-          background-color: #22254a;
-          color: #FFFFFF; /* Cambiado a blanco */
+          background-color: #1b263b; /* Azul más oscuro */
+          color: #FFFFFF;
         }
         .footer strong {
-          color: #AA6FF7;
+          color: #157AFE; /* Azul principal */
         }
-        /* Para los textos fuera del footer */
         .bottom-text {
           color: #FFFFFF;
         }
