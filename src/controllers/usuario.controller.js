@@ -6,6 +6,7 @@ const { emitirEstadisticasInstitucion, emitirEstadisticasEstudiante } = require(
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { console } = require("inspector");
+const { getWelcomeTemplate } = require("../services/welcomeEmailService");
 
 
 const createAdmin = async (req, res) => {
@@ -41,41 +42,12 @@ const createAdmin = async (req, res) => {
       logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
     }
 
-    // Construir el contenido principal del correo
-    const mainContent = `
-      <div style="text-align: center; padding: 20px;">
-        <img src="${logo}" alt="Logo de la Institución" style="max-width: 200px; margin-bottom: 20px;" />
-        <h1 style="color: #333;">¡Bienvenido a PRAE, ${nombre}!</h1>
-        <p>Has sido registrado como administrador en la institución <strong>${nombreInstitucion}</strong>.</p>
-        <p>Estas son tus credenciales de acceso:</p>
-        <ul style="list-style: none; padding: 0;">
-          <li><strong>Correo:</strong> ${correo}</li>
-          <li><strong>Contraseña:</strong> ${contraseña}</li>
-        </ul>
-        <p><strong>Nota:</strong> Te recomendamos cambiar esta contraseña después de tu primer inicio de sesión.</p>
-      </div>
-    `;
+    // Obtener HTML de plantilla con correo y contraseña reemplazados
+    const emailContent = await getWelcomeTemplate(correo, contraseña);
 
-    // Construir el contenido del footer
-    const footerContent = `
-      <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 14px; color: #666;">
-        <p style="font-size: 18px; font-weight: bold;"><strong>${nombreInstitucion}</strong></p>
-        <p>Teléfono: ${telefono || 'No disponible'}</p>
-        <p>Dirección: ${direccion || 'No disponible'}</p>
-        <p>
-          <a href="${instagram || '#'}" style="color: #157AFE; text-decoration: none;">Instagram</a> |
-          <a href="${facebook || '#'}" style="color: #157AFE; text-decoration: none;">Facebook</a>
-        </p>
-      </div>
-    `;
-
-    // Generar el correo completo usando la plantilla genérica
-    const emailContent = emailService.generateEmailTemplate(mainContent, footerContent);
-
-    // Enviar el correo al administrador
     await emailService.sendEmail(
       correo,
-      "Credenciales de acceso a PRAE",
+      "Bienvenido a PRAE - Credenciales de acceso",
       emailContent
     );
 
@@ -125,6 +97,14 @@ const createProfesor = async (req, res) => {
       logo = "https://firebasestorage.googleapis.com/v0/b/praeweb-a1526.firebasestorage.app/o/logos%2FLOGO_SOMBRERO.svg?alt=media&token=d2e2d361-8a9f-45e0-857d-2e7408c9422d";
     }
 
+    // Obtener HTML de plantilla con correo y contraseña reemplazados (tutorial)
+    const emailContentTutorial = await getWelcomeTemplate(correo, contraseña);
+
+    await emailService.sendEmail(
+      correo,
+      "Bienvenido a PRAE - Credenciales de acceso",
+      emailContentTutorial
+    );
     // Construir el contenido principal del correo
     const mainContent = `
       <div style="text-align: center; padding: 20px;">
@@ -209,6 +189,15 @@ const createEstudiante = async (req, res) => {
     const curso = await cursoService.getCursoById(id_curso);
     const nombreCurso = curso?.nombre || 'Curso desconocido';
 
+    // Obtener HTML de plantilla con correo y contraseña reemplazados (tutorial)
+    const emailContentTutorial = await getWelcomeTemplate(correo, contraseña);
+
+    await emailService.sendEmail(
+      correo,
+      "Bienvenido a PRAE - Credenciales de acceso",
+      emailContentTutorial
+    );
+
     // Construir el contenido principal del correo
     const mainContent = `
       <div style="text-align: center; padding: 20px;">
@@ -240,7 +229,7 @@ const createEstudiante = async (req, res) => {
     // Enviar el correo
     await emailService.sendEmail(
       correo,
-      'Bienvenido a nuestra aplicación',
+      'Credenciales de acceso PRAE - ESTUDIANTE',
       emailContent
     );
 

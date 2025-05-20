@@ -35,7 +35,7 @@ const adminMiddleware = require("../middleware/admin.middleware");
  *       401:
  *         description: Token inválido o expirado
  *       403:
- *         description: Acceso denegado: No tienes permisos de administrador
+ *         description: "Acceso denegado: No tienes permisos de administrador"
  *       500:
  *         description: Error al generar el boletín
  */
