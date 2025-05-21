@@ -52,10 +52,10 @@ const createAdmin = async (req, res) => {
     const emailContent = await getWelcomeTemplate(
       correo,
       contraseña,
-      nombreInstitucion,
       color_principal,
       color_pildora1,
-      color_pildora2
+      color_pildora2,
+      nombreInstitucion 
     );
 
     await emailService.sendEmail(

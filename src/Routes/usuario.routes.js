@@ -26,7 +26,7 @@ const {
 
 /**
  * @swagger
- * /usuarios/admin:
+ * /usuario/admin:
  *   post:
  *     summary: Crea un nuevo administrador
  *     tags: [Usuarios - POST]
@@ -56,7 +56,7 @@ router.post('/admin', createAdmin);
 /**
 /**
  * @swagger
- * /usuarios/updatePassword:
+ * /usuario/updatePassword:
  *   put:
  *     summary: Actualiza la contraseña de un usuario
  *     tags: [Usuarios - PUT]
@@ -81,7 +81,7 @@ router.put('/updatePassword', verifyRecoveryToken, updatePassword);
 
 /**
  * @swagger
- * /usuarios/docente:
+ * /usuario/docente:
  *   post:
  *     summary: Crea un nuevo docente
  *     tags: [Usuarios - POST]
@@ -114,7 +114,7 @@ router.post('/docente', verifyToken, createProfesor);
 
 /**
  * @swagger
- * /usuarios/estudiante:
+ * /usuario/estudiante:
  *   post:
  *     summary: Crea un nuevo estudiante
  *     tags: [Usuarios - POST]
@@ -147,7 +147,7 @@ router.post('/estudiante', verifyToken, createEstudiante);
 
 /**
  * @swagger
- * /usuarios:
+ * /usuario:
  *   get:
  *     summary: Obtiene la lista de usuarios
  *     tags: [Usuarios - GET]
@@ -159,7 +159,7 @@ router.get('/', verifyToken, getUsuarios);
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /usuario/{id}:
  *   put:
  *     summary: Actualiza un usuario por su ID
  *     tags: [Usuarios - PUT]
@@ -197,7 +197,7 @@ router.put('/:id', verifyToken, updateUsuario);
 
 /**
  * @swagger
- * /usuarios/{id}:
+ * /usuario/{id}:
  *   delete:
  *     summary: Elimina un usuario por su ID
  *     tags: [Usuarios - DELETE]
@@ -216,7 +216,7 @@ router.delete('/:id', verifyToken, deleteUsuario);
 
 /**
  * @swagger
- * /usuarios/activar/{documento_identidad}:
+ * /usuario/activar/{documento_identidad}:
  *   put:
  *     summary: Activa un usuario por su documento de identidad
  *     tags: [Usuarios - PUT]
@@ -235,7 +235,7 @@ router.put('/activar/:documento_identidad', verifyToken, activarUsuario);
 
 /**
  * @swagger
- * /usuarios/admins:
+ * /usuario/admins:
  *   get:
  *     summary: Obtiene la lista de administradores
  *     tags: [Usuarios - GET]
@@ -247,7 +247,7 @@ router.get('/admins', verifyToken, getAdmins);
 
 /**
  * @swagger
- * /usuarios/docentes:
+ * /usuario/docentes:
  *   get:
  *     summary: Obtiene la lista de docentes
  *     tags: [Usuarios - GET]
@@ -259,7 +259,7 @@ router.get('/docentes', verifyToken, getDocentes);
 
 /**
  * @swagger
- * /usuarios/estudiantes:
+ * /usuario/estudiantes:
  *   get:
  *     summary: Obtiene la lista de estudiantes
  *     tags: [Usuarios - GET]
@@ -271,7 +271,7 @@ router.get('/estudiantes', verifyToken, getEstudiantes);
 
 /**
  * @swagger
- * /usuarios/updateAdmin/{documento_identidad}:
+ * /usuario/updateAdmin/{documento_identidad}:
  *   put:
  *     summary: Actualiza los datos de un administrador
  *     tags: [Usuarios - PUT]
@@ -307,7 +307,7 @@ router.put("/updateAdmin/:documento_identidad", verifyToken, updateAdmin);
 
 /**
  * @swagger
- * /usuarios/updateProfesor/{documento_identidad}:
+ * /usuario/updateProfesor/{documento_identidad}:
  *   put:
  *     summary: Actualiza los datos de un profesor
  *     tags: [Usuarios - PUT]
@@ -345,7 +345,7 @@ router.put("/updateProfesor/:documento_identidad", verifyToken, updateProfesor);
 
 /**
  * @swagger
- * /usuarios/updateEstudiante/{documento_identidad}:
+ * /usuario/updateEstudiante/{documento_identidad}:
  *   put:
  *     summary: Actualiza los datos de un estudiante
  *     tags: [Usuarios - PUT]
@@ -383,7 +383,7 @@ router.put("/updateEstudiante/:documento_identidad", verifyToken, updateEstudian
 
 /**
  * @swagger
- * /usuarios/institucion/{id_institucion}:
+ * /usuario/institucion/{id_institucion}:
  *   get:
  *     summary: Obtiene los estudiantes de una institución
  *     tags: [Usuarios - GET]
@@ -402,7 +402,7 @@ router.get('/institucion/:id_institucion', verifyToken, getEstudiantesPorInstitu
 
 /**
  * @swagger
- * /usuarios/profesor/{documento_profe}/estudiantes:
+ * /usuario/profesor/{documento_profe}/estudiantes:
  *   get:
  *     summary: Obtiene los estudiantes asociados a los cursos de un profesor
  *     tags: [Usuarios - GET]
@@ -462,7 +462,7 @@ router.get('/profesor/:documento_profe/estudiantes', verifyToken, getEstudiantes
 
 /**
  * @swagger
- * /usuarios/profesor/{id}:
+ * /usuario/profesor/{id}:
  *   get:
  *     summary: Obtiene un profesor por su ID
  *     tags: [Usuarios - GET]
@@ -481,7 +481,7 @@ router.get('/profesor/:documento_identidad', verifyToken, getProfesorById);
 
 /**
  * @swagger
- * /usuarios/estudiante/{id}:
+ * /usuario/estudiante/{id}:
  *   get:
  *     summary: Obtiene un estudiante por su ID
  *     tags: [Usuarios - GET]
@@ -500,7 +500,7 @@ router.get('/estudiante/:id', verifyToken, getEstudianteById);
 
 /**
  * @swagger
- * /usuarios/docentes/institucion/{id_institucion}:
+ * /usuario/docentes/institucion/{id_institucion}:
  *   get:
  *     summary: Obtiene los docentes de una institución
  *     tags: [Usuarios - GET]
