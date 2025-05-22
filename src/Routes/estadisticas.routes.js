@@ -2,10 +2,37 @@ const express = require('express');
 const router = express.Router();
 const {
   getEstadisticasAdmin,
+  exportarEstadisticasExcel,
   getEstadisticasProfesor,
   getEstadisticasEstudiante,
 } = require('../controllers/estadisticas.controller');
 const verifyToken = require("../middleware/auth.middleware");
+
+/**
+ * @swagger
+ * /estadisticas/admin/{id_institucion}/excel:
+ *   get:
+ *     summary: Obtiene estadísticas para el administrador de una institución en formato EXCEL
+ *     tags: [Estadísticas - GET]
+ *     parameters:
+ *       - in: path
+ *         name: id_institucion
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la institución
+ *     responses:
+ *       200:
+ *         description: Archivo Excel generado correctamente
+ *         content:
+ *           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.get('/admin/:id_institucion/excel', exportarEstadisticasExcel);
 
 /**
  * @swagger
