@@ -1,0 +1,39 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main  # Se ejecuta solo cuando haces push a la rama main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Google Cloud credentials
+        uses: google-github-actions/setup-gcloud@v0.5.1
+        with:
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCLOUD_CREDENTIALS }}
+      
+      - name: Set environment variables
+        run: echo "GCP_PROJECT_ID=${{ secrets.GCLOUD_PROJECT_ID }}" >> $GITHUB_ENV
+
+      - name: Build Docker image
+        run: |
+          docker build -t gcr.io/$GCP_PROJECT_ID/mi-backend-prae .
+
+      - name: Push Docker image to Google Container Registry
+        run: |
+          docker push gcr.io/$GCP_PROJECT_ID/mi-backend-prae
+
+      - name: Deploy to Google Cloud Run
+        run: |
+          gcloud run deploy mi-backend-prae \
+            --image gcr.io/$GCP_PROJECT_ID/mi-backend-prae \
+            --platform managed \
+            --region us-central1 \
+            --allow-unauthenticated \
+            --port 5000
