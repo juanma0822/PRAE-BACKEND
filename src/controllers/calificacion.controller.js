@@ -3,7 +3,7 @@ const usuarioService = require("../services/usuario.service");
 const emailService = require("../services/emailService");
 const actividadService = require("../services/actividad.service");
 const { getIo } = require("../sockets/sockets");
-const { emitirEstadisticasProfesor, emitirEstadisticasEstudiante } = require("../sockets/emitStats");
+const { emitirEstadisticasProfesor, emitirEstadisticasEstudiante, emitirEstadisticasInstitucion } = require("../sockets/emitStats");
 
 const asignarCalificacion = async (req, res) => {
   try {
@@ -24,6 +24,9 @@ const asignarCalificacion = async (req, res) => {
     const actividad = await actividadService.getActividadById(id_actividad);
     const { nombre_actividad, nombre_materia, id_docente } = actividad;
 
+    const estudiante = await usuarioService.getEstudianteById(id_estudiante);
+    const { correo, id_institucion} = estudiante;
+
     const mainContent = `
       <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; text-align: center; padding: 20px;">
         <h2 style="color: #157AFE;">¡Nueva calificación asignada!</h2>
@@ -32,8 +35,6 @@ const asignarCalificacion = async (req, res) => {
       </div>`;
 
     const emailContent = emailService.generateEmailTemplate(mainContent, "");
-    const estudiante = await usuarioService.getEstudianteById(id_estudiante);
-    const { correo } = estudiante;
 
     await emailService.sendEmail(
       correo,
@@ -43,6 +44,7 @@ const asignarCalificacion = async (req, res) => {
     getIo().to(id_estudiante).emit("nuevaCalificacion", nuevaCalificacion);
     await emitirEstadisticasProfesor(id_docente);
     await emitirEstadisticasEstudiante(id_estudiante);
+    await emitirEstadisticasInstitucion(id_institucion);
 
 
     res.status(201).json(nuevaCalificacion);
@@ -76,6 +78,11 @@ const actualizarCalificacion = async (req, res) => {
     );
     const actividad = await actividadService.getActividadById(id_actividad);
     const { id_docente } = actividad;
+
+    const estudiante = await usuarioService.getEstudianteById(id_estudiante);
+    const { id_institucion } = estudiante;
+
+    await emitirEstadisticasInstitucion(id_institucion);
 
     // Emitir estadísticas al profesor
     await emitirEstadisticasProfesor(id_docente);
