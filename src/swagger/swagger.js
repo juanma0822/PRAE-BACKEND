@@ -15,7 +15,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: "https://mi-backend-prae-55793889802.us-central1.run.app",
+        url: "https://prae-backend-55793889802.us-south1.run.app",
         description: "Servidor en Produccion",
       },
       {
