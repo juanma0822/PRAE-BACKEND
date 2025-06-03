@@ -84,6 +84,7 @@ const actualizarCalificacion = async (req, res) => {
 
     await emitirEstadisticasInstitucion(id_institucion);
 
+
     // Emitir estadísticas al profesor
     await emitirEstadisticasProfesor(id_docente);
 

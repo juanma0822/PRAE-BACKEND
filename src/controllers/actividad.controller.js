@@ -1,5 +1,6 @@
 const actividadService = require('../services/actividad.service');
-const { emitirEstadisticasProfesor } = require('../sockets/emitStats');
+const materiaService = require('../services/materia.service');
+const { emitirEstadisticasProfesor, emitirEstadisticasInstitucion } = require('../sockets/emitStats');
 
 const crearActividad = async (req, res) => {
   try {
@@ -16,6 +17,7 @@ const crearActividad = async (req, res) => {
       id_institucion // Pasar el id_institucion para obtener el periodo activo
     );
 
+    await emitirEstadisticasInstitucion(id_institucion);
     // Emitir estadísticas al docente
     await emitirEstadisticasProfesor(id_docente);
 
@@ -49,7 +51,19 @@ const actualizarActividad = async (req, res) => {
     try {
         const { id_actividad } = req.params;
         const { nombre, peso, id_docente } = req.body;
+
+        // Obtener la actividad antes de actualizar para saber la materia
+        const actividad = await actividadService.getActividadById(id_actividad);
+        // Obtener la materia para saber la institución
+        const materia = await materiaService.getMateriaById(actividad.id_materia);
+        const id_institucion = materia.id_institucion;
+
         const actividadActualizada = await actividadService.actualizarActividad(id_actividad, nombre, peso, id_docente);
+
+        // Emitir estadísticas
+        await emitirEstadisticasProfesor(id_docente);
+        await emitirEstadisticasInstitucion(id_institucion);
+
         res.status(200).json(actividadActualizada);
     } catch (error) {
         res.status(500).json({ error: 'Error al actualizar la actividad' });
@@ -60,11 +74,17 @@ const eliminarActividad = async (req, res) => {
   try {
     const { id_actividad } = req.params;
 
+    // Obtener la actividad antes de eliminar para saber la materia y docente
+    const actividad = await actividadService.getActividadById(id_actividad);
+    const materia = await materiaService.getMateriaById(actividad.id_materia);
+    const id_institucion = materia.id_institucion;
+
     const actividadEliminada = await actividadService.eliminarActividad(id_actividad);
 
     if (actividadEliminada?.id_docente) {
       await emitirEstadisticasProfesor(actividadEliminada.id_docente);
     }
+    await emitirEstadisticasInstitucion(id_institucion);
 
     res.status(200).json({
       message: 'Actividad eliminada correctamente',
