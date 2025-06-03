@@ -198,7 +198,7 @@ router.get("/", (req, res) => {
         </p>
         <p>
           Nuestra API permite la gestión de cursos, materias, actividades, calificaciones, usuarios,
-          periodos académicos, generación de boletines y mucho más, todo en una estructura moderna y escalable.
+          periodos académicos, generación de boletines y mucho más, todo en una estructura moderna, escalable y conectada en tiempo real.
         </p>
         <p>
           Además, incorporamos WebSockets para estadísticas en tiempo real, generación de PDFs con Puppeteer,
