@@ -6,7 +6,7 @@ export let options = {
   duration: '30s',
 };
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://prae-backend-55793889802.us-south1.run.app';
 
 export default function () {
   const headers = {
@@ -23,7 +23,7 @@ export default function () {
 
   check(res, {
     '✅ Status 200': (r) => r.status === 200,
-    '⚡ Tiempo < 500ms': (r) => r.timings.duration < 500,
+    '⚡ Tiempo < 1000ms': (r) => r.timings.duration < 1000,
   });
 
   sleep(1);
