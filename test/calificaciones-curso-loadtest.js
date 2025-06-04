@@ -6,7 +6,7 @@ export let options = {
   duration: '30s',
 };
 
-const BASE_URL = 'https://prae-backend.up.railway.app';
+const BASE_URL = 'http://localhost:5000';
 
 export default function () {
   const headers = {
@@ -15,7 +15,7 @@ export default function () {
   };
 
   const res = http.get(
-    `${BASE_URL}/calificacion/materia/:id_materia/curso/:id_curso/docente/:docuemento_docente/institucion/:id_institucion`,
+    `${BASE_URL}/calificacion/materia/:id_materia/curso/:id_curso/docente/:documento_docente/institucion/:id_institucion`,
     { headers }
   );
 

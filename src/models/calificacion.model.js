@@ -370,6 +370,73 @@ const getCalificacionById = async (id_calificacion) => {
   return result[0];
 };
 
+//PRUEBAS DE CARGA - OPTIMIZADO
+const selectCalificacionesCursoOptimizado = async (
+  id_materia,
+  id_curso,
+  id_docente,
+  id_institucion
+) => {
+  const query = `
+    SELECT
+      p.id_periodo,
+      p.nombre AS periodo_nombre,
+      p.estado AS periodo_estado,
+      e.id_curso,
+      u.documento_identidad,
+      u.nombre AS estudiante_nombre,
+      u.apellido AS estudiante_apellido,
+      COALESCE(
+        json_agg(
+          json_build_object(
+            'id_actividad', a.id_actividad,
+            'actividad', a.nombre,
+            'peso', a.peso,
+            'nota', COALESCE(ca.nota, 0),
+            'id_calificacion', ca.id_calificacion
+          )
+        ) FILTER (WHERE a.id_actividad IS NOT NULL),
+        '[]'
+      ) AS actividades
+    FROM PeriodoAcademico p
+    JOIN Curso cu ON cu.id_institucion = p.id_institucion -- Relacionar curso con institución
+    JOIN Estudiante e ON e.id_curso = cu.id_curso -- Relacionamos estudiante con curso
+    JOIN Usuario u ON u.documento_identidad = e.documento_identidad
+    LEFT JOIN Actividades a ON a.id_materia = $1 AND a.id_docente = $3 AND a.id_curso = cu.id_curso AND a.activo = TRUE AND a.id_periodo = p.id_periodo
+    LEFT JOIN Calificacion ca ON ca.id_actividad = a.id_actividad AND ca.id_estudiante = e.documento_identidad
+    WHERE cu.id_institucion = $4 AND cu.id_curso = $2 AND u.activo = TRUE -- Aquí usas correctamente el $2 (id_curso)
+    GROUP BY p.id_periodo, e.id_curso, u.documento_identidad, u.nombre, u.apellido
+    ORDER BY p.id_periodo ASC, u.apellido ASC;
+`;
+  const values = [id_materia, id_curso, id_docente, id_institucion];
+  const result = await consultarDB(query, values);
+
+  const resultByPeriod = result.reduce((acc, row) => {
+    if (!acc[row.id_periodo]) {
+      acc[row.id_periodo] = {
+        nombre: row.periodo_nombre,
+        estado: row.periodo_estado,
+        estudiantes: [],
+      };
+    }
+
+    const student = {
+      documento_identidad: row.documento_identidad,
+      nombre: row.estudiante_nombre,
+      apellido: row.estudiante_apellido,
+      id_curso: row.id_curso,
+      actividades: row.actividades,
+    };
+
+    acc[row.id_periodo].estudiantes.push(student);
+
+    return acc;
+  }, {});
+
+  return resultByPeriod;
+};
+
+
 module.exports = {
   insertCalificacion,
   updateCalificacion,
@@ -379,4 +446,5 @@ module.exports = {
   selectPromedioEstudiante,
   selectPromedioCursoMateria,
   getCalificacionById,
+  selectCalificacionesCursoOptimizado,
 };

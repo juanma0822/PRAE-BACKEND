@@ -66,6 +66,22 @@ const getCalificacionById = async (id_calificacion) => {
     return await calificacionModel.getCalificacionById(id_calificacion);
 };
 
+//Prueba optimizacion de carga de notas
+const obtenerCalificacionesCursoOptimizado = async (id_materia, id_curso, id_docente, id_institucion) => {
+  const periodoActivo = await periodoAcademicoService.getPeriodoActivoByInstitucion(id_institucion);
+  if (!periodoActivo) {
+    throw new Error('No hay un periodo activo para la institución');
+  }
+
+  return await calificacionModel.selectCalificacionesCursoOptimizado(
+    id_materia,
+    id_curso,
+    id_docente,
+    id_institucion
+  );
+};
+
+
 module.exports = {
     asignarCalificacion,
     actualizarCalificacion,
@@ -75,4 +91,5 @@ module.exports = {
     obtenerPromedioEstudiante,
     obtenerPromedioCurso,
     getCalificacionById,
+    obtenerCalificacionesCursoOptimizado,
 };

@@ -14,7 +14,7 @@ export default function () {
 
   const headers = { 'Content-Type': 'application/json' };
 
-  const res = http.post('https://prae-backend.up.railway.app/auth/Login', payload, { headers });
+  const res = http.post('http://localhost:5000/auth/Login', payload, { headers });
 
   console.log(`Status: ${res.status}, body: ${res.body}`);
 
