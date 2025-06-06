@@ -4,6 +4,7 @@ const emailService = require("../services/emailService");
 const actividadService = require("../services/actividad.service");
 const { getIo } = require("../sockets/sockets");
 const { emitirEstadisticasProfesor, emitirEstadisticasEstudiante, emitirEstadisticasInstitucion } = require("../sockets/emitStats");
+const { getNotaTemplate } = require("../services/EmailServices/calificacionEmailService");
 
 const asignarCalificacion = async (req, res) => {
   try {
@@ -25,16 +26,22 @@ const asignarCalificacion = async (req, res) => {
     const { nombre_actividad, nombre_materia, id_docente } = actividad;
 
     const estudiante = await usuarioService.getEstudianteById(id_estudiante);
-    const { correo, id_institucion} = estudiante;
+    const { correo, id_institucion } = estudiante;
 
-    const mainContent = `
-      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; text-align: center; padding: 20px;">
-        <h2 style="color: #157AFE;">¡Nueva calificación asignada!</h2>
-        <p>Se te ha asignado una calificación en la actividad <strong>${nombre_actividad}</strong> de la materia <strong>${nombre_materia}</strong>.</p>
-        <p>Revisa tus logros y sigue esforzándote. ¡Tú puedes!</p>
-      </div>`;
+    // Obtener datos de la institución para el correo
+    const institucion = await usuarioService.getUsuarioByDocumento(estudiante.documento_identidad);
+    const nombreInstitucion = institucion.nombre_institucion;
+    const logo = institucion.logo_institucion ;
 
-    const emailContent = emailService.generateEmailTemplate(mainContent, "");
+    // Obtener HTML de plantilla con todos los datos reemplazados
+    const emailContent = await getNotaTemplate(
+      correo,
+      nombreInstitucion,
+      nombre_actividad,
+      nombre_materia,
+      nota,
+      logo
+    );
 
     await emailService.sendEmail(
       correo,
@@ -45,7 +52,6 @@ const asignarCalificacion = async (req, res) => {
     await emitirEstadisticasProfesor(id_docente);
     await emitirEstadisticasEstudiante(id_estudiante);
     await emitirEstadisticasInstitucion(id_institucion);
-
 
     res.status(201).json(nuevaCalificacion);
   } catch (error) {

@@ -1,7 +1,9 @@
 const ComentarioService = require('../services/comentario.service');
 const usuarioService = require('../services/usuario.service'); 
 const emailService = require('../services/emailService'); 
+const institucionService = require('../services/institucion.service');
 const { emitirEstadisticasProfesor, emitirEstadisticasEstudiante } = require('../sockets/emitStats');
+const { getObservacionTemplate } = require("../services/EmailServices/observacionEmailService");
 
 // Crear un nuevo comentario
 const createComentario = async (req, res) => {
@@ -15,19 +17,18 @@ const createComentario = async (req, res) => {
     const estudiante = await usuarioService.getEstudianteById(documento_estudiante);
     const { correo, nombre } = estudiante;
 
-    // Construir el contenido principal del correo
-    const mainContent = `
-      <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #333; text-align: center; padding: 20px;">
-        <h2 style="color: #157AFE;">¡Nueva observación recibida!</h2>
-        <p>Hola ${nombre},</p>
-        <p>Revisa tu apartado de observaciones. Un profesor te ha hecho una nueva observación.</p>
-        <p>Estas observaciones te ayudan a mejorar tu proceso de aprendizaje y a seguir formándote constantemente.</p>
-        <p>¡Sigue esforzándote y creciendo!</p>
-      </div>
-    `;
+    const institucion = await institucionService.getInstitucionById(estudiante.id_institucion);
+    const nombreInstitucion = institucion.nombre;
+    const logoInstitucion = institucion.logo;
 
-    // Generar el correo completo usando la plantilla genérica sin footer
-    const emailContent = emailService.generateEmailTemplate(mainContent, '');
+
+    const emailContent = await getObservacionTemplate(
+      correo,
+      nombreInstitucion,
+      nombre,
+      logoInstitucion
+    );
+
 
     // Enviar el correo al estudiante
     await emailService.sendEmail(

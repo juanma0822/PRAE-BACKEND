@@ -9,7 +9,7 @@ const {
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { console } = require("inspector");
-const { getWelcomeTemplate } = require("../services/welcomeEmailService");
+const { getWelcomeTemplate } = require("../services/EmailServices/welcomeEmailService");
 
 const createAdmin = async (req, res) => {
   try {
