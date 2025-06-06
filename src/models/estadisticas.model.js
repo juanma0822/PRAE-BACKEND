@@ -350,6 +350,24 @@ const getEstadisticasProfesor = async (documento_profe) => {
     const promedio_por_curso = {};
     const acumulado_por_materia = {};
 
+    // Obtener todos los cursos activos asignados al profesor
+    const cursosAsignadosQuery = `
+      SELECT DISTINCT c.nombre AS curso
+      FROM Curso c
+      JOIN Asignar a ON a.id_curso = c.id_curso
+      WHERE a.id_docente = $1 AND a.estado = TRUE AND c.activo = TRUE
+    `;
+    const cursosAsignados = await consultarDB(cursosAsignadosQuery, [documento_profe]);
+
+    // Asegurar que todos los cursos estén en promedio_por_curso
+    cursosAsignados.forEach(({ curso }) => {
+      if (!promedio_por_curso[curso]) {
+        promedio_por_curso[curso] = {
+          promedioCurso: 0
+        };
+      }
+    });
+
     // Agrupar los resultados de calificaciones por curso y materia
     detalle.forEach(
       ({
@@ -405,6 +423,29 @@ const getEstadisticasProfesor = async (documento_profe) => {
       promedio_por_curso[curso].promedioCurso = promedioCurso;
       delete promedio_por_curso[curso].materias; // Eliminar el campo temporal
     }
+
+    // Agregar la cantidad de estudiantes a cada curso en especifico
+    const estudiantesPorCursoQuery = `
+      SELECT c.nombre AS curso, COUNT(e.documento_identidad) AS total_estudiantes
+      FROM Curso c
+      JOIN Estudiante e ON e.id_curso = c.id_curso
+      JOIN Asignar a ON a.id_curso = c.id_curso
+      WHERE a.id_docente = $1 AND a.estado = TRUE AND c.activo = TRUE
+      GROUP BY c.nombre
+    `;
+    const estudiantesPorCurso = await consultarDB(estudiantesPorCursoQuery, [documento_profe]);
+
+    // Agregar el total de estudiantes a cada curso en promedio_por_curso
+    estudiantesPorCurso.forEach(({ curso, total_estudiantes }) => {
+      if (promedio_por_curso[curso]) {
+        promedio_por_curso[curso].totalEstudiantes = Number(total_estudiantes);
+      } else {
+        promedio_por_curso[curso] = {
+          promedioCurso: 0,
+          totalEstudiantes: Number(total_estudiantes)
+        };
+      }
+    });
 
     // Retornar los resultados
     return {
