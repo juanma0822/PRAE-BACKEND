@@ -3,7 +3,7 @@ const { generateBoletinPdf, generateBoletinFinalPdf } = require('../services/gen
 const getBoletinPdfEstudiante = async (req, res) => {
   const {documento_identidad} = req.params; 
   try {
-    const pdfBuffer = await generateBoletinPdf(documento_identidad);
+    const pdfBuffer = await generateBoletinFinalPdf(documento_identidad);
 
     res.set({
       'Content-Type': 'application/pdf',
